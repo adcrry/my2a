@@ -22,3 +22,12 @@ services:
     volumes:
       - ./back:/src
       - ./backups:/backups
+  front:
+    build:
+      context: front
+      dockerfile: Dockerfile
+      target: development
+    volumes:
+      - ./front:/srv/app
+    ports:
+      - 3000:3000
