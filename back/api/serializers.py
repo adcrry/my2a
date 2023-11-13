@@ -1,6 +1,6 @@
 from rest_framework.serializers import ModelSerializer
 
-from education.models import Student
+from education.models import Student, Course
 
 
 class StudentSerializer(ModelSerializer):
@@ -10,6 +10,25 @@ class StudentSerializer(ModelSerializer):
             "id",
             "name",
             "surname",
-            "departement",
+            "department",
             "parcours",
+        ]
+
+
+class CourseSerializer(ModelSerializer):
+    class Meta:
+        model = Course
+        fields = [
+            "id",
+            "name",
+            "code",
+            "department",
+            "parcours",
+            "semester",
+            "description",
+            "teacher",
+            "day",
+            "start_time",
+            "end_time",
+            # "ects",
         ]
