@@ -3,4 +3,4 @@ from typing import List
 
 # from pandas.Dataframe import groupby
 
-from student.models import Student
+from education.models import Student

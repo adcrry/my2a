@@ -32,7 +32,7 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     "rest_framework",
-    "student.apps.StudentConfig",
+    "education.apps.EducationConfig",
     "api.apps.ApiConfig",
     "django.contrib.admin",
     "django.contrib.auth",
