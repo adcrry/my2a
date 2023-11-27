@@ -19,7 +19,12 @@ from django.contrib import admin
 from django.urls import path, include
 from rest_framework import routers
 
-from .views import StudentViewset, CourseViewset
+from education.views import (
+    StudentViewset,
+    CourseViewset,
+    DepartmentViewset,
+    ParcoursViewset,
+)
 
 # Create a router instance
 router = routers.SimpleRouter()
@@ -28,6 +33,8 @@ router = routers.SimpleRouter()
 # This will generate the URL '/api/student/' for this endpoint
 router.register("student", StudentViewset, basename="student")
 router.register("course", CourseViewset, basename="course")
+router.register("department", DepartmentViewset, basename="department")
+router.register("parcours", ParcoursViewset, basename="parcours")
 
 # ----- API -----
 urlpatterns = [

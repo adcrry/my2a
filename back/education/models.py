@@ -1,40 +1,31 @@
 from django.db import models
+from django.contrib.auth.models import User
+from django.contrib.auth import models as models2
+from django.db import models
+from django.utils import timezone
 
 
-class Student(models.Model):
+class Department(models.Model):
     name = models.CharField(max_length=100)
-    surname = models.CharField(max_length=100)
-    department = models.CharField(max_length=4)
-    parcours = models.CharField(max_length=4)
+    code = models.CharField(max_length=4)
+    # Responsable est un admin qui peut gérer les cours du départment (un user)
+    responsable = models.OneToOneField(
+        User, on_delete=models.CASCADE, null=True, blank=True
+    )
 
-
-# class Departement(models.Model):
-#     # name is the name of the department (e.g. "Génie civil et construction")
-#     # code is the code of the department (e.g. "GCC")
-#     # select among the choices of the Department class
-#     name = models.CharField(max_length=100, choices=Department.choices)
-#     code = models.CharField(max_length=4, choices=Department.choices)
+    def __str__(self):
+        return self.code
 
 
 class Course(models.Model):
     name = models.CharField(max_length=100)
-    code = models.CharField(max_length=4)
-
-    class Department(models.TextChoices):
-        IMI = "Ingénierie mathématique et informatique"
-        GCC = "Génie civil et construction"
-        GMM = "Génie mécanique et matériaux"
-        SEGF = "Sciences économiques, gestion, finance"
-        VET = "Ville, environnement, transport"
-        GI = "Génie industriel"
-
-    department = models.CharField(max_length=50, choices=Department.choices)
-    parcours = models.CharField(max_length=4)
-    description = models.TextField()
+    code = models.CharField(max_length=10)
+    department = models.OneToOneField(Department, on_delete=models.CASCADE)
+    description = models.TextField(null=True, blank=True)
 
     class Semester(models.TextChoices):
-        S3 = "Semestre 3"
-        S4 = "Semestre 4"
+        S3 = "S3"
+        S4 = "S4"
 
     semester = models.CharField(max_length=10, choices=Semester.choices)
 
@@ -47,15 +38,62 @@ class Course(models.Model):
 
     day = models.CharField(max_length=10, choices=Day.choices)
 
-    # horaire de début et de fin
+    # horaire de début et de fin - format hh:mm (24h) France
     start_time = models.TimeField()
     end_time = models.TimeField()
 
     # ects -> faire *10
     _ects = models.IntegerField()
 
-    teacher = models.CharField(max_length=100)
+    teacher = models.CharField(max_length=100, null=True, blank=True)
 
     @property
     def ects(self):
         return self._ects * 10
+
+    def __str__(self):
+        return self.code
+
+
+class Parcours(models.Model):
+    """
+    Represents a specific educational program or curriculum.
+    """
+
+    name = models.CharField(max_length=100)
+    department = models.ForeignKey(Department, on_delete=models.CASCADE)
+    description = models.TextField(null=True, blank=True)
+    courses_mandatory = models.ManyToManyField(
+        Course, blank=True, related_name="mandatory_parcours"
+    )
+    courses_on_list = models.ManyToManyField(
+        Course, blank=True, related_name="on_list_parcours"
+    )
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name_plural = "parcours"
+
+
+class Student(models.Model):
+    user = models.OneToOneField(models2.User(), on_delete=models.PROTECT)
+    name = models.CharField(max_length=100)
+    surname = models.CharField(max_length=100)
+    parcours = models.CharField(max_length=4, null=True, blank=True)
+    department = models.ForeignKey(
+        Department, on_delete=models.CASCADE, null=True, blank=True
+    )
+
+    def __str__(self):
+        return self.name + " " + self.surname
+
+
+# class Department(models.TextChoices):
+#         IMI = "Ingénierie mathématique et informatique"
+#         GCC = "Génie civil et construction"
+#         GMM = "Génie mécanique et matériaux"
+#         SEGF = "Sciences économiques, gestion, finance"
+#         VET = "Ville, environnement, transport"
+#         GI = "Génie industriel"
