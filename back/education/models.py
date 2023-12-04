@@ -42,8 +42,8 @@ class Course(models.Model):
     start_time = models.TimeField()
     end_time = models.TimeField()
 
-    # ects -> faire *10
-    _ects = models.IntegerField()
+    # ects -> faire *10, prendre en compte qu'on ne compte pas les langues, -> 39 ects
+    _ects = models.IntegerField() 
 
     teacher = models.CharField(max_length=100, null=True, blank=True)
 
@@ -65,7 +65,7 @@ class Parcours(models.Model):
     description = models.TextField(null=True, blank=True)
     courses_mandatory = models.ManyToManyField(
         Course, blank=True, related_name="mandatory_parcours"
-    )
+    ) # ajouter les cours du tronc commun dedans
     courses_on_list = models.ManyToManyField(
         Course, blank=True, related_name="on_list_parcours"
     )
@@ -86,14 +86,51 @@ class Student(models.Model):
         Department, on_delete=models.CASCADE, null=True, blank=True
     )
 
+    def check_time_table(self):
+        """Return the list of compatible courses for the student."""
+        student_courses = Enrollment.objects.filter(student=self)
+        compatible_courses = []
+        for courses in Course.objects.all():
+            for s_courses in student_courses:
+                if (s_courses.day == courses.day
+                    and ((s_courses.start_time < courses.start_time and courses.start_time < s_courses.end_time)
+                    or (s_courses.start_time < courses.end_time and courses.end_time < s_courses.end_time))):
+                    break
+            compatible_courses.append(courses)
+            
+    def count_ects(self):
+        """Return the number of ects the student has."""
+        student_courses = Enrollment.objects.filter(student=self)
+        ects = 0
+        for course in student_courses:
+            ects += course.ects
+        return ects
+    
+    def check_ects(self):
+        """Return True if the student has enough ects, False otherwise."""
+        return self.count_ects() >= 39
+    
     def __str__(self):
         return self.name + " " + self.surname
 
+class Enrollment(models.model):
+    student = models.OneToOneField(Student, on_delete=models.CASCADE)
+    course = models.OneToOneField(Course, on_delete=models.CASCADE)
 
-# class Department(models.TextChoices):
-#         IMI = "Ingénierie mathématique et informatique"
-#         GCC = "Génie civil et construction"
-#         GMM = "Génie mécanique et matériaux"
-#         SEGF = "Sciences économiques, gestion, finance"
-#         VET = "Ville, environnement, transport"
-#         GI = "Génie industriel"
+    class Category(models.TextChoices):
+        mandatory = "mandatory"
+        elective = "elective"
+        visiting = "visiting"
+
+    category = models.CharField(max_length=10, choices=Category.choices)
+
+    def __str__(self):
+        return self.student.name + " " + self.course.code
+
+class Department(models.TextChoices):
+         IMI = "Ingénierie mathématique et informatique"
+         GCC = "Génie civil et construction"
+         GMM = "Génie mécanique et matériaux"
+         SEGF = "Sciences économiques, gestion, finance"
+         VET = "Ville, environnement, transport"
+         GI = "Génie industriel"

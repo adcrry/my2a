@@ -1,6 +1,6 @@
 from rest_framework.serializers import ModelSerializer
 
-from .models import Student, Course, Department, Parcours
+from .models import Student, Course, Department, Parcours, Enrollment
 
 
 class StudentSerializer(ModelSerializer):
@@ -58,4 +58,14 @@ class ParcoursSerializer(ModelSerializer):
             "description",
             "courses_mandatory",
             "courses_on_list",
+        ]
+
+class EnrollmentSerializer(ModelSerializer):
+    class Meta:
+        model = Enrollment
+        fields = [
+            "id",
+            "student",
+            "course",
+            "category",
         ]
