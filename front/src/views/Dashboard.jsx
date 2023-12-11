@@ -15,15 +15,66 @@ export default function Dashboard() {
     
     const [progress, setProgress] = useState(0)
     const [opened, setOpened] = useState('')
+    const [departments, setDepartments] = useState([])
     const [departement, setDepartement] = useState('')
-
+    const [parcoursList, setParcoursList] = useState([])
+    const [parcours, setParcours] = useState('')
 
     const handleChange = (panel) => {
         if(opened != panel) setOpened(panel)
     }
+
+    const getDepartmentItems = () => {
+        return departments.map((department) => {
+            return (
+                <MenuItem value={department.code}>{department.code}</MenuItem>
+            )
+        })
+    }
+
+    const getDepartmentIdByCode = (code) => {
+        return departments.find((department) => department.code === code)?.id
+    }
+
+    const getParcoursItems = () => {
+        return parcoursList.map((parcours) => {
+            return (
+                <MenuItem value={parcours.id}>{parcours.name}</MenuItem>
+            )
+        })
+    }
+
     useEffect(() => {
-        setProgress(80)
+        fetch('http://localhost:8000/api/department/', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        })
+        .then((res) => res.json())
+        .then((result) => {
+            setDepartments(result)
+        },
+            (error) => {
+              console.log(error);
+            })
     }, [])
+
+    useEffect(() => {
+        fetch('http://localhost:8000/api/parcours/?department=' + getDepartmentIdByCode(departement), {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        })
+        .then((res) => res.json())
+        .then((result) => {
+            setParcoursList(result)
+        },
+            (error) => {
+              console.log(error);
+            })
+    }, [departement])
     return (
         <>            
             <Topbar title="Accueil" />
@@ -50,19 +101,19 @@ export default function Dashboard() {
                                 id="demo-simple-select"
                                 value={departement}
                                 label="Département"
-                                onChange={(e) => setDepartement(e.target.value)}
+                                onChange={(e) => {
+                                    setDepartement(e.target.value)
+                                    setOpened('parcours')
+                                    setProgress(34)
+                                }}
                                 placeholder="Département"
                                 >
-                                <MenuItem value={'IMI'}>IMI</MenuItem>
-                                <MenuItem value={'VET'}>VET</MenuItem>
-                                <MenuItem value={'GCC'}>GCC</MenuItem>
-                                <MenuItem value={'GMM'}>GMM</MenuItem>
-                                <MenuItem value={'SEGF'}>SEGF</MenuItem>
+                                {getDepartmentItems()}
                             </Select>
                         </FormControl>
                     </AccordionDetails>
                 </Accordion>
-                <Accordion expanded={opened==='parcours'} onChange={(e, expanded) => {
+                <Accordion disabled={progress < 33} expanded={opened==='parcours'} onChange={(e, expanded) => {
                     if(expanded) handleChange('parcours')
                 }}>
                     <AccordionSummary aria-controls="panel2d-content" id="panel2d-header">
@@ -70,25 +121,25 @@ export default function Dashboard() {
                     </AccordionSummary>
                     <AccordionDetails>
                     <FormControl fullWidth>
-                            <InputLabel>Département</InputLabel>
+                            <InputLabel>Parcours</InputLabel>
                             <Select
                                 labelId="demo-simple-select-label"
                                 id="demo-simple-select"
-                                value={departement}
-                                label="Département"
-                                onChange={(e) => setDepartement(e.target.value)}
-                                placeholder="Département"
+                                value={parcours}
+                                label="Parcours"
+                                onChange={(e) =>{
+                                    setParcours(e.target.value)
+                                    setOpened('obligatoires')
+                                    setProgress(67)
+                                }}
+                                placeholder="Parcours"
                                 >
-                                <MenuItem value={'IMI'}>IMI</MenuItem>
-                                <MenuItem value={'VET'}>VET</MenuItem>
-                                <MenuItem value={'GCC'}>GCC</MenuItem>
-                                <MenuItem value={'GMM'}>GMM</MenuItem>
-                                <MenuItem value={'SEGF'}>SEGF</MenuItem>
+                                {getParcoursItems()}
                             </Select>
                         </FormControl>
                     </AccordionDetails>
                 </Accordion>
-                <Accordion expanded={opened==='obligatoires'} onChange={(e, expanded) => {
+                <Accordion disabled={progress < 66} expanded={opened==='obligatoires'} onChange={(e, expanded) => {
                     if(expanded) handleChange('obligatoires')
                 }}>
                     <AccordionSummary aria-controls="panel3d-content" id="panel3d-header">
@@ -96,27 +147,27 @@ export default function Dashboard() {
                     </AccordionSummary>
                     <AccordionDetails>
                     <Typography>Choisissez vos cours obligatoires:</Typography>
-                    <FormGroup>
-                        <FormControlLabel control={<Checkbox onClick={() => {}}/>} label="Deep Learning (3 ECTS)" />
-                        <FormControlLabel control={<Checkbox onClick={() => {}}/>} label="Machine Learning (5 ECTS)" />
-                        <FormControlLabel control={<Checkbox onClick={() => {}}/>} label="Processus stochastiques et application (4 ECTS)" />
-                        <FormControlLabel control={<Checkbox onClick={() => {}}/>} label="Technique de développement logiciel (3 ECTS)" />
-                    </FormGroup>
+                        <FormGroup>
+                            <FormControlLabel control={<Checkbox onClick={() => {}}/>} label="Deep Learning (3 ECTS)" />
+                            <FormControlLabel control={<Checkbox onClick={() => {}}/>} label="Machine Learning (5 ECTS)" />
+                            <FormControlLabel control={<Checkbox onClick={() => {}}/>} label="Processus stochastiques et application (4 ECTS)" />
+                            <FormControlLabel control={<Checkbox onClick={() => {}}/>} label="Technique de développement logiciel (3 ECTS)" />
+                        </FormGroup>
                     </AccordionDetails>
                 </Accordion>
-                <Accordion expanded={opened==='electifs'} onChange={(e, expanded) => {
+                <Accordion disabled={progress < 66} expanded={opened==='electifs'} onChange={(e, expanded) => {
                     if(expanded) handleChange('electifs')
                 }}>
                     <AccordionSummary aria-controls="panel3d-content" id="panel3d-header">
                     <Typography>Choix des cours électifs</Typography>
                     </AccordionSummary>
                     <AccordionDetails>
-                    <Typography>
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse
-                        malesuada lacus ex, sit amet blandit leo lobortis eget. Lorem ipsum dolor
-                        sit amet, consectetur adipiscing elit. Suspendisse malesuada lacus ex,
-                        sit amet blandit leo lobortis eget.
-                    </Typography>
+                        <FormGroup>
+                            <FormControlLabel control={<Checkbox onClick={() => {}}/>} label="Cours 1 (3 ECTS)" />
+                            <FormControlLabel control={<Checkbox onClick={() => {}}/>} label="Cours 2 (5 ECTS)" />
+                            <FormControlLabel control={<Checkbox onClick={() => {}}/>} label="Processus stochastiques et application (4 ECTS)" />
+                            <FormControlLabel control={<Checkbox onClick={() => {}}/>} label="Technique de développement logiciel (3 ECTS)" />
+                        </FormGroup>
                     </AccordionDetails>
                 </Accordion>
                 </Grid>
