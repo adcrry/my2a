@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth import models as models2
 from django.db import models
 from django.utils import timezone
+from .exportpdf import generate_pdf_from_courses
 
 
 class Department(models.Model):
@@ -93,8 +94,8 @@ class Student(models.Model):
         for courses in Course.objects.all():
             for s_courses in student_courses:
                 if (s_courses.day == courses.day
-                    and ((s_courses.start_time < courses.start_time and courses.start_time < s_courses.end_time)
-                    or (s_courses.start_time < courses.end_time and courses.end_time < s_courses.end_time))):
+                    and ((s_courses.course.start_time < courses.start_time and courses.start_time < s_courses.course.end_time)
+                    or (s_courses.course.start_time < courses.end_time and courses.end_time < s_courses.course.end_time))):
                     break
             compatible_courses.append(courses)
             
@@ -112,6 +113,12 @@ class Student(models.Model):
     
     def __str__(self):
         return self.name + " " + self.surname
+    
+    def generate_timetable(self):
+        """Return the timetable of the student."""
+        courses = Enrollment.objects.filter(student=self)
+        courses = [{"name":course.course.code,"day":course.course.day,"start_time":course.course.start_time,"end_time":course.course.end_time} for course in courses]
+        return generate_pdf_from_courses(self.name,courses)
 
 class Enrollment(models.model):
     student = models.OneToOneField(Student, on_delete=models.CASCADE)
