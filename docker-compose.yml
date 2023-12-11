@@ -28,6 +28,6 @@ services:
       dockerfile: Dockerfile
       target: development
     volumes:
-      - ./front:/srv/app
+      - ./front:/app
     ports:
       - 3000:3000

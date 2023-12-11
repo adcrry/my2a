@@ -3,6 +3,8 @@ import '../styles/styles.css'
 import "react-step-progress-bar/styles.css";
 import { ProgressBar, Step } from "react-step-progress-bar";
 import Typography from '@mui/material/Typography';
+import { TextField } from "@mui/material";
+
 
 export default function CustomProgressBar(props){
 
@@ -13,7 +15,7 @@ export default function CustomProgressBar(props){
                 <div
                     className={`indexedStep ${accomplished ? "accomplished" : null}`}
                 >
-                    <Typography style={{marginTop: 50}} variant="h6" color="inherit" component="div">Choix du département</Typography>
+                    <Typography style={{marginTop: 50, textAlign: 'center'}}>Département</Typography>
                 </div>
                 )}
             </Step>
@@ -22,7 +24,7 @@ export default function CustomProgressBar(props){
                 <div
                     className={`indexedStep ${accomplished ? "accomplished" : null}`}
                 >
-                    <Typography style={{marginTop: 50}} variant="h6" color="inherit" component="div">Choix du parcours</Typography>
+                    <Typography style={{marginTop: 50, textAlign: 'center'}}>Parcours</Typography>
                 </div>
                 )}
             </Step>
@@ -31,7 +33,7 @@ export default function CustomProgressBar(props){
                 <div
                     className={`indexedStep ${accomplished ? "accomplished" : null}`}
                 >
-                    <Typography style={{marginTop: 50}} variant="h6" color="inherit" component="div">Choix des cours obligatoires</Typography>
+                    <Typography style={{marginTop: 50, textAlign: 'center'}}>Obligatoires</Typography>
                 </div>
                 )}
             </Step>
@@ -40,7 +42,7 @@ export default function CustomProgressBar(props){
                 <div
                     className={`indexedStep ${accomplished ? "accomplished" : null}`}
                 >
-                    <Typography style={{marginTop: 50}} variant="h6" color="inherit" component="div">Choix des cours electifs</Typography>
+                    <Typography style={{marginTop: 50, textAlign: 'center'}}>Électifs</Typography>
                 </div>
                 )}
             </Step>
