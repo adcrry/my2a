@@ -2,3 +2,5 @@
 database/
 backups/
 *.pyc
+db/.DS_Store
+*.numbers
