@@ -5,12 +5,13 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 
-from .models import Student, Course, Department, Parcours
+from .models import Student, Course, Department, Parcours, Enrollment
 from .serializers import (
     StudentSerializer,
     CourseSerializer,
     DepartmentSerializer,
     ParcoursSerializer,
+    EnrollmentSerializer,
 )
 from rest_framework.decorators import action
 
@@ -202,3 +203,56 @@ class ParcoursViewset(ReadOnlyModelViewSet):
 # api/IMI/VisionApprentissage/courses/mandatory
 
 # api/IMI/VisionApprentissage/courses/on_list
+
+class EnrollmentViewset(ReadOnlyModelViewSet):
+    """
+    A viewset for retrieving Enrollment objects.
+
+    This viewset allows for retrieving all Enrollment objects, one in particular.
+    """
+
+    # Example:
+    # /api/enrollment/ (all contacts)
+    # /api/enrollment/4/ (contact with id 4)
+
+    serializer_class = EnrollmentSerializer
+
+    def get_queryset(self):
+        """
+        Returns a queryset of all Enrollment objects.
+        """
+
+        queryset = Enrollment.objects.all()
+        return queryset
+
+class PostDepartment(APIView):
+    """
+    API endpoint to select a department
+    """
+    def post(self,request):
+        department = get_object_or_404(Department,name=request.data["department"])
+        student = Student.objects.get(user__id=request.user.id)
+        student.department = department
+        student.save()
+
+class PostParcours(APIView):
+    """
+    API endpoint to select a parcours
+    """
+    def post(self,request):
+        parcours = get_object_or_404(Parcours,name=request.data["parcours"])
+        student = Student.objects.get(user__id=request.user.id)
+        student.parcours = parcours
+        student.save()
+
+class PostEnrollment(APIView):
+    """
+    API endpoint to select courses
+    """
+    def post(self,request):
+        for course in request.data["courses"]:
+            get_object_or_404(Course,name=course)
+            student = Student.objects.get(user__id=request.user.id)
+            enrollment = Enrollment(student=student,course=course)
+            enrollment.save()
+

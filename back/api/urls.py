@@ -24,6 +24,7 @@ from education.views import (
     CourseViewset,
     DepartmentViewset,
     ParcoursViewset,
+    EnrollmentViewset,
 )
 
 # Create a router instance
@@ -35,6 +36,7 @@ router.register("student", StudentViewset, basename="student")
 router.register("course", CourseViewset, basename="course")
 router.register("department", DepartmentViewset, basename="department")
 router.register("parcours", ParcoursViewset, basename="parcours")
+router.register("enrollment", EnrollmentViewset, basename="enrollment")
 
 # ----- API -----
 urlpatterns = [
