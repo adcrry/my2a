@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.template import loader
 from django.http import HttpResponse
 from rest_framework.views import APIView
@@ -12,7 +12,7 @@ from .serializers import (
     DepartmentSerializer,
     ParcoursSerializer,
 )
-
+from rest_framework.decorators import action
 
 def index(request):
     return HttpResponse("Hello, world. You're at the polls index.")
@@ -38,7 +38,41 @@ class StudentViewset(ReadOnlyModelViewSet):
 
         queryset = Student.objects.all()
         return queryset
+    
+    @action(detail=False, methods=['get'])
+    def current(self, request):
+        """
+        Returns the current user.
+        """
+        student = get_object_or_404(Student, user=request.user)
+        serializer = StudentSerializer(student)
+        return Response(serializer.data)
+    
 
+    @action(detail=False, methods=['post'], url_path="current/department")
+    def set_department(self, request):
+        """
+        Set current user department.
+        """
+
+        student = get_object_or_404(Student, user=request.user)
+        department = get_object_or_404(Department, code=request.data["department"])
+        student.department = department
+        student.save()
+        serializer = StudentSerializer(student)
+        return Response(serializer.data)
+    
+    @action(detail=False, methods=['post'], url_path="current/parcours")
+    def set_parcours(self, request):
+        """
+        Set current user parcours.
+        """
+        student = get_object_or_404(Student, user=request.user)
+        parcours = get_object_or_404(Parcours, id=request.data["parcours"])
+        student.parcours = parcours
+        student.save()
+        serializer = StudentSerializer(student)
+        return Response(serializer.data)
 
 class CourseViewset(ReadOnlyModelViewSet):
     """
