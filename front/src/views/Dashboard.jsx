@@ -19,6 +19,7 @@ export default function Dashboard() {
     const [departement, setDepartement] = useState('')
     const [parcoursList, setParcoursList] = useState([])
     const [parcours, setParcours] = useState('')
+    const [mandatoryCourses, setMandatoryCourses] = useState([])
 
     const handleChange = (panel) => {
         if(opened != panel) setOpened(panel)
@@ -42,6 +43,15 @@ export default function Dashboard() {
                 <MenuItem value={parcours.id}>{parcours.name}</MenuItem>
             )
         })
+    }
+
+    const getMandatoryCourses = () => {
+        return mandatoryCourses.map((course) => {
+            return (
+                <FormControlLabel control={<Checkbox onClick={() => {}}/>} label={course.name + ' (' + course.ects + ' ECTS)'} />
+            )
+        })
+    
     }
 
     useEffect(() => {
@@ -75,6 +85,23 @@ export default function Dashboard() {
               console.log(error);
             })
     }, [departement])
+
+    useEffect(() => {
+        fetch('http://localhost:8000/api/course/?parcours=' + parcours + '&on_list=true' + getDepartmentIdByCode(departement), {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        })
+        .then((res) => res.json())
+        .then((result) => {
+            console.log(result)
+            setMandatoryCourses(result)
+        },
+            (error) => {
+              console.log(error);
+            })
+    }, [parcours]);
     return (
         <>            
             <Topbar title="Accueil" />
@@ -146,12 +173,8 @@ export default function Dashboard() {
                     <Typography>Choix des cours obligatoires</Typography>
                     </AccordionSummary>
                     <AccordionDetails>
-                    <Typography>Choisissez vos cours obligatoires:</Typography>
                         <FormGroup>
-                            <FormControlLabel control={<Checkbox onClick={() => {}}/>} label="Deep Learning (3 ECTS)" />
-                            <FormControlLabel control={<Checkbox onClick={() => {}}/>} label="Machine Learning (5 ECTS)" />
-                            <FormControlLabel control={<Checkbox onClick={() => {}}/>} label="Processus stochastiques et application (4 ECTS)" />
-                            <FormControlLabel control={<Checkbox onClick={() => {}}/>} label="Technique de développement logiciel (3 ECTS)" />
+                            {getMandatoryCourses()}                            
                         </FormGroup>
                     </AccordionDetails>
                 </Accordion>
