@@ -47,7 +47,9 @@ class StudentViewset(ReadOnlyModelViewSet):
         """
         student = get_object_or_404(Student, user=request.user)
         serializer = StudentSerializer(student)
-        return Response(serializer.data)
+        response = Response(serializer.data)
+        response.set_cookie('student_id', student.id)
+        return response
     
 
     @action(detail=False, methods=['post'], url_path="current/department")
@@ -55,7 +57,6 @@ class StudentViewset(ReadOnlyModelViewSet):
         """
         Set current user department.
         """
-
         student = get_object_or_404(Student, user=request.user)
         department = get_object_or_404(Department, code=request.data["department"])
         student.department = department
@@ -69,11 +70,28 @@ class StudentViewset(ReadOnlyModelViewSet):
         Set current user parcours.
         """
         student = get_object_or_404(Student, user=request.user)
-        parcours = get_object_or_404(Parcours, id=request.data["parcours"])
-        student.parcours = parcours
+        student.parcours = request.data["parcours"]
         student.save()
         serializer = StudentSerializer(student)
         return Response(serializer.data)
+    
+    @action(detail=False, methods=['post'], url_path="current/enroll")
+    def update_course_choice(self, request):
+        """
+        Update the course choice of the current user.
+        """
+        student = get_object_or_404(Student, user=request.user)
+        if request.data["is_enrolled"]:
+            course = get_object_or_404(Course, name=request.data["course"])
+            enrollment = Enrollment(student=student, course=course)
+            enrollment.save()
+            serializer = EnrollmentSerializer(enrollment)
+            return Response(serializer.data)
+        else:
+            enrollment = get_object_or_404(Enrollment, student=student, course__name=request.data["course"])
+            enrollment.delete()
+        return Response({"status":"ok"})
+        
 
 class CourseViewset(ReadOnlyModelViewSet):
     """
@@ -225,31 +243,11 @@ class EnrollmentViewset(ReadOnlyModelViewSet):
         queryset = Enrollment.objects.all()
         return queryset
 
-class PostDepartment(APIView):
-    """
-    API endpoint to select a department
-    """
-    def post(self,request):
-        department = get_object_or_404(Department,name=request.data["department"])
-        student = Student.objects.get(user__id=request.user.id)
-        student.department = department
-        student.save()
-
-class PostParcours(APIView):
-    """
-    API endpoint to select a parcours
-    """
-    def post(self,request):
-        parcours = get_object_or_404(Parcours,name=request.data["parcours"])
-        student = Student.objects.get(user__id=request.user.id)
-        student.parcours = parcours
-        student.save()
-
 class PostEnrollment(APIView):
     """
     API endpoint to select courses
     """
-    def post(self,request):
+    def post(self, request):
         for course in request.data["courses"]:
             get_object_or_404(Course,name=course)
             student = Student.objects.get(user__id=request.user.id)

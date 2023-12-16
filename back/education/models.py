@@ -120,7 +120,7 @@ class Student(models.Model):
         courses = [{"name":course.course.code,"day":course.course.day,"start_time":course.course.start_time,"end_time":course.course.end_time} for course in courses]
         return generate_pdf_from_courses(self.name,courses)
 
-class Enrollment(models.model):
+class Enrollment(models.Model):
     student = models.OneToOneField(Student, on_delete=models.CASCADE)
     course = models.OneToOneField(Course, on_delete=models.CASCADE)
 
@@ -133,7 +133,7 @@ class Enrollment(models.model):
 
     def __str__(self):
         return self.student.name + " " + self.course.code
-
+"""
 class Department(models.TextChoices):
          IMI = "Ingénierie mathématique et informatique"
          GCC = "Génie civil et construction"
@@ -141,3 +141,4 @@ class Department(models.TextChoices):
          SEGF = "Sciences économiques, gestion, finance"
          VET = "Ville, environnement, transport"
          GI = "Génie industriel"
+"""

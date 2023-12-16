@@ -24,10 +24,12 @@ SECRET_KEY = "django-insecure-qn$x7fp@9r*#=3z@&4=myk=)1!^w@afq+6pyt^7lbto%99h^9t
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-CORS_ORIGIN_ALLOW_ALL = True
+CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_CREDENTIALS = True
+CSRF_TRUSTED_ORIGINS = ['http://localhost']
 
 if DEBUG:
-    ALLOWED_HOSTS = ['localhost']
+    ALLOWED_HOSTS = ["http://localhost", "localhost"]
 
 
 # Application definition
@@ -44,6 +46,17 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "rest_framework.authtoken",
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated'
+    ],
+}
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",

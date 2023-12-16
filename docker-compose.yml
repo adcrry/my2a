@@ -22,6 +22,8 @@ services:
     volumes:
       - ./back:/src
       - ./backups:/backups
+    networks:
+      - nginx_link
   front:
     build:
       context: front
@@ -31,3 +33,17 @@ services:
       - ./front:/app
     ports:
       - 3000:3000
+    networks:
+      - nginx_link
+  nginx:
+    build: nginx
+    ports:
+      - "127.0.0.1:80:80"
+    restart: always
+    networks:
+      - nginx_link
+    depends_on:
+      - back
+      - front
+networks:
+  nginx_link:
