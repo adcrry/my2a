@@ -4,3 +4,4 @@ backups/
 *.pyc
 db/.DS_Store
 *.numbers
+*.sqlite3

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 import { List, Paper, Grid, Typography, Accordion, AccordionSummary, AccordionDetails } from "@mui/material";
 import Topbar from "../components/Topbar";
 import CustomProgressBar from "../components/ProgressBar";
@@ -12,7 +13,7 @@ import Checkbox from '@mui/material/Checkbox';
 import Select from '@mui/material/Select';
 import Cookies from 'js-cookie';
 
-export default function Dashboard() {
+export default function Dashboard(props) {
     
     const [progress, setProgress] = useState(0)
     const [opened, setOpened] = useState('')
@@ -21,6 +22,7 @@ export default function Dashboard() {
     const [parcoursList, setParcoursList] = useState([])
     const [parcours, setParcours] = useState({})
     const [mandatoryCourses, setMandatoryCourses] = useState([])
+    let { id } = useParams();
 
     const handleChange = (panel) => {
         if(opened != panel) setOpened(panel)
@@ -174,6 +176,10 @@ export default function Dashboard() {
                 })
         }
     }, [parcours]);
+
+    useEffect(() => {
+        console.log(id)
+    }, [])
 
     return (
         <>            
