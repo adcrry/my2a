@@ -12,6 +12,7 @@ from .serializers import (
     DepartmentSerializer,
     ParcoursSerializer,
     EnrollmentSerializer,
+    CompleteStudentSerializer
 )
 from rest_framework.decorators import action
 
@@ -52,14 +53,23 @@ class StudentViewset(ReadOnlyModelViewSet):
         return response
     
 
+    #Return all data of the current user (dep, parcours, courses)
+    @action(detail=False, methods=['get'], url_path="current/id")
+    def get_current_id(self, request):
+        student = get_object_or_404(Student, user=request.user)
+        serializer = CompleteStudentSerializer(student)
+        return Response(serializer.data)
+    
+
     @action(detail=False, methods=['post'], url_path="current/department")
     def set_department(self, request):
         """
         Set current user department.
         """
         student = get_object_or_404(Student, user=request.user)
-        department = get_object_or_404(Department, code=request.data["department"])
+        department = get_object_or_404(Department, id=request.data["department"])
         student.department = department
+        student.parcours = None
         student.save()
         serializer = StudentSerializer(student)
         return Response(serializer.data)
@@ -70,7 +80,8 @@ class StudentViewset(ReadOnlyModelViewSet):
         Set current user parcours.
         """
         student = get_object_or_404(Student, user=request.user)
-        student.parcours = request.data["parcours"]
+        parcours = get_object_or_404(Parcours, id=request.data["parcours"])
+        student.parcours = parcours
         student.save()
         serializer = StudentSerializer(student)
         return Response(serializer.data)
@@ -83,7 +94,10 @@ class StudentViewset(ReadOnlyModelViewSet):
         student = get_object_or_404(Student, user=request.user)
         if request.data["is_enrolled"]:
             course = get_object_or_404(Course, name=request.data["course"])
-            enrollment = Enrollment(student=student, course=course)
+            if Enrollment.objects.filter(student=student, course=course).exists():
+                return Response({"status":"already enrolled"})
+            print(request.data["category"])
+            enrollment = Enrollment(student=student, course=course, category=request.data["category"])
             enrollment.save()
             serializer = EnrollmentSerializer(enrollment)
             return Response(serializer.data)

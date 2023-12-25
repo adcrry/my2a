@@ -71,21 +71,31 @@ class Parcours(models.Model):
         Course, blank=True, related_name="on_list_parcours"
     )
 
-    def __str__(self):
-        return self.name
-
     class Meta:
         verbose_name_plural = "parcours"
+
+    def __str__(self):
+        return self.name
 
 
 class Student(models.Model):
     user = models.OneToOneField(models2.User(), on_delete=models.PROTECT)
     name = models.CharField(max_length=100)
     surname = models.CharField(max_length=100)
-    parcours = models.CharField(max_length=4, null=True, blank=True)
+    parcours = models.ForeignKey(Parcours, on_delete=models.CASCADE, null=True, blank=True)
     department = models.ForeignKey(
         Department, on_delete=models.CASCADE, null=True, blank=True
     )
+
+    def mandatory_courses(self):
+        """Return the list of mandatory courses for the student."""
+        return Enrollment.objects.filter(student=self, category="mandatory")
+    
+
+    def elective_courses(self):
+        """Return the list of elective courses for the student."""
+        return Enrollment.objects.filter(student=self, category="elective")
+        
 
     def check_time_table(self):
         """Return the list of compatible courses for the student."""
@@ -121,8 +131,8 @@ class Student(models.Model):
         return generate_pdf_from_courses(self.name,courses)
 
 class Enrollment(models.Model):
-    student = models.OneToOneField(Student, on_delete=models.CASCADE)
-    course = models.OneToOneField(Course, on_delete=models.CASCADE)
+    student = models.ForeignKey(Student, on_delete=models.CASCADE)
+    course = models.ForeignKey(Course, on_delete=models.CASCADE)
 
     class Category(models.TextChoices):
         mandatory = "mandatory"

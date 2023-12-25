@@ -1,9 +1,9 @@
-from rest_framework.serializers import ModelSerializer
+from rest_framework import serializers
 
 from .models import Student, Course, Department, Parcours, Enrollment
 
 
-class StudentSerializer(ModelSerializer):
+class StudentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Student
         fields = [
@@ -16,7 +16,7 @@ class StudentSerializer(ModelSerializer):
         ]
 
 
-class CourseSerializer(ModelSerializer):
+class CourseSerializer(serializers.ModelSerializer):
     class Meta:
         model = Course
         fields = [
@@ -37,7 +37,38 @@ class CourseSerializer(ModelSerializer):
         ]
 
 
-class DepartmentSerializer(ModelSerializer):
+class EnrollmentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Enrollment
+        fields = [
+            "id",
+            "student",
+            "course",
+            "category",
+        ]
+    
+    course = CourseSerializer()
+
+
+class CompleteStudentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Student
+        fields = [
+            "id",
+            "user",
+            "name",
+            "surname",
+            "department",
+            "parcours",
+            "mandatory_courses",
+            "elective_courses"
+        ]
+
+    mandatory_courses = EnrollmentSerializer(many=True)
+    elective_courses = EnrollmentSerializer(many=True)
+
+
+class DepartmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Department
         fields = [
@@ -48,7 +79,7 @@ class DepartmentSerializer(ModelSerializer):
         ]
 
 
-class ParcoursSerializer(ModelSerializer):
+class ParcoursSerializer(serializers.ModelSerializer):
     class Meta:
         model = Parcours
         fields = [
@@ -60,12 +91,3 @@ class ParcoursSerializer(ModelSerializer):
             "courses_on_list",
         ]
 
-class EnrollmentSerializer(ModelSerializer):
-    class Meta:
-        model = Enrollment
-        fields = [
-            "id",
-            "student",
-            "course",
-            "category",
-        ]

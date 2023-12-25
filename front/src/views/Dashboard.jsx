@@ -13,16 +13,18 @@ import Checkbox from '@mui/material/Checkbox';
 import Select from '@mui/material/Select';
 import Cookies from 'js-cookie';
 
-export default function Dashboard(props) {
+export default function Dashboard() {
     
     const [progress, setProgress] = useState(0)
     const [opened, setOpened] = useState('')
     const [departments, setDepartments] = useState([])
-    const [departement, setDepartement] = useState('')
+    const [departement, setDepartement] = useState(-1)
     const [parcoursList, setParcoursList] = useState([])
-    const [parcours, setParcours] = useState({})
+    const [parcours, setParcours] = useState(-1)
     const [mandatoryCourses, setMandatoryCourses] = useState([])
-    let { id } = useParams();
+    const [choosenMandatoryCourses, setChoosenMandatoryCourses] = useState([])
+    const [electiveCourses, setElectiveCourses] = useState([])
+    const [choosenElectiveCourses, setChoosenElectiveCourses] = useState([])
 
     const handleChange = (panel) => {
         if(opened != panel) setOpened(panel)
@@ -31,19 +33,15 @@ export default function Dashboard(props) {
     const getDepartmentItems = () => {
         return departments.map((department) => {
             return (
-                <MenuItem value={department.code}>{department.code}</MenuItem>
+                <MenuItem value={department.id}>{department.code}</MenuItem>
             )
         })
-    }
-
-    const getDepartmentIdByCode = (code) => {
-        return departments.find((department) => department.code === code)?.id
     }
 
     const getParcoursItems = () => {
         return parcoursList.map((parcours) => {
             return (
-                <MenuItem value={parcours}>{parcours.name}</MenuItem>
+                <MenuItem value={parcours.id}>{parcours.name}</MenuItem>
             )
         })
     }
@@ -51,8 +49,19 @@ export default function Dashboard(props) {
     const getMandatoryCourses = () => {
         return mandatoryCourses.map((course) => {
             return (
+                <FormControlLabel control={<Checkbox defaultChecked={choosenMandatoryCourses.includes(course.name)} onClick={(e) => {
+                    changeEnrollment(course.name, e.target.checked, 'mandatory')
+                }}/>} label={course.name + ' (' + course.ects + ' ECTS)'} />
+            )
+        })
+    
+    }
+
+    const getElectiveCourses = () => {
+        return electiveCourses.map((course) => {
+            return (
                 <FormControlLabel control={<Checkbox onClick={(e) => {
-                    changeEnrollment(course.name, e.target.checked)
+                    changeEnrollment(course.name, e.target.checked, 'elective')
                 }}/>} label={course.name + ' (' + course.ects + ' ECTS)'} />
             )
         })
@@ -72,7 +81,6 @@ export default function Dashboard(props) {
         })
         .then((res) => res.json())
         .then((result) => {
-            console.log(result)
             setOpened('parcours')
             setProgress(34)
         }, 
@@ -90,7 +98,7 @@ export default function Dashboard(props) {
                 'Content-Type': 'application/json',
                 'X-CSRFToken': Cookies.get('csrftoken'),
             },
-            body: JSON.stringify({parcours: code.name}),
+            body: JSON.stringify({parcours: code}),
         })
         .then((res) => res.json())
         .then((result) => {
@@ -102,7 +110,7 @@ export default function Dashboard(props) {
         })
     }
 
-    const changeEnrollment = (course, is_enrolled) => {
+    const changeEnrollment = (course, is_enrolled, category) => {
         fetch('http://localhost:8000/api/student/current/enroll/', {
             method: 'POST',
             credentials: "include",
@@ -110,7 +118,7 @@ export default function Dashboard(props) {
                 'Content-Type': 'application/json',
                 'X-CSRFToken': Cookies.get('csrftoken'),
             },
-            body: JSON.stringify({course: course, is_enrolled: is_enrolled}),
+            body: JSON.stringify({course: course, is_enrolled: is_enrolled, category: category}),
         })
         .then((res) => res.json())
         .then((result) => {
@@ -131,17 +139,54 @@ export default function Dashboard(props) {
         })
         .then((res) => res.json())
         .then((result) => {
-            console.log(result)
             setDepartments(result)
         },
-            (error) => {
-              console.log(error);
-            })
+        (error) => {
+            console.log(error);
+        })
+        
+        fetch('http://localhost:8000/api/student/current/id/', {
+            method: 'GET',
+            credentials: "include",
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        })
+        .then((res) => res.json())
+        .then((result) => {
+            if(result.department != null){
+                setDepartement(result.department)
+                setOpened('parcours')
+                setProgress(34)
+            } 
+
+            if(result.parcours != null){
+                setParcours(result.parcours)
+                setOpened('obligatoires')
+                setProgress(67)
+            }
+             
+            const tempMandatory = []
+            for(const index in result.mandatory_courses){
+                tempMandatory.push(result.mandatory_courses[index].course.name)
+            }
+            setChoosenMandatoryCourses(tempMandatory)
+
+            const tempElective = []
+            for(const index in result.elective_courses){
+                tempElective.push(result.elective_courses[index].course.name)
+            }
+            setChoosenElectiveCourses(tempElective)
+
+        },
+        (error) => {
+            console.log(error);
+        })
     }, [])
 
     useEffect(() => {
-        if(departement != '') {
-            fetch('http://localhost:8000/api/parcours/?department=' + getDepartmentIdByCode(departement), {
+        if(departement != -1) {
+            fetch('http://localhost:8000/api/parcours/?department=' + departement, {
                 method: 'GET',
                 credentials: "include",
                 headers: {
@@ -159,8 +204,8 @@ export default function Dashboard(props) {
     }, [departement])
 
     useEffect(() => {
-        if(parcours.id != null) {
-            fetch('http://localhost:8000/api/course/?parcours=' + parcours.id + '&on_list=true' + getDepartmentIdByCode(departement), {
+        if(parcours != -1) {
+            fetch('http://localhost:8000/api/course/?parcours=' + parcours + '&on_list=true', {
                 method: 'GET',
                 credentials: "include",
                 headers: {
@@ -176,10 +221,6 @@ export default function Dashboard(props) {
                 })
         }
     }, [parcours]);
-
-    useEffect(() => {
-        console.log(id)
-    }, [])
 
     return (
         <>            
@@ -261,10 +302,7 @@ export default function Dashboard(props) {
                     </AccordionSummary>
                     <AccordionDetails>
                         <FormGroup>
-                            <FormControlLabel control={<Checkbox onClick={() => {}}/>} label="Cours 1 (3 ECTS)" />
-                            <FormControlLabel control={<Checkbox onClick={() => {}}/>} label="Cours 2 (5 ECTS)" />
-                            <FormControlLabel control={<Checkbox onClick={() => {}}/>} label="Processus stochastiques et application (4 ECTS)" />
-                            <FormControlLabel control={<Checkbox onClick={() => {}}/>} label="Technique de développement logiciel (3 ECTS)" />
+                            {getElectiveCourses()}
                         </FormGroup>
                     </AccordionDetails>
                 </Accordion>
