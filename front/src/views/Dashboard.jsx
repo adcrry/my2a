@@ -10,6 +10,7 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
 import Select from '@mui/material/Select';
 import Cookies from 'js-cookie';
+import '../styles/styles.css'
 
 export default function Dashboard() {
     
@@ -313,16 +314,15 @@ export default function Dashboard() {
     }, [parcours, choosenElectiveCourses, choosenMandatoryCourses])
 
     return (
-        <>            
+        <div>            
             <Topbar title="Mon parcours" />
             <Grid container style={{marginTop: '30px',  alignItems:"center", justifyContent:"center"}}>
-                <Grid item md={10} xs={12} sm={12}>
+                <Grid item md={10} xs={11} sm={11}>
                     <CustomProgressBar progress={progress} />
                 </Grid>
             </Grid>
-            <Grid container style={{marginTop: '80px',  alignItems:"center", justifyContent:"center"}}>
-            <Grid item md={10} xs={12} sm={12}>
-
+            <Grid container spacing={2} style={{marginTop: '80px',  alignItems:"center", justifyContent:"center"}}>
+            <Grid item md={5} xs={11} sm={11}>
             <Accordion expanded={opened==='departement'} onChange={(e, expanded) => {
                 if(expanded) handleChange('departement')
             }}>
@@ -376,7 +376,7 @@ export default function Dashboard() {
                     if(expanded) handleChange('obligatoires')
                 }}>
                     <AccordionSummary aria-controls="panel3d-content" id="panel3d-header">
-                    <Typography>Choix des cours obligatoires</Typography>
+                    <Typography>Choix des cours obligatoires sur liste</Typography>
                     </AccordionSummary>
                     <AccordionDetails>
                         <FormGroup>
@@ -397,8 +397,14 @@ export default function Dashboard() {
                     </AccordionDetails>
                 </Accordion>
                 </Grid>
+                <Grid item md={6} xs={11} sm={11}>
+                    <div className="pdf-viewer">
+                        <iframe key={choosenElectiveCourses + choosenMandatoryCourses} src="http://localhost/api/student/current/timetable/" width="100%" height="500px" />
+                    </div>
+                </Grid>
+                
             </Grid>
             
-        </>
+        </div>
     )
 }

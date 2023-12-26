@@ -132,6 +132,16 @@ class StudentViewset(ReadOnlyModelViewSet):
                 courses.remove(course)
         serializer = CourseSerializer(courses, many=True)
         return Response(serializer.data)
+    
+    @action(detail=False, methods=['get'], url_path="current/timetable")
+    def get_timetable(self, request):
+        student = get_object_or_404(Student, user=request.user)
+        response = HttpResponse(content_type='application/pdf')
+        response['Content-Disposition'] = 'filename=timetable.pdf'
+        response.write(student.generate_timetable())
+        pdf = student.generate_timetable()
+
+        return response
         
 
 class CourseViewset(ReadOnlyModelViewSet):

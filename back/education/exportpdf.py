@@ -1,15 +1,22 @@
 from reportlab.lib import colors
-from reportlab.lib.pagesizes import letter
+from reportlab.lib.pagesizes import letter, landscape
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph
 from reportlab.lib.styles import getSampleStyleSheet
+
+from io import BytesIO
+
+import datetime
+
+def date_to_hour_id(date : datetime.datetime):
+    return str(date.hour) + ("h" + str(date.minute)).replace("h0","h00")
 
 def generate_pdf_from_courses(name,courses):
     """
     Generate a pdf from a list of courses.
     """
-
+    buffer = BytesIO()
     pdf_file = "edt_"+ name + ".pdf"
-    doc = SimpleDocTemplate(pdf_file, pagesize=letter)
+    doc = SimpleDocTemplate(buffer, pagesize=landscape(letter))
     elements = []
 
     title_style = getSampleStyleSheet()['Title']
@@ -91,8 +98,9 @@ def generate_pdf_from_courses(name,courses):
     ])
 
     for course in courses:
-        start_line = hour_to_line[course["start_time"]]
-        end_line = hour_to_line[course["end_time"]]
+        print(course)
+        start_line = hour_to_line[date_to_hour_id(course["start_time"])]
+        end_line = hour_to_line[date_to_hour_id(course["end_time"])]
         style.add('LINEBELOW', (table_data[0].index(course["day"]), start_line-1), (table_data[0].index(course["day"]), start_line-1), 1, colors.black)
         style.add('LINEABOVE', (table_data[0].index(course["day"]), end_line+1), (table_data[0].index(course["day"]), end_line+1), 1, colors.black)
         
@@ -104,11 +112,12 @@ def generate_pdf_from_courses(name,courses):
             style.add('BACKGROUND', (table_data[0].index(course["day"]), line), (table_data[0].index(course["day"]), line), colors_list[courses.index(course)])
 
 
-    table = Table(table_data, colWidths=100, rowHeights=25)
+    table = Table(table_data, colWidths=100, rowHeights=15)
     
     table.setStyle(style)
 
     elements.append(table)
     doc.build(elements)
-
-    return pdf_file
+    pdf = buffer.getvalue()
+    buffer.close()
+    return pdf
