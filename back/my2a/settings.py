@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "rest_framework.authtoken",
+    "django_cas_ng"
 ]
 
 REST_FRAMEWORK = {
@@ -67,6 +68,8 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "django_cas_ng.middleware.CASMiddleware",
+
 ]
 
 ROOT_URLCONF = "my2a.urls"
@@ -85,6 +88,11 @@ TEMPLATES = [
             ],
         },
     },
+]
+
+AUTHENTICATION_BACKENDS = [
+    "django.contrib.auth.backends.ModelBackend",
+    "django_cas_ng.backends.CASBackend",
 ]
 
 WSGI_APPLICATION = "my2a.wsgi.application"
@@ -143,3 +151,10 @@ STATIC_URL = "/static/"
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# SSO CONNECT
+CAS_SERVER_URL = "http://cas.enpc.fr/cas/"
+CAS_CREATE_USER = False
+CAS_CHECK_NEXT = False
+CAS_REDIRECT_URL = "/"
+CAS_ADMIN_PREFIX = "admin/"
