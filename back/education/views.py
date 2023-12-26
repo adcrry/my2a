@@ -83,6 +83,8 @@ class StudentViewset(ReadOnlyModelViewSet):
         parcours = get_object_or_404(Parcours, id=request.data["parcours"])
         student.parcours = parcours
         student.save()
+        enrollment = Enrollment.objects.filter(student=student)
+        enrollment.delete()
         serializer = StudentSerializer(student)
         return Response(serializer.data)
     
@@ -105,6 +107,31 @@ class StudentViewset(ReadOnlyModelViewSet):
             enrollment = get_object_or_404(Enrollment, student=student, course__name=request.data["course"])
             enrollment.delete()
         return Response({"status":"ok"})
+    
+    @action(detail=False, methods=['get'], url_path="current/courses/available")
+    def get_available_courses(self, request):
+        """
+        Return the available courses for the current user.
+        """
+        student = get_object_or_404(Student, user=request.user)
+        courses = student.check_time_table()
+        serializer = CourseSerializer(courses, many=True)
+        return Response(serializer.data)
+    
+    @action(detail=False, methods=['get'], url_path="current/courses/available_electives")
+    def get_not_enrolled_courses(self, request):
+        """
+        Return the courses not enrolled by the current user.
+        """
+        student = get_object_or_404(Student, user=request.user)
+        courses = Course.objects.all()
+        courses = [course for course in courses]
+        mandatory = student.parcours.courses_mandatory.all().union(student.parcours.courses_on_list.all())
+        for course in mandatory:
+            if course in courses:
+                courses.remove(course)
+        serializer = CourseSerializer(courses, many=True)
+        return Response(serializer.data)
         
 
 class CourseViewset(ReadOnlyModelViewSet):

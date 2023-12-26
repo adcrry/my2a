@@ -1,9 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import { List, Paper, Grid, Typography, Accordion, AccordionSummary, AccordionDetails } from "@mui/material";
+import { Grid, Typography, Accordion, AccordionSummary, AccordionDetails } from "@mui/material";
 import Topbar from "../components/Topbar";
 import CustomProgressBar from "../components/ProgressBar";
-import Box from '@mui/material/Box';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
@@ -25,6 +23,7 @@ export default function Dashboard() {
     const [choosenMandatoryCourses, setChoosenMandatoryCourses] = useState([])
     const [electiveCourses, setElectiveCourses] = useState([])
     const [choosenElectiveCourses, setChoosenElectiveCourses] = useState([])
+    const [compatibleCourses, setCompatibleCourses] = useState([])
 
     const handleChange = (panel) => {
         if(opened != panel) setOpened(panel)
@@ -46,6 +45,15 @@ export default function Dashboard() {
         })
     }
 
+    const isCourseCompitable = (courseName) => {
+            for(const index in compatibleCourses){
+                if(compatibleCourses[index].name == courseName){
+                    return true
+                }
+            }
+            return false
+    }
+
     const getMandatoryCourses = () => {
         return mandatoryCourses.map((course) => {
             return (
@@ -60,9 +68,9 @@ export default function Dashboard() {
     const getElectiveCourses = () => {
         return electiveCourses.map((course) => {
             return (
-                <FormControlLabel control={<Checkbox onClick={(e) => {
+                <FormControlLabel control={<Checkbox defaultChecked={choosenElectiveCourses.includes(course.name)} onClick={(e) => {
                     changeEnrollment(course.name, e.target.checked, 'elective')
-                }}/>} label={course.name + ' (' + course.ects + ' ECTS)'} />
+                }}/>} label={course.name + ' (' + course.ects + ' ECTS)'} style={{color: isCourseCompitable(course.name) || choosenElectiveCourses.includes(course.name) ? 'black' : 'red'}} />
             )
         })
     
@@ -122,7 +130,58 @@ export default function Dashboard() {
         })
         .then((res) => res.json())
         .then((result) => {
-
+            fetch('http://localhost:8000/api/student/current/courses/available', {
+                method: 'GET',
+                credentials: "include",
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            })
+            .then((res) => res.json())
+            .then((result_available) => {
+                fetch('http://localhost:8000/api/student/current/courses/available_electives', {
+                    method: 'GET',
+                    credentials: "include",
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                })
+                .then((res) => res.json())
+                .then((result) => {
+                    setElectiveCourses(result)
+                    fetch('http://localhost:8000/api/student/current/id/', {
+                        method: 'GET',
+                        credentials: "include",
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                    })
+                    .then((res) => res.json())
+                    .then((result) => {
+                        const tempMandatory = []
+                        for(const index in result.mandatory_courses){
+                            tempMandatory.push(result.mandatory_courses[index].course.name)
+                        }
+                        setChoosenMandatoryCourses(tempMandatory)
+            
+                        const tempElective = []
+                        for(const index in result.elective_courses){
+                            tempElective.push(result.elective_courses[index].course.name)
+                        }
+                        setChoosenElectiveCourses(tempElective)
+                        setCompatibleCourses(result_available)
+            },
+            (error) => {
+                console.log(error);
+            })
+                },
+                (error) => {
+                    console.log(error);
+                })
+            },
+            (error) => {
+                console.log(error);
+            })
         },
         (error) => {
             console.log(error)
@@ -216,11 +275,42 @@ export default function Dashboard() {
             .then((result) => {
                 setMandatoryCourses(result)
             },
-                (error) => {
+            (error) => {
                 console.log(error);
-                })
+            })
         }
     }, [parcours]);
+
+    useEffect(() => {
+        fetch('http://localhost:8000/api/student/current/courses/available', {
+                method: 'GET',
+                credentials: "include",
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            })
+            .then((res) => res.json())
+            .then((result) => {
+                setCompatibleCourses(result)
+                fetch('http://localhost:8000/api/student/current/courses/available_electives', {
+                    method: 'GET',
+                    credentials: "include",
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                })
+                .then((res) => res.json())
+                .then((result) => {
+                    setElectiveCourses(result)
+                },
+                (error) => {
+                    console.log(error);
+                })
+            },
+            (error) => {
+                console.log(error);
+            })
+    }, [parcours, choosenElectiveCourses, choosenMandatoryCourses])
 
     return (
         <>            
