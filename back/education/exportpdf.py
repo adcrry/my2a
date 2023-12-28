@@ -1,6 +1,6 @@
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import letter, landscape
-from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, PageBreak
 from reportlab.lib.styles import getSampleStyleSheet
 
 from io import BytesIO
@@ -23,32 +23,16 @@ def generate_pdf_from_courses(name,courses):
     title_text = "Emploi du temps de "+name
     title = Paragraph(title_text, title_style)
     elements.append(title)
+    generate_table(elements, courses, "S3")
+    elements.append(PageBreak())
+    generate_table(elements, courses, "S4")
+    doc.build(elements)
+    pdf = buffer.getvalue()
+    buffer.close()
+    return pdf
 
-    table_data = [
-        [' ', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi'],
-        ['8h', ' ', ' ', ' ', ' ', ' '],
-        ['8h30', ' ', ' ', ' ', ' ', ' '],
-        ['9h', ' ', ' ', ' ', ' ', ' '],
-        ['9h30', ' ', ' ', ' ', ' ', ' '],
-        ['10h', ' ', ' ', ' ', ' ', ' '],
-        ['10h30', ' ', ' ', ' ', ' ', ' '],
-        ['11h', ' ', ' ', ' ', ' ', ' '],
-        ['11h30', ' ', ' ', ' ', ' ', ' '],
-        ['12h', ' ', ' ', ' ', ' ', ' '],
-        ['12h30', ' ', ' ', ' ', ' ', ' '],
-        ['13h', ' ', ' ', ' ', ' ', ' '],
-        ['13h30', ' ', ' ', ' ', ' ', ' '],
-        ['14h', ' ', ' ', ' ', ' ', ' '],
-        ['14h30', ' ', ' ', ' ', ' ', ' '],
-        ['15h', ' ', ' ', ' ', ' ', ' '],
-        ['15h30', ' ', ' ', ' ', ' ', ' '],
-        ['16h', ' ', ' ', ' ', ' ', ' '],
-        ['16h30', ' ', ' ', ' ', ' ', ' '],
-        ['17h', ' ', ' ', ' ', ' ', ' '],
-        ['17h30', ' ', ' ', ' ', ' ', ' '],
-        ['18h', ' ', ' ', ' ', ' ', ' ']
-        ]
-        
+
+def generate_table(elements, courses, semester):
     hour_to_line = {"8h00":1,
                     "8h30":2,
                     "9h00":3,
@@ -96,9 +80,49 @@ def generate_pdf_from_courses(name,courses):
         ('LINEAFTER', (0, 0), (-1, 0), 1, colors.black),
         ('BACKGROUND', (1, 1), (-1, -1), colors.whitesmoke),
     ])
-
+    table_data = [
+        [' ', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi'],
+        ['8h', ' ', ' ', ' ', ' ', ' '],
+        ['8h30', ' ', ' ', ' ', ' ', ' '],
+        ['9h', ' ', ' ', ' ', ' ', ' '],
+        ['9h30', ' ', ' ', ' ', ' ', ' '],
+        ['10h', ' ', ' ', ' ', ' ', ' '],
+        ['10h30', ' ', ' ', ' ', ' ', ' '],
+        ['11h', ' ', ' ', ' ', ' ', ' '],
+        ['11h30', ' ', ' ', ' ', ' ', ' '],
+        ['12h', ' ', ' ', ' ', ' ', ' '],
+        ['12h30', ' ', ' ', ' ', ' ', ' '],
+        ['13h', ' ', ' ', ' ', ' ', ' '],
+        ['13h30', ' ', ' ', ' ', ' ', ' '],
+        ['14h', ' ', ' ', ' ', ' ', ' '],
+        ['14h30', ' ', ' ', ' ', ' ', ' '],
+        ['15h', ' ', ' ', ' ', ' ', ' '],
+        ['15h30', ' ', ' ', ' ', ' ', ' '],
+        ['16h', ' ', ' ', ' ', ' ', ' '],
+        ['16h30', ' ', ' ', ' ', ' ', ' '],
+        ['17h', ' ', ' ', ' ', ' ', ' '],
+        ['17h30', ' ', ' ', ' ', ' ', ' '],
+        ['18h', ' ', ' ', ' ', ' ', ' ']
+        ]
+    style = TableStyle([
+        ('FONTNAME', (0, 0), (-1, -1), 'Times-Bold'),
+        ('BACKGROUND', (0, 0), (-1, 0), colors.lightgrey),
+        ('BACKGROUND', (0, 0), (0, -1), colors.lightgrey),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('BOX', (0, 0), (-1, -1), 1, colors.black),
+        ('LINEABOVE', (0, 0), (-1, 0), 1, colors.black),
+        ('LINEABOVE', (0, 0), (0, -1), 1, colors.black),
+        ('LINEBELOW', (0, 0), (-1, 0), 1, colors.black), 
+        ('LINEBELOW', (0, 0), (0, -1), 1, colors.black),
+        ('LINEAFTER', (1, 1), (-1, -1), 1, colors.black),
+        ('LINEAFTER', (0, 0), (0, -1), 1, colors.black),
+        ('LINEAFTER', (0, 0), (-1, 0), 1, colors.black),
+        ('BACKGROUND', (1, 1), (-1, -1), colors.whitesmoke),
+    ])
+    
     for course in courses:
-        print(course)
+        if(not course["semester"] == semester):
+            continue
         start_line = hour_to_line[date_to_hour_id(course["start_time"])]
         end_line = hour_to_line[date_to_hour_id(course["end_time"])]
         style.add('LINEBELOW', (table_data[0].index(course["day"]), start_line-1), (table_data[0].index(course["day"]), start_line-1), 1, colors.black)
@@ -117,7 +141,3 @@ def generate_pdf_from_courses(name,courses):
     table.setStyle(style)
 
     elements.append(table)
-    doc.build(elements)
-    pdf = buffer.getvalue()
-    buffer.close()
-    return pdf

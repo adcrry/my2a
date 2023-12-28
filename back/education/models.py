@@ -140,7 +140,7 @@ class Student(models.Model):
     def generate_timetable(self):
         """Return the timetable of the student."""
         courses = [e.course for e in Enrollment.objects.filter(student=self)] + [course for course in self.parcours.courses_mandatory.all()]
-        courses = [{"name":course.code,"day":course.day,"start_time":course.start_time,"end_time":course.end_time} for course in courses]
+        courses = [{"name":course.code,"day":course.day,"start_time":course.start_time,"end_time":course.end_time, "semester": course.semester} for course in courses]
         return generate_pdf_from_courses(self.name,courses)
 
 class Enrollment(models.Model):
