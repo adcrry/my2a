@@ -60,12 +60,17 @@ class CompleteStudentSerializer(serializers.ModelSerializer):
             "surname",
             "department",
             "parcours",
+            "ects",
             "mandatory_courses",
             "elective_courses"
         ]
 
     mandatory_courses = EnrollmentSerializer(many=True)
     elective_courses = EnrollmentSerializer(many=True)
+    ects = serializers.SerializerMethodField()
+
+    def get_ects(self, obj):
+        return obj.count_ects()
 
 
 class DepartmentSerializer(serializers.ModelSerializer):

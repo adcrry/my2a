@@ -99,20 +99,20 @@ class Student(models.Model):
 
     def check_time_table(self):
         """Return the list of compatible courses for the student."""
-        student_courses = Enrollment.objects.filter(student=self)
+        student_courses = [e.course for e in Enrollment.objects.filter(student=self)] + [course for course in self.parcours.courses_mandatory.all()]
         compatible_courses = []
         incompatible_courses = []
         courses = Course.objects.all()
-        if student_courses.count() == 0:
+        if len(student_courses) == 0:
             compatible_courses = courses
             return compatible_courses
         for course in courses:
             for s_courses in student_courses:
-                min_start = min(s_courses.course.start_time, course.start_time)
-                max_start = max(s_courses.course.start_time, course.start_time)
-                min_end = min(s_courses.course.end_time, course.end_time)
+                min_start = min(s_courses.start_time, course.start_time)
+                max_start = max(s_courses.start_time, course.start_time)
+                min_end = min(s_courses.end_time, course.end_time)
                
-                if (s_courses.course.semester == course.semester and s_courses.course.day == course.day and min_start <= max_start and max_start <= min_end):
+                if (s_courses.semester == course.semester and s_courses.day == course.day and min_start <= max_start and max_start <= min_end):
                     incompatible_courses.append(course)
                     if course in compatible_courses:
                         compatible_courses.remove(course)
@@ -127,7 +127,7 @@ class Student(models.Model):
         student_courses = Enrollment.objects.filter(student=self)
         ects = 0
         for course in student_courses:
-            ects += course.ects
+            ects += course.course._ects
         return ects
     
     def check_ects(self):
@@ -139,8 +139,8 @@ class Student(models.Model):
     
     def generate_timetable(self):
         """Return the timetable of the student."""
-        courses = Enrollment.objects.filter(student=self)
-        courses = [{"name":course.course.code,"day":course.course.day,"start_time":course.course.start_time,"end_time":course.course.end_time} for course in courses]
+        courses = [e.course for e in Enrollment.objects.filter(student=self)] + [course for course in self.parcours.courses_mandatory.all()]
+        courses = [{"name":course.code,"day":course.day,"start_time":course.start_time,"end_time":course.end_time} for course in courses]
         return generate_pdf_from_courses(self.name,courses)
 
 class Enrollment(models.Model):
