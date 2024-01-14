@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react';
+import {useEffect, useState, forwardRef} from 'react';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
@@ -11,8 +11,19 @@ import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye';
 import { styled, alpha } from '@mui/material/styles';
 import InputBase from '@mui/material/InputBase';
 import SearchIcon from '@mui/icons-material/Search'
+import Button from '@mui/material/Button';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
+import Slide from '@mui/material/Slide';
 
-export const GridBreak = styled('div')(({theme}) => ({
+const Transition = forwardRef(function Transition(props, ref) {
+    return <Slide direction="up" ref={ref} {...props} />;
+  });
+
+const GridBreak = styled('div')(({theme}) => ({
     width: '100%',
 }))
 
@@ -60,6 +71,12 @@ export default function Inspector(){
 
     const [students, setStudents] = useState([])
     const [search, setSearch] = useState('')
+    const [open, setOpen] = useState(false);
+    const [currentStudent, setCurrentStudent] = useState([])
+
+    const handleClose = () => {
+      setOpen(false);
+    };
 
     useEffect(() => {
         fetch("/api/student/", {
@@ -89,6 +106,21 @@ export default function Inspector(){
         })
     }
 
+    const fetchStudentData = (id) => {
+        fetch("/api/student/" + id, {
+            method: "GET",
+            credentials: "include",
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        })
+        .then((res) => res.json())
+        .then((result) => {
+            setCurrentStudent(result)
+            setOpen(true)
+        })
+    }
+
     const changeStudentStatus = (id) => {
 
     }
@@ -96,6 +128,7 @@ export default function Inspector(){
     useEffect(() => {
         updateSearch(search)
     },  [search])
+
     return (
         <div>
             <Topbar title="Gestion My2A" />
@@ -125,7 +158,9 @@ export default function Inspector(){
                         style={{backgroundColor: value.editable ? 'rgba(255, 0, 0, 0.2)' : 'rgba(0, 255, 0, 0.2)'}}
                         secondaryAction={
                             <>
-                                <IconButton edge="end" aria-label="removeredeye">
+                                <IconButton edge="end" aria-label="removeredeye" onClick={() => {
+                                    fetchStudentData(value.id)
+                                }}>
                                     <RemoveRedEyeIcon />
                                 </IconButton>
                                 <IconButton aria-label="edit" style={{marginLeft: '10px'}}>
@@ -143,6 +178,51 @@ export default function Inspector(){
                 </List>
                 </Grid>
             </Grid>
+            <Dialog
+                open={open}
+                TransitionComponent={Transition}
+                keepMounted
+                onClose={handleClose}
+                aria-describedby="alert-dialog-slide-description"
+            >
+                <DialogTitle>{currentStudent.surname}</DialogTitle>
+                <DialogContent>
+                <DialogContentText id="alert-dialog-slide-description">
+                    Cours obligatoires
+                    <List dense sx={{ bgcolor: 'background.paper' }}>
+                    {currentStudent.mandatory_courses && currentStudent.mandatory_courses.map((value) => {
+                        const labelId = `checkbox-list-secondary-label-${value}`;
+                        return (
+                        <ListItem
+                            key={value.id}
+                            disablePadding
+                        >
+                            <ListItemText id={labelId} primary={`-  ${value.course.name}`} />
+                        </ListItem>
+                        );
+                    })}
+                    </List>
+                    Courses électifs
+                    <List dense sx={{ bgcolor: 'background.paper' }}>
+                    {currentStudent.elective_courses && currentStudent.elective_courses.map((value) => {
+                        const labelId = `checkbox-list-secondary-label-${value}`;
+                        return (
+                        <ListItem
+                            key={value.id}
+                            disablePadding
+                        >
+                            <ListItemText id={labelId} primary={`- ${value.course.name}`} />
+                        </ListItem>
+                        );
+                    })}
+                    </List>
+                </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                <Button onClick={handleClose}>Imprimer</Button>
+                <Button onClick={handleClose}>Fermer</Button>
+                </DialogActions>
+            </Dialog>
         </div>
     )
 }

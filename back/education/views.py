@@ -4,6 +4,8 @@ from django.http import HttpResponse
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
+from rest_framework.permissions import IsAdminUser
+from rest_framework.decorators import permission_classes
 
 from .models import Student, Course, Department, Parcours, Enrollment
 from .serializers import (
@@ -41,13 +43,21 @@ class StudentViewset(ReadOnlyModelViewSet):
         queryset = Student.objects.all()
         return queryset
     
+    @permission_classes([IsAdminUser])
+    def retrieve(self, request, pk=None):
+        """
+        Returns a queryset of all Student objects.
+        """
+        student = get_object_or_404(Student, id=pk)
+        serializer = CompleteStudentSerializer(student)
+        return Response(serializer.data)
+    
 
     @action(detail=False, methods=['get'])
     def search(self, request):
         students = Student.objects.filter(surname__contains=request.GET['search'])
         serializer = StudentSerializer(students, many=True)
         return Response(serializer.data)
-
 
     @action(detail=False, methods=['get'])
     def current(self, request):
