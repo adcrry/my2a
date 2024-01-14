@@ -26,6 +26,7 @@ export default function Dashboard() {
     const [choosenElectiveCourses, setChoosenElectiveCourses] = useState([])
     const [compatibleCourses, setCompatibleCourses] = useState([])
     const [isLogged, setIsLogged] = useState(false)
+    const [editable, setEditable] = useState(false)
 
     const handleChange = (panel) => {
         if (opened != panel) setOpened(panel)
@@ -61,7 +62,7 @@ export default function Dashboard() {
             return (
                 <FormControlLabel control={<Checkbox defaultChecked={choosenMandatoryCourses.includes(course.name)} onClick={(e) => {
                     changeEnrollment(course.name, e.target.checked, 'mandatory')
-                }} />} disabled={!isCourseCompitable(course.name) && !choosenMandatoryCourses.includes(course.name)} label={course.name + ' (' + course.ects / 10 + ' ECTS)'} />
+                }} />} disabled={!editable || !isCourseCompitable(course.name) && !choosenMandatoryCourses.includes(course.name)} label={course.name + ' (' + course.ects / 10 + ' ECTS)'} />
             )
         })
 
@@ -72,7 +73,7 @@ export default function Dashboard() {
             return (
                 <FormControlLabel control={<Checkbox defaultChecked={choosenElectiveCourses.includes(course.name)} onClick={(e) => {
                     changeEnrollment(course.name, e.target.checked, 'elective')
-                }} />} disabled={!isCourseCompitable(course.name) && !choosenElectiveCourses.includes(course.name)} label={course.name + ' (' + course.ects / 10 + ' ECTS)'} />
+                }} />} disabled={!editable || !isCourseCompitable(course.name) && !choosenElectiveCourses.includes(course.name)} label={course.name + ' (' + course.ects / 10 + ' ECTS)'} />
             )
         })
 
@@ -80,7 +81,7 @@ export default function Dashboard() {
 
     const changeDepartment = (code) => {
         setDepartement(code)
-        fetch('http://localhost:8000/api/student/current/department/', {
+        fetch('http://localhost/api/student/current/department/', {
             method: 'POST',
             credentials: "include",
             headers: {
@@ -101,7 +102,7 @@ export default function Dashboard() {
 
     const changeParcours = (code) => {
         setParcours(code)
-        fetch('http://localhost:8000/api/student/current/parcours/', {
+        fetch('http://localhost/api/student/current/parcours/', {
             method: 'POST',
             credentials: "include",
             headers: {
@@ -121,7 +122,7 @@ export default function Dashboard() {
     }
 
     const changeEnrollment = (course, is_enrolled, category) => {
-        fetch('http://localhost:8000/api/student/current/enroll/', {
+        fetch('http://localhost/api/student/current/enroll/', {
             method: 'POST',
             credentials: "include",
             headers: {
@@ -132,7 +133,7 @@ export default function Dashboard() {
         })
             .then((res) => res.json())
             .then((result) => {
-                fetch('http://localhost:8000/api/student/current/courses/available', {
+                fetch('http://localhost/api/student/current/courses/available', {
                     method: 'GET',
                     credentials: "include",
                     headers: {
@@ -141,7 +142,7 @@ export default function Dashboard() {
                 })
                     .then((res) => res.json())
                     .then((result_available) => {
-                        fetch('http://localhost:8000/api/student/current/courses/available_electives', {
+                        fetch('http://localhost/api/student/current/courses/available_electives', {
                             method: 'GET',
                             credentials: "include",
                             headers: {
@@ -151,7 +152,7 @@ export default function Dashboard() {
                             .then((res) => res.json())
                             .then((result) => {
                                 setElectiveCourses(result)
-                                fetch('http://localhost:8000/api/student/current/id/', {
+                                fetch('http://localhost/api/student/current/id/', {
                                     method: 'GET',
                                     credentials: "include",
                                     headers: {
@@ -191,7 +192,7 @@ export default function Dashboard() {
     }
 
     useEffect(() => {
-        fetch('http://localhost:8000/api/student/current/', {
+        fetch('http://localhost/api/student/current/', {
             method: 'GET',
             credentials: "include",
             headers: {
@@ -204,7 +205,7 @@ export default function Dashboard() {
                     window.location.href = '/cas/login/'
                 } else {
                     setIsLogged(true)
-                    fetch('http://localhost:8000/api/department/', {
+                    fetch('http://localhost/api/department/', {
                         method: 'GET',
                         credentials: "include",
                         headers: {
@@ -219,7 +220,7 @@ export default function Dashboard() {
                                 console.log(error);
                             })
 
-                    fetch('http://localhost:8000/api/student/current/id/', {
+                    fetch('http://localhost/api/student/current/id/', {
                         method: 'GET',
                         credentials: "include",
                         headers: {
@@ -265,7 +266,7 @@ export default function Dashboard() {
 
     useEffect(() => {
         if (departement != -1) {
-            fetch('http://localhost:8000/api/parcours/?department=' + departement, {
+            fetch('http://localhost/api/parcours/?department=' + departement, {
                 method: 'GET',
                 credentials: "include",
                 headers: {
@@ -284,7 +285,7 @@ export default function Dashboard() {
 
     useEffect(() => {
         if (parcours != -1) {
-            fetch('http://localhost:8000/api/course/?parcours=' + parcours + '&on_list=true', {
+            fetch('http://localhost/api/course/?parcours=' + parcours + '&on_list=true', {
                 method: 'GET',
                 credentials: "include",
                 headers: {
@@ -299,7 +300,7 @@ export default function Dashboard() {
                         console.log(error);
                     })
 
-            fetch('http://localhost:8000/api/student/current/courses/available', {
+            fetch('http://localhost/api/student/current/courses/available', {
                 method: 'GET',
                 credentials: "include",
                 headers: {
@@ -308,7 +309,7 @@ export default function Dashboard() {
             })
                 .then((res) => res.json())
                 .then((result_available) => {
-                    fetch('http://localhost:8000/api/student/current/courses/available_electives', {
+                    fetch('http://localhost/api/student/current/courses/available_electives', {
                         method: 'GET',
                         credentials: "include",
                         headers: {
@@ -318,7 +319,7 @@ export default function Dashboard() {
                         .then((res) => res.json())
                         .then((result) => {
                             setElectiveCourses(result)
-                            fetch('http://localhost:8000/api/student/current/id/', {
+                            fetch('http://localhost/api/student/current/id/', {
                                 method: 'GET',
                                 credentials: "include",
                                 headers: {
@@ -339,6 +340,8 @@ export default function Dashboard() {
                                     }
                                     setChoosenElectiveCourses(tempElective)
                                     setCompatibleCourses(result_available)
+                                    setEditable(result.editable)
+                                    console.log('DKSF,SDFS', result.editable)
                                 },
                                     (error) => {
                                         console.log(error);
@@ -356,7 +359,7 @@ export default function Dashboard() {
     }, [parcours]);
 
     useEffect(() => {
-        fetch('http://localhost:8000/api/student/current/courses/available', {
+        fetch('http://localhost/api/student/current/courses/available', {
             method: 'GET',
             credentials: "include",
             headers: {
@@ -366,7 +369,7 @@ export default function Dashboard() {
             .then((res) => res.json())
             .then((result) => {
                 setCompatibleCourses(result)
-                fetch('http://localhost:8000/api/student/current/courses/available_electives', {
+                fetch('http://localhost/api/student/current/courses/available_electives', {
                     method: 'GET',
                     credentials: "include",
                     headers: {
@@ -417,6 +420,7 @@ export default function Dashboard() {
                                                 changeDepartment(e.target.value)
                                             }}
                                             placeholder="Département"
+                                            disabled={!editable}
                                         >
                                             {getDepartmentItems()}
                                         </Select>
@@ -441,6 +445,7 @@ export default function Dashboard() {
                                                 changeParcours(e.target.value)
                                             }}
                                             placeholder="Parcours"
+                                            disabled={!editable}
                                         >
                                             {getParcoursItems()}
                                         </Select>

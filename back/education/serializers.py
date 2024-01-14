@@ -13,6 +13,7 @@ class StudentSerializer(serializers.ModelSerializer):
             "surname",
             "department",
             "parcours",
+            "editable"
         ]
 
 
@@ -62,7 +63,8 @@ class CompleteStudentSerializer(serializers.ModelSerializer):
             "parcours",
             "ects",
             "mandatory_courses",
-            "elective_courses"
+            "elective_courses",
+            "editable"
         ]
 
     mandatory_courses = EnrollmentSerializer(many=True)

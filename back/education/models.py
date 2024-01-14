@@ -86,14 +86,15 @@ class Student(models.Model):
     department = models.ForeignKey(
         Department, on_delete=models.CASCADE, null=True, blank=True
     )
+    editable = models.BooleanField()
 
     def mandatory_courses(self):
         """Return the list of mandatory courses for the student."""
         return Enrollment.objects.filter(student=self, category="mandatory")
     
-
     def elective_courses(self):
         """Return the list of elective courses for the student."""
+        print("ksdjfksdjfsijfd")
         return Enrollment.objects.filter(student=self, category="elective")
         
 

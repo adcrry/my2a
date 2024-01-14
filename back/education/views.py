@@ -41,6 +41,14 @@ class StudentViewset(ReadOnlyModelViewSet):
         queryset = Student.objects.all()
         return queryset
     
+
+    @action(detail=False, methods=['get'])
+    def search(self, request):
+        students = Student.objects.filter(surname__contains=request.GET['search'])
+        serializer = StudentSerializer(students, many=True)
+        return Response(serializer.data)
+
+
     @action(detail=False, methods=['get'])
     def current(self, request):
         """
@@ -67,6 +75,8 @@ class StudentViewset(ReadOnlyModelViewSet):
         Set current user department.
         """
         student = get_object_or_404(Student, user=request.user)
+        if not student.editable: 
+            return Response({"error":"student_not_editable"})
         department = get_object_or_404(Department, id=request.data["department"])
         student.department = department
         student.parcours = None
@@ -80,6 +90,8 @@ class StudentViewset(ReadOnlyModelViewSet):
         Set current user parcours.
         """
         student = get_object_or_404(Student, user=request.user)
+        if not student.editable: 
+            return Response({"error":"student_not_editable"})
         parcours = get_object_or_404(Parcours, id=request.data["parcours"])
         student.parcours = parcours
         student.save()
@@ -94,6 +106,8 @@ class StudentViewset(ReadOnlyModelViewSet):
         Update the course choice of the current user.
         """
         student = get_object_or_404(Student, user=request.user)
+        if not student.editable: 
+            return Response({"error":"student_not_editable"})
         if request.data["is_enrolled"]:
             course = get_object_or_404(Course, name=request.data["course"])
             if Enrollment.objects.filter(student=student, course=course).exists():
