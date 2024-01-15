@@ -43,14 +43,9 @@ class Course(models.Model):
     start_time = models.TimeField()
     end_time = models.TimeField()
 
-    # ects -> faire *10, prendre en compte qu'on ne compte pas les langues, -> 39 ects
-    _ects = models.IntegerField() 
+    ects = models.FloatField() 
 
     teacher = models.CharField(max_length=100, null=True, blank=True)
-
-    @property
-    def ects(self):
-        return self._ects * 10
 
     def __str__(self):
         return self.code
@@ -128,7 +123,7 @@ class Student(models.Model):
         student_courses = Enrollment.objects.filter(student=self)
         ects = 0
         for course in student_courses:
-            ects += course.course._ects
+            ects += course.course.ects
         return ects
     
     def check_ects(self):

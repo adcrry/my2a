@@ -62,7 +62,7 @@ export default function Dashboard() {
             return (
                 <FormControlLabel control={<Checkbox defaultChecked={choosenMandatoryCourses.includes(course.name)} onClick={(e) => {
                     changeEnrollment(course.name, e.target.checked, 'mandatory')
-                }} />} disabled={!editable || !isCourseCompitable(course.name) && !choosenMandatoryCourses.includes(course.name)} label={course.name + ' (' + course.ects / 10 + ' ECTS)'} />
+                }} />} disabled={!editable || !isCourseCompitable(course.name) && !choosenMandatoryCourses.includes(course.name)} label={course.name + ' (' + course.ects + ' ECTS)'} />
             )
         })
 
@@ -73,7 +73,7 @@ export default function Dashboard() {
             return (
                 <FormControlLabel control={<Checkbox defaultChecked={choosenElectiveCourses.includes(course.name)} onClick={(e) => {
                     changeEnrollment(course.name, e.target.checked, 'elective')
-                }} />} disabled={!editable || !isCourseCompitable(course.name) && !choosenElectiveCourses.includes(course.name)} label={course.name + ' (' + course.ects / 10 + ' ECTS)'} />
+                }} />} disabled={!editable || !isCourseCompitable(course.name) && !choosenElectiveCourses.includes(course.name)} label={course.name + ' (' + course.ects + ' ECTS)'} />
             )
         })
 
