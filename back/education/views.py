@@ -138,6 +138,8 @@ class StudentViewset(ReadOnlyModelViewSet):
         Return the available courses for the current user.
         """
         student = get_object_or_404(Student, user=request.user)
+        if student.parcours is None: 
+            return Response([])
         courses = student.check_time_table()
         serializer = CourseSerializer(courses, many=True)
         return Response(serializer.data)
@@ -150,6 +152,8 @@ class StudentViewset(ReadOnlyModelViewSet):
         student = get_object_or_404(Student, user=request.user)
         courses = Course.objects.all()
         courses = [course for course in courses]
+        if student.parcours is None: 
+            return Response([])
         mandatory = student.parcours.courses_mandatory.all().union(student.parcours.courses_on_list.all())
         for course in mandatory:
             if course in courses:
@@ -166,7 +170,23 @@ class StudentViewset(ReadOnlyModelViewSet):
         pdf = student.generate_timetable()
 
         return response
-        
+    
+    @action(detail=False, methods=['get'], url_path='updatestatus')
+    def change_status(self, request):
+        #check if user is admin or is self
+        student = get_object_or_404(Student, user=request.user)
+        if request.GET['id'] is not None:
+            if(student.user.is_superuser):  
+                target_student = get_object_or_404(Student, id=request.GET['id'])
+                target_student.editable = not target_student.editable
+                target_student.save()
+                return Response({"status": "ok"})
+        else:
+            if student.editable:
+                student.editable = False
+                student.save()
+                return Response({"status": "ok"})
+        return Response({"status": "error"})
 
 class CourseViewset(ReadOnlyModelViewSet):
     """

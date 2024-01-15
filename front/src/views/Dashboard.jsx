@@ -81,6 +81,7 @@ export default function Dashboard() {
 
     const changeDepartment = (code) => {
         setDepartement(code)
+        setParcours(-1)
         fetch('http://localhost/api/student/current/department/', {
             method: 'POST',
             credentials: "include",
@@ -229,6 +230,7 @@ export default function Dashboard() {
                     })
                         .then((res) => res.json())
                         .then((result) => {
+                            setEditable(result.editable)
                             if (result.department != null) {
                                 setDepartement(result.department)
                                 setOpened('parcours')
@@ -309,6 +311,7 @@ export default function Dashboard() {
             })
                 .then((res) => res.json())
                 .then((result_available) => {
+                    console.log("EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE")
                     fetch('http://localhost/api/student/current/courses/available_electives', {
                         method: 'GET',
                         credentials: "include",
@@ -341,7 +344,6 @@ export default function Dashboard() {
                                     setChoosenElectiveCourses(tempElective)
                                     setCompatibleCourses(result_available)
                                     setEditable(result.editable)
-                                    console.log('DKSF,SDFS', result.editable)
                                 },
                                     (error) => {
                                         console.log(error);

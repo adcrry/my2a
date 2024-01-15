@@ -73,12 +73,13 @@ export default function Inspector(){
     const [search, setSearch] = useState('')
     const [open, setOpen] = useState(false);
     const [currentStudent, setCurrentStudent] = useState([])
+    const [editOpened, setEditOpened] = useState(false)
 
     const handleClose = () => {
       setOpen(false);
     };
 
-    useEffect(() => {
+    const updateStudents = () => {
         fetch("/api/student/", {
             method: "GET",
             credentials: "include",
@@ -90,6 +91,10 @@ export default function Inspector(){
         .then((result) => {
             setStudents(result)
         })
+    }
+
+    useEffect(() => {
+        updateStudents()
     }, [])
 
     const updateSearch = (search) => {
@@ -122,7 +127,18 @@ export default function Inspector(){
     }
 
     const changeStudentStatus = (id) => {
-
+        fetch("/api/student/updatestatus/?id=" + id, {
+            method: "GET",
+            credentials: "include",
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        })
+        .then((res) => res.json())
+        .then((result) => {
+            setEditOpened(false)
+            updateStudents()
+        })
     }
 
     useEffect(() => {
@@ -163,7 +179,12 @@ export default function Inspector(){
                                 }}>
                                     <RemoveRedEyeIcon />
                                 </IconButton>
-                                <IconButton aria-label="edit" style={{marginLeft: '10px'}}>
+                                <IconButton aria-label="edit" style={{marginLeft: '10px'}} onClick={
+                                    () => {
+                                        setCurrentStudent(value)
+                                        setEditOpened(true)
+                                    }
+                                }>
                                     <EditIcon />
                                 </IconButton>
                             </>
@@ -197,7 +218,7 @@ export default function Inspector(){
                             key={value.id}
                             disablePadding
                         >
-                            <ListItemText id={labelId} primary={`-  ${value.course.name}`} />
+                            <ListItemText id={labelId} primary={`- ${value.course.name}`} />
                         </ListItem>
                         );
                     })}
@@ -221,6 +242,26 @@ export default function Inspector(){
                 <DialogActions>
                 <Button onClick={handleClose}>Imprimer</Button>
                 <Button onClick={handleClose}>Fermer</Button>
+                </DialogActions>
+            </Dialog>
+            <Dialog
+                open={editOpened}
+                TransitionComponent={Transition}
+                keepMounted
+                onClose={() => {setEditOpened(false)}}
+                aria-describedby="alert-dialog-slide-description"
+            >
+                <DialogTitle>Êtes-vous certain de vouloir modifier le statut de {currentStudent.name} ?</DialogTitle>
+                <DialogContent>
+                <DialogContentText id="alert-dialog-slide-description">
+                    Attention: {currentStudent.name} pourra à nouveau modifier son contrat de formation
+                </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                <Button onClick={() => {changeStudentStatus(currentStudent.id)}}>Valider</Button>
+                <Button onClick={() => {
+                    setEditOpened(false)
+                }}>Fermer</Button>
                 </DialogActions>
             </Dialog>
         </div>
