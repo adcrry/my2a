@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { Grid, Typography, Accordion, AccordionSummary, AccordionDetails } from "@mui/material";
+import React, { useEffect, useState, forwardRef } from "react";
+import { Button, Grid, Typography, Accordion, AccordionSummary, AccordionDetails, Box, setRef } from "@mui/material";
 import Topbar from "../components/Topbar";
 import CustomProgressBar from "../components/ProgressBar";
 import InputLabel from '@mui/material/InputLabel';
@@ -7,11 +7,22 @@ import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
+import SendIcon from '@mui/icons-material/Send';
 import Checkbox from '@mui/material/Checkbox';
 import Select from '@mui/material/Select';
 import Cookies from 'js-cookie';
 import '../styles/styles.css'
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
+import Slide from '@mui/material/Slide';
+import CircularProgress from '@mui/material/CircularProgress';
 
+const Transition = forwardRef(function Transition(props, ref) {
+    return <Slide direction="up" ref={ref} {...props} />;
+});
 export default function Dashboard() {
 
     const [progress, setProgress] = useState(0)
@@ -27,6 +38,8 @@ export default function Dashboard() {
     const [compatibleCourses, setCompatibleCourses] = useState([])
     const [isLogged, setIsLogged] = useState(false)
     const [editable, setEditable] = useState(false)
+    const [confirmationDialogState, setConfirmationDialogState] = useState(false)
+    const [student, setStudent] = useState({})
 
     const handleChange = (panel) => {
         if (opened != panel) setOpened(panel)
@@ -162,6 +175,7 @@ export default function Dashboard() {
                                 })
                                     .then((res) => res.json())
                                     .then((result) => {
+                                        setStudent(result)
                                         const tempMandatory = []
                                         for (const index in result.mandatory_courses) {
                                             tempMandatory.push(result.mandatory_courses[index].course.name)
@@ -190,6 +204,21 @@ export default function Dashboard() {
                 (error) => {
                     console.log(error)
                 })
+    }
+
+    const validateForm = () => {
+        fetch('/api/student/updatestatus/', {
+            method: 'GET',
+            credentials: "include",
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        })
+            .then((res) => res.json)
+            .then((result) => {
+                setConfirmationDialogState(false)
+                window.location.href = '/dashboard'
+            })
     }
 
     useEffect(() => {
@@ -230,6 +259,7 @@ export default function Dashboard() {
                     })
                         .then((res) => res.json())
                         .then((result) => {
+                            setStudent(result)
                             setEditable(result.editable)
                             if (result.department != null) {
                                 setDepartement(result.department)
@@ -331,6 +361,7 @@ export default function Dashboard() {
                             })
                                 .then((res) => res.json())
                                 .then((result) => {
+                                    setStudent(result)
                                     const tempMandatory = []
                                     for (const index in result.mandatory_courses) {
                                         tempMandatory.push(result.mandatory_courses[index].course.name)
@@ -403,6 +434,21 @@ export default function Dashboard() {
                     </Grid>
                     <Grid container spacing={2} style={{ marginTop: '80px', alignItems: "center", justifyContent: "center" }}>
                         <Grid item md={5} xs={11} sm={11}>
+                            <Box sx={{ position: 'relative', display: 'inline-flex' }}>
+                                <CircularProgress variant="determinate" value={100} />
+                                <Box sx={{
+                                    top: 0,
+                                    left: 0,
+                                    bottom: 0,
+                                    right: 0,
+                                    position: 'absolute',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                }}>
+                                    <Typography variant="caption" component="div">{student.ects} ECTS</Typography>
+                                </Box>
+                            </Box>
                             <Accordion expanded={opened === 'departement'} onChange={(e, expanded) => {
                                 if (expanded) handleChange('departement')
                             }}>
@@ -478,15 +524,42 @@ export default function Dashboard() {
                                     </FormGroup>
                                 </AccordionDetails>
                             </Accordion>
+                            {editable && (
+                                <Button variant="contained" style={{ marginTop: 10, float: "right" }} onClick={() => {
+                                    setConfirmationDialogState(true)
+                                }} endIcon={<SendIcon />}>
+                                    VALIDER
+                                </Button>
+                            )}
                         </Grid>
                         <Grid item md={6} xs={11} sm={11}>
                             <div className="pdf-viewer">
                                 <iframe key={mandatoryCourses + choosenElectiveCourses + choosenMandatoryCourses} src="http://localhost/api/student/current/timetable/" width="100%" height="500px" />
                             </div>
                         </Grid>
-
                     </Grid>
-
+                    <Dialog
+                        open={confirmationDialogState}
+                        TransitionComponent={Transition}
+                        keepMounted
+                        onClose={() => setConfirmationDialogState(false)}
+                        aria-describedby="alert-dialog-slide-description"
+                    >
+                        <DialogTitle>{"Êtes-vous certain de vouloir valider votre cours de choix ?"}</DialogTitle>
+                        <DialogContent>
+                            <DialogContentText id="alert-dialog-slide-description">
+                                Attention: Cette action est irréversible. Aucun changement ne pourra être effectué sans approbation de l'administration.
+                            </DialogContentText>
+                        </DialogContent>
+                        <DialogActions>
+                            <Button onClick={() => {
+                                validateForm()
+                            }}>Valider</Button>
+                            <Button onClick={() => {
+                                setConfirmationDialogState(false)
+                            }}>Annuler</Button>
+                        </DialogActions>
+                    </Dialog>
                 </div>
             )}
         </>

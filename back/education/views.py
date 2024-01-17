@@ -175,7 +175,7 @@ class StudentViewset(ReadOnlyModelViewSet):
     def change_status(self, request):
         #check if user is admin or is self
         student = get_object_or_404(Student, user=request.user)
-        if request.GET['id'] is not None:
+        if 'id' in request.GET:
             if(student.user.is_superuser):  
                 target_student = get_object_or_404(Student, id=request.GET['id'])
                 target_student.editable = not target_student.editable

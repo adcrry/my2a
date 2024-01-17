@@ -124,6 +124,8 @@ class Student(models.Model):
         ects = 0
         for course in student_courses:
             ects += course.course.ects
+        for course in self.parcours.courses_mandatory.all():
+            ects += course.ects
         return ects
     
     def check_ects(self):
