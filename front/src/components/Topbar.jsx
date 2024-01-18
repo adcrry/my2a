@@ -7,7 +7,7 @@ import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
 
-export default function Topbar(props) {
+export default function TopBar(props) {
 
     return (
         <AppBar position="static" elevation={0}>
