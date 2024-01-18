@@ -6,6 +6,7 @@ import ListItemText from '@mui/material/ListItemText';
 
 import TopBar from "../components/TopBar"
 // import NavBar from "../components/NavBar"
+import SectionBar from "../components/SectionBar";
 
 
 import { Grid } from '@mui/material';
@@ -154,6 +155,8 @@ export default function Inspector() {
             <TopBar title="Gestion My2A" />
             <Grid container style={{ marginTop: '30px', alignItems: "center", justifyContent: "center" }}>
                 <Grid item md={6}>
+                    <SectionBar title="Parcourir les étudiants" />
+                    <div style={{ marginBottom: '10px' }}></div>
                     <Search>
                         <SearchIconWrapper>
                             <SearchIcon />
@@ -194,8 +197,9 @@ export default function Inspector() {
                                         </>
                                     }
                                 >
+                                    {/* Rq : mettre dans l'ordre alphabétique */}
                                     <ListItemButton>
-                                        <ListItemText id={labelId} primary={`${value.surname}`} />
+                                        <ListItemText id={labelId} primary={`${value.surname}` + ` ${value.name}`} />
                                     </ListItemButton>
                                 </ListItem>
                             );
@@ -222,7 +226,7 @@ export default function Inspector() {
                                         key={value.id}
                                         disablePadding
                                     >
-                                        <ListItemText id={labelId} primary={`- ${value.course.name}`} />
+                                        <ListItemText id={labelId} primary={`- ${value.course.surname}`} />
                                     </ListItem>
                                 );
                             })}
@@ -236,7 +240,7 @@ export default function Inspector() {
                                         key={value.id}
                                         disablePadding
                                     >
-                                        <ListItemText id={labelId} primary={`- ${value.course.name}`} />
+                                        <ListItemText id={labelId} primary={`- ${value.course.surname}`} />
                                     </ListItem>
                                 );
                             })}
@@ -255,17 +259,15 @@ export default function Inspector() {
                 onClose={() => { setEditOpened(false) }}
                 aria-describedby="alert-dialog-slide-description"
             >
-                <DialogTitle>Êtes-vous certain de vouloir modifier le statut de {currentStudent.name} ?</DialogTitle>
+                <DialogTitle>Rendre le profil de {currentStudent.name} {currentStudent.surname} modifiable ?</DialogTitle>
                 <DialogContent>
                     <DialogContentText id="alert-dialog-slide-description">
-                        Attention: {currentStudent.name} pourra à nouveau modifier son contrat de formation
+                        Attention: {currentStudent.name} pourra à nouveau modifier ses choix de parcours et cours.
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={() => { changeStudentStatus(currentStudent.id) }}>Valider</Button>
-                    <Button onClick={() => {
-                        setEditOpened(false)
-                    }}>Fermer</Button>
+                    <Button onClick={() => { changeStudentStatus(currentStudent.id) }}>Confirmer</Button>
+                    <Button onClick={() => { setEditOpened(false) }}>Annuler</Button>
                 </DialogActions>
             </Dialog>
         </div>
