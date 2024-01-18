@@ -11,6 +11,7 @@ import SectionBar from "../components/SectionBar";
 
 import { Grid } from '@mui/material';
 import IconButton from "@mui/material/IconButton";
+import DownloadIcon from '@mui/icons-material/Download';
 import EditIcon from "@mui/icons-material/Edit";
 import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye';
 import { styled, alpha } from '@mui/material/styles';
@@ -229,19 +230,21 @@ export default function Inspector() {
                 onClose={handleClose}
                 aria-describedby="alert-dialog-slide-description"
             >
-                <DialogTitle>{currentStudent.surname}</DialogTitle>
+                <DialogTitle>{currentStudent.surname} {currentStudent.name}</DialogTitle>
                 <DialogContent>
                     <DialogContentText>
-                        Département : {labels.departments && labels.departments[currentStudent.department-1]}
+                        <DialogContentText>
+                            <strong>Département</strong> : {labels.departments && labels.departments[currentStudent.department-1]}
+                        </DialogContentText>
                     </DialogContentText>
                     <DialogContentText>
-                        Parcours : {labels.parcours && labels.parcours[currentStudent.parcours-1]}
+                    <strong>Parcours</strong> : {labels.parcours && labels.parcours[currentStudent.parcours-1]}
                     </DialogContentText>
                     <DialogContentText>
-                        ECTS : {currentStudent.ects}
+                    <strong>ECTS</strong> : <span style={{ fontWeight:  currentStudent.ects < required_ects ? 'bold' : 'normal',  color: currentStudent.ects < required_ects ? 'red' : 'black' }}>{currentStudent.ects}</span>
                     </DialogContentText>
                     <DialogContentText id="alert-dialog-slide-description">
-                        Cours obligatoires
+                    <strong>Cours obligatoires</strong>
                         <List dense sx={{ bgcolor: 'background.paper' }}>
                             {currentStudent.mandatory_courses && currentStudent.mandatory_courses.map((value) => {
                                 const labelId = `checkbox-list-secondary-label-${value}`;
@@ -255,7 +258,7 @@ export default function Inspector() {
                                 );
                             })}
                         </List>
-                        Courses électifs
+                        <strong>Courses électifs </strong>
                         <List dense sx={{ bgcolor: 'background.paper' }}>
                             {currentStudent.elective_courses && currentStudent.elective_courses.map((value) => {
                                 const labelId = `checkbox-list-secondary-label-${value}`;
@@ -272,8 +275,8 @@ export default function Inspector() {
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleClose}>Imprimer</Button>
-                    <Button onClick={handleClose}>Fermer</Button>
+                    <Button color="secondary" variant="outlined" onClick={handleClose} startIcon={<DownloadIcon />} >Imprimer</Button>
+                    <Button color="inherit" variant="outlined" onClick={handleClose}>Fermer</Button>
                 </DialogActions>
             </Dialog>
             <Dialog
