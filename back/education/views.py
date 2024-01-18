@@ -21,6 +21,15 @@ from rest_framework.decorators import action
 def index(request):
     return HttpResponse("Hello, world. You're at the polls index.")
 
+class TranslationView(APIView):
+
+    def get(self, request, format=None):
+        """
+        Return a list of all users.
+        """
+        department = [department.code for department in Department.objects.all()]
+        parcours = [parcours.name for parcours in Parcours.objects.all()]
+        return Response({"departments": department, "parcours": parcours})
 
 class StudentViewset(ReadOnlyModelViewSet):
     """

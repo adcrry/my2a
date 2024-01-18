@@ -80,6 +80,7 @@ export default function Inspector() {
     const [open, setOpen] = useState(false);
     const [currentStudent, setCurrentStudent] = useState([])
     const [editOpened, setEditOpened] = useState(false)
+    const [labels, setLabels] = useState({})
 
     const handleClose = () => {
         setOpen(false);
@@ -101,6 +102,19 @@ export default function Inspector() {
 
     useEffect(() => {
         updateStudents()
+        console.log("oaziufsofsopfi")
+        fetch("/api/labels/", {
+            method: "GET",
+            credentials: "include",
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then((res) => res.json())
+        .then((result) => {
+            setLabels(result)
+            console.log(result)
+        })
     }, [])
 
     const updateSearch = (search) => {
@@ -218,10 +232,10 @@ export default function Inspector() {
                 <DialogTitle>{currentStudent.surname}</DialogTitle>
                 <DialogContent>
                     <DialogContentText>
-                        Département : {currentStudent.department}
+                        Département : {labels.departments && labels.departments[currentStudent.department-1]}
                     </DialogContentText>
                     <DialogContentText>
-                        Parcours : {currentStudent.ects}
+                        Parcours : {labels.parcours && labels.parcours[currentStudent.parcours-1]}
                     </DialogContentText>
                     <DialogContentText>
                         ECTS : {currentStudent.ects}
