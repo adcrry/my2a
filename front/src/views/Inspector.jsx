@@ -226,7 +226,7 @@ export default function Inspector() {
                                         key={value.id}
                                         disablePadding
                                     >
-                                        <ListItemText id={labelId} primary={`- ${value.course.surname}`} />
+                                        <ListItemText id={labelId} primary={`- ${value.course.name}`} />
                                     </ListItem>
                                 );
                             })}
@@ -240,7 +240,7 @@ export default function Inspector() {
                                         key={value.id}
                                         disablePadding
                                     >
-                                        <ListItemText id={labelId} primary={`- ${value.course.surname}`} />
+                                        <ListItemText id={labelId} primary={`- ${value.course.name}`} />
                                     </ListItem>
                                 );
                             })}

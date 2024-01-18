@@ -24,7 +24,7 @@ const handleClose = () => {
 
 
 export default function SectionBar(props) {
-    const info = true;
+    const info = false;
     const [openDialog, setOpenDialog] = React.useState(false);
 
     return (
@@ -47,7 +47,6 @@ export default function SectionBar(props) {
                             <DialogTitle>Explications</DialogTitle>
                             <DialogContent>
                                 <DialogContentText>
-                                    {console.log("infooooos")}
                                     {props.infos}
                                 </DialogContentText>
                             </DialogContent>

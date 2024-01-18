@@ -1,6 +1,6 @@
 import React, { useEffect, useState, forwardRef } from "react";
 import { Button, Grid, Typography, Accordion, AccordionSummary, AccordionDetails, Box, setRef } from "@mui/material";
-import Topbar from "../components/Topbar";
+import TopBar from "../components/TopBar";
 import CustomProgressBar from "../components/ProgressBar";
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
@@ -19,6 +19,8 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import Slide from '@mui/material/Slide';
 import CircularProgress from '@mui/material/CircularProgress';
+
+const required_ects = 49.5
 
 const Transition = forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
@@ -341,7 +343,6 @@ export default function Dashboard() {
             })
                 .then((res) => res.json())
                 .then((result_available) => {
-                    console.log("EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE")
                     fetch('http://localhost/api/student/current/courses/available_electives', {
                         method: 'GET',
                         credentials: "include",
@@ -426,29 +427,32 @@ export default function Dashboard() {
         <>
             {isLogged && (
                 <div>
-                    <Topbar title="Mon parcours" />
-                    <Grid container style={{ marginTop: '30px', alignItems: "center", justifyContent: "center" }}>
-                        <Grid item md={10} xs={11} sm={11}>
+                    <TopBar title="Mon parcours" />
+                    <Grid container columnGap={10} style={{ marginTop: '30px', alignItems: "center", justifyContent: "center" }}>
+                        <Grid item md={8} xs={11} sm={11}>
                             <CustomProgressBar progress={progress} />
                         </Grid>
-                    </Grid>
-                    <Grid container spacing={2} style={{ marginTop: '80px', alignItems: "center", justifyContent: "center" }}>
-                        <Grid item md={5} xs={11} sm={11}>
-                            <Box sx={{ position: 'relative', display: 'inline-flex' }}>
-                                <CircularProgress variant="determinate" value={100} />
+                        <Grid md={1}>
+                        <Box sx={{ position: 'relative', display: 'inline-flex', marginBottom: 4 }}>
+                                <CircularProgress variant="determinate" value={student.ects/49.5*100} size={120} thickness={3}/>
                                 <Box sx={{
                                     top: 0,
                                     left: 0,
                                     bottom: 0,
                                     right: 0,
+                                    width: 120,
                                     position: 'absolute',
                                     display: 'flex',
                                     alignItems: 'center',
-                                    justifyContent: 'center',
+                                    textAlign: 'center',
                                 }}>
-                                    <Typography variant="caption" component="div">{student.ects} ECTS</Typography>
+                                    <Typography sx={{fontWeight: 'bold', fontSize: 18}}variant="caption" component="div">{student.ects} / {required_ects} ECTS </Typography>
                                 </Box>
                             </Box>
+                        </Grid>
+                    </Grid>
+                    <Grid container spacing={2} style={{ marginTop: '80px', alignItems: "center", justifyContent: "center" }}>
+                        <Grid item md={5} xs={11} sm={11}>
                             <Accordion expanded={opened === 'departement'} onChange={(e, expanded) => {
                                 if (expanded) handleChange('departement')
                             }}>
