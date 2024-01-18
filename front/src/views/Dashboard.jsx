@@ -434,7 +434,7 @@ export default function Dashboard() {
                         </Grid>
                         <Grid md={1}>
                         <Box sx={{ position: 'relative', display: 'inline-flex', marginBottom: 4 }}>
-                                <CircularProgress color={student.ects < required_ects ? "warning" : "success"} variant="determinate" value={student.ects/required_ects*100} size={120} thickness={3}/>
+                                <CircularProgress color={student.ects < required_ects ? "warning" : "success"} variant="determinate" value={student.ects > required_ects ? 100 : student.ects/required_ects*100} size={120} thickness={3}/>
                                 <Box sx={{
                                     top: 0,
                                     left: 0,
