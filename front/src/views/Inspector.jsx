@@ -151,7 +151,7 @@ export default function Inspector() {
 
     return (
         <div>
-            <NavBar title="Gestion My2A" />
+            <TopBar title="Gestion My2A" />
             <Grid container style={{ marginTop: '30px', alignItems: "center", justifyContent: "center" }}>
                 <Grid item md={6}>
                     <Search>
