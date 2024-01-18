@@ -20,6 +20,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import Slide from '@mui/material/Slide';
 import CircularProgress from '@mui/material/CircularProgress';
 import { required_ects } from "../utils/utils";
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
 const Transition = forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
@@ -455,12 +456,11 @@ export default function Dashboard() {
                             <Accordion expanded={opened === 'departement'} onChange={(e, expanded) => {
                                 if (expanded) handleChange('departement')
                             }}>
-                                <AccordionSummary aria-controls="panel1d-content" id="panel1d-header">
-                                    <Typography>Choix du département</Typography>
+                                <AccordionSummary aria-controls="panel1d-content" id="panel1d-header" expandIcon={<ExpandMoreIcon />}>
+                                    <Typography><b>Choix du département</b></Typography>
                                 </AccordionSummary>
                                 <AccordionDetails>
-                                    <Typography>Choisissez votre département de 2A: </Typography>
-                                    <FormControl fullWidth style={{ marginTop: 20 }}>
+                                    <FormControl fullWidth>
                                         <InputLabel>Département</InputLabel>
                                         <Select
                                             labelId="demo-simple-select-label"
@@ -481,8 +481,8 @@ export default function Dashboard() {
                             <Accordion disabled={progress < 33} expanded={opened === 'parcours'} onChange={(e, expanded) => {
                                 if (expanded) handleChange('parcours')
                             }}>
-                                <AccordionSummary aria-controls="panel2d-content" id="panel2d-header">
-                                    <Typography>Choix du parcours</Typography>
+                                <AccordionSummary aria-controls="panel2d-content" id="panel2d-header" expandIcon={<ExpandMoreIcon />}>
+                                    <Typography><b>Choix du parcours</b></Typography>
                                 </AccordionSummary>
                                 <AccordionDetails>
                                     <FormControl fullWidth>
@@ -506,8 +506,8 @@ export default function Dashboard() {
                             <Accordion disabled={progress < 66} expanded={opened === 'obligatoires'} onChange={(e, expanded) => {
                                 if (expanded) handleChange('obligatoires')
                             }}>
-                                <AccordionSummary aria-controls="panel3d-content" id="panel3d-header">
-                                    <Typography>Choix des cours obligatoires sur liste</Typography>
+                                <AccordionSummary aria-controls="panel3d-content" id="panel3d-header" expandIcon={<ExpandMoreIcon />}>
+                                    <Typography><b>Choix des cours obligatoires sur liste</b></Typography>
                                 </AccordionSummary>
                                 <AccordionDetails>
                                     <FormGroup>
@@ -518,8 +518,8 @@ export default function Dashboard() {
                             <Accordion disabled={progress < 66} expanded={opened === 'electifs'} onChange={(e, expanded) => {
                                 if (expanded) handleChange('electifs')
                             }}>
-                                <AccordionSummary aria-controls="panel3d-content" id="panel3d-header">
-                                    <Typography>Choix des cours électifs</Typography>
+                                <AccordionSummary aria-controls="panel3d-content" id="panel3d-header" expandIcon={<ExpandMoreIcon />}   >
+                                    <Typography><b>Choix des cours électifs</b></Typography>
                                 </AccordionSummary>
                                 <AccordionDetails>
                                     <FormGroup>
@@ -531,7 +531,7 @@ export default function Dashboard() {
                                 <Button variant="contained" disableElevation style={{ marginTop: 10, float: "right" }} onClick={() => {
                                     setConfirmationDialogState(true)
                                 }} endIcon={<SendIcon />}>
-                                    ENVOYER
+                                    Confirmer
                                 </Button>
                             )}
                         </Grid>
@@ -554,7 +554,7 @@ export default function Dashboard() {
                                 Attention: Cette action est irréversible. Aucun changement ultérieur ne pourra être effectué sauf en cas de demande auprès de l'administration.
                             </DialogContentText>
                             <DialogContentText sx={{color: "red", fontWeight: "bold"}}>
-                                {student.ects < required_ects && "Vous n'avez que " + student.ects + " ECTS sur les " + required_ects + " requis. EN GROS TU VAS AVOIR DES PROBLEMES AVEC SANDRINE FAIS UN EFFORT FRERE"}
+                                {student.ects < required_ects && "Vous n'avez que " + student.ects + " ECTS sur les " + required_ects + " requis. EN GROS TU VAS AVOIR DES PROBLEMES AVEC SANDRINE FAIS UN EFFORT"}
                             </DialogContentText>
                         </DialogContent>
                         <DialogActions>
