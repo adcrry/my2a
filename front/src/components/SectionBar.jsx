@@ -7,19 +7,14 @@ import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
 
-export default function Topbar(props) {
-
+export default function SectionBar(props) {
     return (
-        <AppBar position="static" elevation={0}>
+        <AppBar position="static" color={props.color} elevation={0}>
             <Toolbar variant="dense">
-                <IconButton edge="start" color="inherit" aria-label="menu" sx={{ mr: 2 }}>
-                    <MenuIcon />
-                </IconButton>
                 <Typography variant="h6" color="inherit" component="div">
                     {props.title}
                 </Typography>
             </Toolbar>
         </AppBar>
     )
-
 }
