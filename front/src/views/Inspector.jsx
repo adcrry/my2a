@@ -23,6 +23,7 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import Slide from '@mui/material/Slide';
+import { required_ects } from "../utils/utils";
 
 const Transition = forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
@@ -216,6 +217,15 @@ export default function Inspector() {
             >
                 <DialogTitle>{currentStudent.surname}</DialogTitle>
                 <DialogContent>
+                    <DialogContentText>
+                        Département : {currentStudent.department}
+                    </DialogContentText>
+                    <DialogContentText>
+                        Parcours : {currentStudent.ects}
+                    </DialogContentText>
+                    <DialogContentText>
+                        ECTS : {currentStudent.ects}
+                    </DialogContentText>
                     <DialogContentText id="alert-dialog-slide-description">
                         Cours obligatoires
                         <List dense sx={{ bgcolor: 'background.paper' }}>
@@ -262,7 +272,7 @@ export default function Inspector() {
                 <DialogTitle>Rendre le profil de {currentStudent.name} {currentStudent.surname} modifiable ?</DialogTitle>
                 <DialogContent>
                     <DialogContentText id="alert-dialog-slide-description">
-                        Attention: {currentStudent.name} pourra à nouveau modifier ses choix de parcours et cours.
+                        Attention: {currentStudent.name} pourra à nouveau modifier ses choix de cours.
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>

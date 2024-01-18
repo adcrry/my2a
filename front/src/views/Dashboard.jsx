@@ -19,8 +19,7 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import Slide from '@mui/material/Slide';
 import CircularProgress from '@mui/material/CircularProgress';
-
-const required_ects = 49.5
+import { required_ects } from "../utils/utils";
 
 const Transition = forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
@@ -434,7 +433,7 @@ export default function Dashboard() {
                         </Grid>
                         <Grid md={1}>
                         <Box sx={{ position: 'relative', display: 'inline-flex', marginBottom: 4 }}>
-                                <CircularProgress variant="determinate" value={student.ects/49.5*100} size={120} thickness={3}/>
+                                <CircularProgress color={student.ects < required_ects ? "warning" : "success"} variant="determinate" value={student.ects/required_ects*100} size={120} thickness={3}/>
                                 <Box sx={{
                                     top: 0,
                                     left: 0,
@@ -446,12 +445,12 @@ export default function Dashboard() {
                                     alignItems: 'center',
                                     textAlign: 'center',
                                 }}>
-                                    <Typography sx={{fontWeight: 'bold', fontSize: 18}}variant="caption" component="div">{student.ects} / {required_ects} ECTS </Typography>
+                                    <Typography sx={{fontWeight: 'bold', fontSize: 18}} variant="caption" component="div">{student.ects} / {required_ects} ECTS </Typography>
                                 </Box>
                             </Box>
                         </Grid>
                     </Grid>
-                    <Grid container spacing={2} style={{ marginTop: '80px', alignItems: "center", justifyContent: "center" }}>
+                    <Grid container spacing={5} style={{ marginTop: '10px', justifyContent: "center" }}>
                         <Grid item md={5} xs={11} sm={11}>
                             <Accordion expanded={opened === 'departement'} onChange={(e, expanded) => {
                                 if (expanded) handleChange('departement')
@@ -529,10 +528,10 @@ export default function Dashboard() {
                                 </AccordionDetails>
                             </Accordion>
                             {editable && (
-                                <Button variant="contained" style={{ marginTop: 10, float: "right" }} onClick={() => {
+                                <Button variant="contained" disableElevation style={{ marginTop: 10, float: "right" }} onClick={() => {
                                     setConfirmationDialogState(true)
                                 }} endIcon={<SendIcon />}>
-                                    VALIDER
+                                    ENVOYER
                                 </Button>
                             )}
                         </Grid>
@@ -549,16 +548,19 @@ export default function Dashboard() {
                         onClose={() => setConfirmationDialogState(false)}
                         aria-describedby="alert-dialog-slide-description"
                     >
-                        <DialogTitle>{"Êtes-vous certain de vouloir valider votre cours de choix ?"}</DialogTitle>
+                        <DialogTitle>{"Confirmer mes choix de cours ?"}</DialogTitle>
                         <DialogContent>
                             <DialogContentText id="alert-dialog-slide-description">
-                                Attention: Cette action est irréversible. Aucun changement ne pourra être effectué sans approbation de l'administration.
+                                Attention: Cette action est irréversible. Aucun changement ultérieur ne pourra être effectué sauf en cas de demande auprès de l'administration.
+                            </DialogContentText>
+                            <DialogContentText sx={{color: "red", fontWeight: "bold"}}>
+                                {student.ects < required_ects && "Vous n'avez que " + student.ects + " ECTS sur les " + required_ects + " requis. EN GROS TU VAS AVOIR DES PROBLEMES AVEC SANDRINE FAIS UN EFFORT FRERE"}
                             </DialogContentText>
                         </DialogContent>
                         <DialogActions>
                             <Button onClick={() => {
                                 validateForm()
-                            }}>Valider</Button>
+                            }}>Confirmer</Button>
                             <Button onClick={() => {
                                 setConfirmationDialogState(false)
                             }}>Annuler</Button>
