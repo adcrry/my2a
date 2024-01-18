@@ -5,3 +5,5 @@ backups/
 db/.DS_Store
 *.numbers
 *.sqlite3
+back/.DS_Store
+.DS_Store
