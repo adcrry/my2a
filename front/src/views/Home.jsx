@@ -1,7 +1,7 @@
 import React from 'react';
 
 import '../components/TopBar'
-import Topbar from '../components/Topbar';
+// import Topbar from '../components/Topbar';
 
 export default function HomeView() {
 

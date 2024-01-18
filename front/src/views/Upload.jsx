@@ -7,12 +7,9 @@ import SectionBar from "../components/SectionBar";
 
 
 import { Grid } from '@mui/material';
-import IconButton from "@mui/material/IconButton";
-import EditIcon from "@mui/icons-material/Edit";
-import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye';
+import InfoIcon from '@mui/icons-material/Info';
 import { styled, alpha } from '@mui/material/styles';
-import InputBase from '@mui/material/InputBase';
-import SearchIcon from '@mui/icons-material/Search'
+import { IconButton } from '@mui/material';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import SendIcon from '@mui/icons-material/Send';
 import Button from '@mui/material/Button';
@@ -43,32 +40,7 @@ const VisuallyHiddenInput = styled('input')({
 export default function Upload() {
     const [students, setStudents] = useState([]);
     const [selectedFile, setSelectedFile] = useState(null);
-
-    // const [openSB, setOpenSB] = React.useState(false);
-    // const [exitedSB, setExitedSB] = React.useState(true);
-    // const nodeRef = React.useRef(null);
-
-    // const handleCloseSB = (_, reason) => {
-    //     if (reason === 'clickaway') { return; }
-
-    //     setOpenSB(false);
-    // };
-
-    // const handleClickSB = () => {
-    //     setOpenSB(true);
-    // };
-
-    // const handleOnEnterSB = () => {
-    //     setExitedSB(false);
-    // };
-
-    // const handleOnExitedSB = () => {
-    //     setExitedSB(true);
-    // };
-
-    const handleClose = () => {
-        setOpen(false);
-    };
+    const [openDialog, setOpenDialog] = useState(false);
 
     const updateStudents = () => {
         fetch("/api/student/", {
@@ -86,7 +58,28 @@ export default function Upload() {
 
     const handleFileChange = (event) => {
         setSelectedFile(event.target.files[0]);
+        // Checker que c'est un csv
     };
+
+    const handleImportClick = () => {
+
+        // <MySnackBar message="Tout est bon" details="C'est good" isError={false} />
+        // const formData = new FormData();
+        // formData.append("file", selectedFile);
+
+        // fetch("/api/student/import", {
+        //     method: "POST",
+        //     credentials: "include",
+        //     body: formData,
+        // })
+        //     .then((res) => res.json())
+        //     .then((result) => {
+        //         // console.log(result);
+        //         // handleClickSB();
+        //         updateStudents();
+        //     });
+    }
+
 
     useEffect(() => {
         updateStudents();
@@ -94,19 +87,23 @@ export default function Upload() {
 
     return (
         <div>
-            <NavBar title="Gestion My2A > Imports" />
+            <TopBar title="Gestion My2A > Imports" />
             <Grid container style={{ marginTop: '30px', alignItems: "center", justifyContent: "center" }}>
                 <Grid item md={6} rowGap={8} spacing={12}>
-                    <SectionBar title="Importer des cours" />
-                    <div style={{ marginBottom: '10px' }}></div>
+                    <SectionBar
+                        title="Importer des cours"
+                        infos="blabla"
+                    />
+                    {/* <Button variant="outlined" startIcon={<InfoIcon />}></Button> */}
+                    <div style={{ marginBottom: '20px' }}></div>
                     <Grid container justifyContent="center" columnGap={4}>
-                        {/* <Button component="label" variant="outlined" color="secondary" startIcon={<CloudUploadIcon />} disabled={selectedFile !== null}>
+                        <Button component="label" variant="outlined" color="secondary" startIcon={<CloudUploadIcon />} disabled={selectedFile !== null}>
                             Sélectionner un fichier
                             <VisuallyHiddenInput type="file" onChange={handleFileChange} />
-                        </Button> */}
-                        {/* <Button variant="contained" color="secondary" endIcon={<SendIcon />} disableElevation disabled={selectedFile === null} onClick={handleImportClick}>
+                        </Button>
+                        <Button variant="contained" color="secondary" endIcon={<SendIcon />} disableElevation disabled={selectedFile === null} onClick={handleImportClick}>
                             Importer
-                        </Button> */}
+                        </Button>
 
                     </Grid>
                 </Grid>
@@ -121,7 +118,5 @@ export default function Upload() {
 // Checker que c'est bien un csv. sinon message d'erreur 
 // Ajouter un i pour avoir un exemple de csv.
 
-{/* <TriggerButton type="button" onClick={handleClickSB}>
-                            Open snackbar
-                        </TriggerButton> */}
+
 {/* <MySnackBar message="Tout est bon" details="C'est good" isError={false} /> */ }
