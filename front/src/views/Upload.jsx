@@ -58,6 +58,7 @@ export default function Upload() {
     const [snackbarSeverity, setSnackbarSeverity] = useState("success");
     const [processed, setProcessed] = useState(false);
     const [failedProcessing, setFailedProcessing] = useState([]);
+    const [createdProcessing, setCreatedProcessing] = useState([]);
 
 
     const handleFileChange = (event) => {
@@ -69,7 +70,7 @@ export default function Upload() {
         if (validFileTypes.includes(fileType)) {
             setSelectedFile(file);
             setOpenSnackbar(true);
-            setSnackbarMessage("Fichier valide");
+            setSnackbarMessage("Format du fichier valide");
             setSnackbarSeverity("success");
 
             // Fichier valide, continuer le traitement
@@ -107,6 +108,7 @@ export default function Upload() {
                         setSnackbarMessage("Import partiellement réussi");
                         setSnackbarSeverity("warning");
                         setFailedProcessing(result.failed);
+                        setCreatedProcessing(result.created);
                     }
                     else {
                         setOpenSnackbar(true);
@@ -125,6 +127,9 @@ export default function Upload() {
     const handleImportClick = () => {
         // <MySnackBar message="Tout est bon" details="C'est good" isError={false} />
         if (selectedFile) {
+            setOpenSnackbar(true);
+            setSnackbarMessage("Import en cours...");
+            setSnackbarSeverity("info");
             sendFile();
         }
     }
@@ -166,14 +171,34 @@ export default function Upload() {
 
                         {/* Afficher les erreurs si il y en a */}
                         {processed && (
-                            failedProcessing.length > 0 ? (
+                            createdProcessing.length > 0 ? (
                                 <div>
                                     <Typography sx={{ mt: 6, ml: 8 }} variant="h6" component="div">
+                                        Les cours suivants ont été créés:
+                                    </Typography>
+                                    <List sx={{ ml: 12 }}>
+                                        {createdProcessing.map((code) => (
+                                            <ListItem key={code}>
+                                                <ListItemText primary={<>-  <strong>{code}</strong></>} />
+                                            </ListItem>
+                                        ))}
+                                    </List>
+                                </div>
+                            ) : (
+                                <Typography sx={{ mt: 6, ml: 8 }} variant="h6" component="div">
+                                    Aucun cours n'a été ajouté.
+                                </Typography>
+                            ))
+                        }
+                        {processed && (
+                            failedProcessing.length > 0 ? (
+                                <div>
+                                    <Typography sx={{ mt: 0, ml: 8 }} variant="h6" component="div">
                                         Tout a bien été importé sauf les cours suivants:
                                     </Typography>
                                     <List sx={{ ml: 12 }}>
                                         {failedProcessing.map(([code, err]) => (
-                                            <ListItem key={code} sx={{ height: 25 }}>
+                                            <ListItem key={code}>
                                                 {/* <ListItemIcon>
                                                     <FiberManualRecordIcon fontSize="tiny" />
                                                 </ListItemIcon> */}
@@ -183,12 +208,12 @@ export default function Upload() {
                                     </List>
                                 </div>
                             ) : (
-                                <Typography sx={{ mt: 2, ml: 8 }} variant="h6" component="div">
+                                <Typography sx={{ mt: 0, ml: 8 }} variant="h6" component="div">
                                     Tout a bien été importé !
                                 </Typography>
                             )
-                        )}
-
+                        )
+                        }
                     </Box>
                 </Grid>
                 <GridBreak />

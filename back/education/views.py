@@ -388,13 +388,14 @@ class ImportCourseCSV(APIView):
         if csv_file:
             print(f"Received CSV file: {csv_file.name}")
             print("About to process it...")
-            failed = importCourseCSV(csv_file)
+            failed, new = importCourseCSV(csv_file)
             print("Done!")
             return Response(
                 {
                     "success": True,
                     "message": "CSV file processed successfully",
                     "failed": failed,
+                    "created": new,
                 },
                 status=status.HTTP_200_OK,
             )
