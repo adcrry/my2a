@@ -24,7 +24,7 @@ import Grid from '@mui/material/Grid';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
-
+import Cookies from 'js-cookie';
 
 
 const GridBreak = styled('div')(({ theme }) => ({
@@ -90,28 +90,43 @@ export default function Upload() {
         setOpenSnackbar(false);
     };
 
+    const sendFile = () => {
+        const formData = new FormData();
+        formData.append("csv_file", selectedFile);
+
+        fetch("/api/upload/course", {
+            method: "POST",
+            credentials: "include",
+            headers: {
+                'X-CSRFToken': Cookies.get("csrftoken")
+            },
+            body: formData,
+        })
+            .then((res) => res.json())
+            .then((result) => {
+                if (result.success) {
+                    setOpenSnackbar(true);
+                    setSnackbarMessage("Import réussi");
+                    setSnackbarSeverity("success");
+                    setSelectedFile(null);
+                } else {
+                    setOpenSnackbar(true);
+                    setSnackbarMessage("Erreur lors de l'import");
+                    setSnackbarSeverity("error");
+                }
+            });
+    };
+
     const handleImportClick = () => {
-
         // <MySnackBar message="Tout est bon" details="C'est good" isError={false} />
-        // const formData = new FormData();
-        // formData.append("file", selectedFile);
-
-        // fetch("/api/student/import", {
-        //     method: "POST",
-        //     credentials: "include",
-        //     body: formData,
-        // })
-        //     .then((res) => res.json())
-        //     .then((result) => {
-        //         // console.log(result);
-        //         // handleClickSB();
-        //         updateStudents();
-        //     });
+        if (selectedFile) {
+            sendFile();
+        }
     }
 
 
     useEffect(() => {
-        updateStudents();
+        // updateStudents();
     }, []);
 
     return (
@@ -161,9 +176,3 @@ export default function Upload() {
         </div >
     )
 }
-
-// Checker que c'est bien un csv. sinon message d'erreur 
-// Ajouter un i pour avoir un exemple de csv.
-
-
-{/* <MySnackBar message="Tout est bon" details="C'est good" isError={false} /> */ }
