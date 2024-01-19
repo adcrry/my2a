@@ -10,6 +10,7 @@ import SectionBar from "../components/SectionBar";
 import InfoIcon from '@mui/icons-material/Info';
 import { styled, alpha } from '@mui/material/styles';
 import { IconButton } from '@mui/material';
+import ClearIcon from '@mui/icons-material/Clear';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import SendIcon from '@mui/icons-material/Send';
 import Button from '@mui/material/Button';
@@ -20,7 +21,10 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import Slide from '@mui/material/Slide';
 import Grid from '@mui/material/Grid';
+import Snackbar from '@mui/material/Snackbar';
+import MuiAlert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
+
 
 
 const GridBreak = styled('div')(({ theme }) => ({
@@ -43,6 +47,9 @@ export default function Upload() {
     const [students, setStudents] = useState([]);
     const [selectedFile, setSelectedFile] = useState(null);
     const [openDialog, setOpenDialog] = useState(false);
+    const [openSnackbar, setOpenSnackbar] = useState(false);
+    const [snackbarMessage, setSnackbarMessage] = useState("");
+    const [snackbarSeverity, setSnackbarSeverity] = useState("success");
 
     const updateStudents = () => {
         fetch("/api/student/", {
@@ -58,9 +65,29 @@ export default function Upload() {
             });
     };
 
+
     const handleFileChange = (event) => {
-        setSelectedFile(event.target.files[0]);
-        // Checker que c'est un csv
+        const file = event.target.files[0];
+        const fileType = file.type;
+        const validFileTypes = ['text/csv'];
+
+        if (validFileTypes.includes(fileType)) {
+            setSelectedFile(file);
+            setOpenSnackbar(true);
+            setSnackbarMessage("Fichier valide");
+            setSnackbarSeverity("success");
+
+            // Fichier valide, continuer le traitement
+        } else {
+            // Fichier invalide, afficher un message d'erreur
+            setOpenSnackbar(true);
+            setSnackbarMessage("Le fichier doit être au format CSV.");
+            setSnackbarSeverity("error");
+        }
+    };
+
+    const handleCloseSnackbar = () => {
+        setOpenSnackbar(false);
     };
 
     const handleImportClick = () => {
@@ -92,18 +119,25 @@ export default function Upload() {
             <TopBar title="Gestion My2A > Imports" />
             <Grid container style={{ marginTop: '30px', alignItems: "center", justifyContent: "center" }}>
                 <Grid item md={6} rowGap={8} spacing={12}>
-                    <Box sx={{ backgroundColor: "white", paddingBottom: 2 }}>
+                    <Box sx={{ backgroundColor: "white", paddingBottom: 2, borderRadius: "0 0 16px 16px" }}>
                         <SectionBar
                             title="Importer des cours"
-                            infos="blabla"
+                            infos="Il faut que le fichier soit au format csv."
+                            showInfo={true}
                         />
                         {/* <Button variant="outlined" startIcon={<InfoIcon />}></Button> */}
                         <div style={{ marginBottom: '20px' }}></div>
                         <Grid container justifyContent="center" columnGap={4}>
                             <Button component="label" variant="contained" disableElevation color="secondary" startIcon={<CloudUploadIcon />} disabled={selectedFile !== null}>
-                                Sélectionner un fichier
+                                {selectedFile ? selectedFile.name : "Sélectionner un fichier"}
                                 <VisuallyHiddenInput type="file" onChange={handleFileChange} />
                             </Button>
+                            {selectedFile && (
+                                <IconButton color="error" onClick={() => setSelectedFile(null)} style={{ marginLeft: -30 }}
+                                >
+                                    <ClearIcon />
+                                </IconButton>
+                            )}
                             <Button variant="contained" color="secondary" endIcon={<SendIcon />} disableElevation disabled={selectedFile === null} onClick={handleImportClick}>
                                 Importer
                             </Button>
@@ -115,6 +149,12 @@ export default function Upload() {
                 <Grid item md={6} xs={11} sm={11}>
                 </Grid>
             </Grid >
+            <Snackbar open={openSnackbar} autoHideDuration={6000} onClose={handleCloseSnackbar}>
+                <MuiAlert onClose={handleCloseSnackbar} sx={{ width: '100%' }} severity={snackbarSeverity} variant="filled"
+                >
+                    {snackbarMessage}
+                </MuiAlert>
+            </Snackbar>
         </div >
     )
 }
