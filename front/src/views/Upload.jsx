@@ -106,9 +106,26 @@ export default function Upload() {
             .then((result) => {
                 if (result.success) {
                     setOpenSnackbar(true);
+                    // setSnackbarMessage("Import réussi sauf pour les cours suivants:" + result.failed);
                     setSnackbarMessage("Import réussi");
                     setSnackbarSeverity("success");
                     setSelectedFile(null);
+                    console.log(result);
+                    console.log(result.failed);
+                    // if (result.failed.length > 0) {
+                    setOpenDialog(true);
+                    <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
+                        <DialogTitle>Import réussi sauf pour les cours suivants:</DialogTitle>
+                        <DialogContent>
+                            <DialogContentText>
+                                {result.failed}
+                            </DialogContentText>
+                        </DialogContent>
+                        <DialogActions>
+                            <Button color="inherit" variant="outlined" onClick={() => setOpenDialog(false)}>Fermer</Button>
+                        </DialogActions>
+                    </Dialog>
+                    // }
                 } else {
                     setOpenSnackbar(true);
                     setSnackbarMessage("Erreur lors de l'import");

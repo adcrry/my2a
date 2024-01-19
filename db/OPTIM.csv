@@ -1,2 +1,2 @@
-code;name;department;semester;_ects;day;start_time;end_time;description;teacher
-OPTIM ;Optimisation convexe ;IMI;S4;30;Ven;8:30;11:15;;Vincent LECLERE
+code;name;department;semester;ects;day;start_time;end_time;description;teacher
+OPTIM ;Optimisation convexe ;IMI;S4;3;Vendredi;8:30;11:15;;Vincent LECLERE

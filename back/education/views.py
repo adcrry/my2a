@@ -24,6 +24,7 @@ from .serializers import (
     CompleteStudentSerializer,
 )
 
+from .utils import importCourseCSV
 from rest_framework.decorators import action
 
 
@@ -384,10 +385,14 @@ class ImportCourseCSV(APIView):
         # Example: Check request.FILES for the uploaded file
         csv_file = request.FILES.get("csv_file")
         if csv_file:
-            # importCourseCSV(csv_file)
+            failed = importCourseCSV(csv_file)
             print(f"Received CSV file: {csv_file.name}")
             return Response(
-                {"success": True, "message": "CSV file processed successfully"},
+                {
+                    "success": True,
+                    "message": "CSV file processed successfully",
+                    "failed": failed,
+                },
                 status=status.HTTP_200_OK,
             )
         else:
