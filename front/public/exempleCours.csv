@@ -1,0 +1,21 @@
+code;name;department;semester;_ects;day;start_time;end_time;description;teacher
+PRALG ;Programmation avancée et algorithmique ;IMI;S3;20;Mer;13:45;16:30;;Pascal MONASSE
+SPA ;Processus stochastiques et applications ;IMI;S3;30;Lun;8:30;11:15;;Jean-François DELMAS
+MOPS2 ;Contrôle des systèmes dynamiques/analyse fonctionnelle ;IMI;S3;30;Mar;8:30;11:45;;Eric CANCES, Amaury HAYAT
+OPTIM ;Optimisation convexe ;IMI;S4;30;Ven;8:30;11:15;;Vincent LECLERE
+METMF ;Calcul stochastique et finance ;IMI;S4;30;Mer;8:30;11:15;;Benjamin JOURDAIN
+HISTA ;Statistiques en grande dimension ;IMI;S4;30;Lun;8:30;11:15;;Badr-Eddine CHERIEF-ABDELLATIF
+IMIP2 ;Projet de département ;IMI;S4;50;Lun;16:45;19:30;;Eric DUCEAU
+TDLOG ;Techniques de développement logiciel ;IMI;S3;30;Lun;13:45;16:30;;Xavier CLERC
+REOP ;Recherche opérationnelle ;GI;S3;30;Mer;8:30;11:15;;Axel PARMENTIER
+DEEPL ;Deep Learning ;IMI;S3;20;Jeu;8:30;11:45;;Mathieu AUBRY
+ELEF ;Éléments finis ;IMI;S4;20;Lun;13:45;16:30;;Alexandre ERN
+MATME ;Problèmes d'évolution ;IMI;S4;30;Mar;8:30;11:45;;Virginie GALLAND EHRLACHER
+MALAP ;Machine Learning ;IMI;S4;30;Jeu;8:30;11:45;;David PICARD
+STRAF ;Stratégie financière de l'entreprise ;SEGF;S4;30;Mer;13:45;16:30;;Emmanuel BOUTRON
+ATRSC ;Aléa et temps réel pour la Supply Chain ;GI;S4;30;Mar;8:30;11:45;;Frederic MEUNIER
+TRIVA ;Traitement des images et vision artificielle ;IMI;S4;30;Mer;13:45;16:30;;Vincent LEPETIT
+THEOJ ;Théorie des jeux ;SEGF;S3;30;Mar;8:30;11:45;;Bruno ZILIOTTO
+STAT;Statistique et analyse des données;IMI;S3;30;Ven;13:00;15:45;;Julien REYGNER
+STNUM;Statistique numérique et analyse des données;IMI;S3;30;Ven;13:00;15:00;;Vincent LEFIEUX
+DROA;Droit: Initiation;SHS;S4;30;Ven;14:00;16:45;;Antoine ALONSO

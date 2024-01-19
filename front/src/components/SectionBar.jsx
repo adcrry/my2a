@@ -7,12 +7,14 @@ import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
 import InfoIcon from '@mui/icons-material/Info';
+import DownloadIcon from '@mui/icons-material/Download';
 import { styled, alpha } from '@mui/material/styles';
-import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button } from '@mui/material';
 
 
 export default function SectionBar(props) {
     const [openDialog, setOpenDialog] = React.useState(false);
+
 
     const handleOpenDialog = () => {
         setOpenDialog(true);
@@ -20,6 +22,13 @@ export default function SectionBar(props) {
 
     const handleCloseDialog = () => {
         setOpenDialog(false);
+    };
+
+    const handleDownload = () => {
+        const link = document.createElement('a');
+        link.href = props.exampleFile;
+        link.download = 'exampleFile';
+        link.click();
     };
 
     return (
@@ -45,8 +54,11 @@ export default function SectionBar(props) {
                                     {props.infos}
                                 </DialogContentText>
                             </DialogContent>
+                            <DialogActions>
+                                <Button color="secondary" variant="outlined" onClick={handleDownload} startIcon={<DownloadIcon />}>Exemple.csv</Button>
+                                <Button color="inherit" variant="outlined" onClick={handleCloseDialog}>Fermer</Button>
+                            </DialogActions>
                         </Dialog>
-
                     </div>
                 )}
             </Toolbar>

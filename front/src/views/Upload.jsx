@@ -122,8 +122,9 @@ export default function Upload() {
                     <Box sx={{ backgroundColor: "white", paddingBottom: 2, borderRadius: "0 0 16px 16px" }}>
                         <SectionBar
                             title="Importer des cours"
-                            infos="Il faut que le fichier soit au format csv."
+                            infos="Il faut que le fichier soit au format csv. Vous pouvez télécharger l'exemple ci-dessous pour vous aider."
                             showInfo={true}
+                            exampleFile="../public/exempleCours.csv"
                         />
                         {/* <Button variant="outlined" startIcon={<InfoIcon />}></Button> */}
                         <div style={{ marginBottom: '20px' }}></div>
@@ -141,6 +142,8 @@ export default function Upload() {
                             <Button variant="contained" color="secondary" endIcon={<SendIcon />} disableElevation disabled={selectedFile === null} onClick={handleImportClick}>
                                 Importer
                             </Button>
+
+
 
                         </Grid>
                     </Box>
