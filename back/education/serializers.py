@@ -6,15 +6,7 @@ from .models import Student, Course, Department, Parcours, Enrollment
 class StudentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Student
-        fields = [
-            "id",
-            "user",
-            "name",
-            "surname",
-            "department",
-            "parcours",
-            "editable"
-        ]
+        fields = ["id", "user", "name", "surname", "department", "parcours", "editable"]
 
 
 class CourseSerializer(serializers.ModelSerializer):
@@ -47,7 +39,7 @@ class EnrollmentSerializer(serializers.ModelSerializer):
             "course",
             "category",
         ]
-    
+
     course = CourseSerializer()
 
 
@@ -64,7 +56,7 @@ class CompleteStudentSerializer(serializers.ModelSerializer):
             "ects",
             "mandatory_courses",
             "elective_courses",
-            "editable"
+            "editable",
         ]
 
     mandatory_courses = EnrollmentSerializer(many=True)
@@ -97,4 +89,3 @@ class ParcoursSerializer(serializers.ModelSerializer):
             "courses_mandatory",
             "courses_on_list",
         ]
-

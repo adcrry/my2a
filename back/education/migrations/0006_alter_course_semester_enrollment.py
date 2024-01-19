@@ -5,24 +5,53 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('education', '0005_alter_course_code_alter_course_teacher'),
+        ("education", "0005_alter_course_code_alter_course_teacher"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='course',
-            name='semester',
-            field=models.CharField(choices=[('S3', 'S3'), ('S4', 'S4')], max_length=10),
+            model_name="course",
+            name="semester",
+            field=models.CharField(choices=[("S3", "S3"), ("S4", "S4")], max_length=10),
         ),
         migrations.CreateModel(
-            name='Enrollment',
+            name="Enrollment",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('category', models.CharField(choices=[('mandatory', 'Mandatory'), ('elective', 'Elective'), ('visiting', 'Visiting')], max_length=10)),
-                ('course', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to='education.course')),
-                ('student', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to='education.student')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "category",
+                    models.CharField(
+                        choices=[
+                            ("mandatory", "Mandatory"),
+                            ("elective", "Elective"),
+                            ("visiting", "Visiting"),
+                        ],
+                        max_length=10,
+                    ),
+                ),
+                (
+                    "course",
+                    models.OneToOneField(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="education.course",
+                    ),
+                ),
+                (
+                    "student",
+                    models.OneToOneField(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="education.student",
+                    ),
+                ),
             ],
         ),
     ]

@@ -4,19 +4,18 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('education', '0010_student_editable'),
+        ("education", "0010_student_editable"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='course',
-            name='_ects',
+            model_name="course",
+            name="_ects",
         ),
         migrations.AddField(
-            model_name='course',
-            name='ects',
+            model_name="course",
+            name="ects",
             field=models.FloatField(default=0),
             preserve_default=False,
         ),

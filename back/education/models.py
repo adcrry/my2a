@@ -43,7 +43,7 @@ class Course(models.Model):
     start_time = models.TimeField()
     end_time = models.TimeField()
 
-    ects = models.FloatField() 
+    ects = models.FloatField()
 
     teacher = models.CharField(max_length=100, null=True, blank=True)
 
@@ -61,7 +61,7 @@ class Parcours(models.Model):
     description = models.TextField(null=True, blank=True)
     courses_mandatory = models.ManyToManyField(
         Course, blank=True, related_name="mandatory_parcours"
-    ) # ajouter les cours du tronc commun dedans
+    )  # ajouter les cours du tronc commun dedans
     courses_on_list = models.ManyToManyField(
         Course, blank=True, related_name="on_list_parcours"
     )
@@ -77,7 +77,9 @@ class Student(models.Model):
     user = models.OneToOneField(models2.User(), on_delete=models.PROTECT)
     name = models.CharField(max_length=100)
     surname = models.CharField(max_length=100)
-    parcours = models.ForeignKey(Parcours, on_delete=models.CASCADE, null=True, blank=True)
+    parcours = models.ForeignKey(
+        Parcours, on_delete=models.CASCADE, null=True, blank=True
+    )
     department = models.ForeignKey(
         Department, on_delete=models.CASCADE, null=True, blank=True
     )
@@ -86,16 +88,17 @@ class Student(models.Model):
     def mandatory_courses(self):
         """Return the list of mandatory courses for the student."""
         return Enrollment.objects.filter(student=self, category="mandatory")
-    
+
     def elective_courses(self):
         """Return the list of elective courses for the student."""
         print("ksdjfksdjfsijfd")
         return Enrollment.objects.filter(student=self, category="elective")
-        
 
     def check_time_table(self):
         """Return the list of compatible courses for the student."""
-        student_courses = [e.course for e in Enrollment.objects.filter(student=self)] + [course for course in self.parcours.courses_mandatory.all()]
+        student_courses = [
+            e.course for e in Enrollment.objects.filter(student=self)
+        ] + [course for course in self.parcours.courses_mandatory.all()]
         compatible_courses = []
         incompatible_courses = []
         courses = Course.objects.all()
@@ -107,17 +110,25 @@ class Student(models.Model):
                 min_start = min(s_courses.start_time, course.start_time)
                 max_start = max(s_courses.start_time, course.start_time)
                 min_end = min(s_courses.end_time, course.end_time)
-               
-                if (s_courses.semester == course.semester and s_courses.day == course.day and min_start <= max_start and max_start <= min_end):
+
+                if (
+                    s_courses.semester == course.semester
+                    and s_courses.day == course.day
+                    and min_start <= max_start
+                    and max_start <= min_end
+                ):
                     incompatible_courses.append(course)
                     if course in compatible_courses:
                         compatible_courses.remove(course)
                     break
 
-                if course not in incompatible_courses and course not in compatible_courses:
+                if (
+                    course not in incompatible_courses
+                    and course not in compatible_courses
+                ):
                     compatible_courses.append(course)
         return compatible_courses
-            
+
     def count_ects(self):
         """Return the number of ects the student has."""
         student_courses = Enrollment.objects.filter(student=self)
@@ -128,21 +139,33 @@ class Student(models.Model):
             for course in self.parcours.courses_mandatory.all():
                 ects += course.ects
         return ects
-    
+
     def check_ects(self):
         """Return True if the student has enough ects, False otherwise."""
         return self.count_ects() >= 39
-    
+
     def __str__(self):
         return self.name + " " + self.surname
-    
+
     def generate_timetable(self):
         """Return the timetable of the student."""
-        if self.department is None or self.parcours is None: 
+        if self.department is None or self.parcours is None:
             return generate_pdf_from_courses(self.name, [])
-        courses = [e.course for e in Enrollment.objects.filter(student=self)] + [course for course in self.parcours.courses_mandatory.all()]
-        courses = [{"name":course.code,"day":course.day,"start_time":course.start_time,"end_time":course.end_time, "semester": course.semester} for course in courses]
-        return generate_pdf_from_courses(self.name,courses)
+        courses = [e.course for e in Enrollment.objects.filter(student=self)] + [
+            course for course in self.parcours.courses_mandatory.all()
+        ]
+        courses = [
+            {
+                "name": course.code,
+                "day": course.day,
+                "start_time": course.start_time,
+                "end_time": course.end_time,
+                "semester": course.semester,
+            }
+            for course in courses
+        ]
+        return generate_pdf_from_courses(self.name, courses)
+
 
 class Enrollment(models.Model):
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
@@ -157,6 +180,8 @@ class Enrollment(models.Model):
 
     def __str__(self):
         return self.student.name + " " + self.course.code
+
+
 """
 class Department(models.TextChoices):
          IMI = "Ingénierie mathématique et informatique"
