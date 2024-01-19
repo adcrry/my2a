@@ -1,7 +1,8 @@
-from django.contrib.auth.models import User
 from django.contrib.auth import models as models2
+from django.contrib.auth.models import User
 from django.db import models
 from django.utils import timezone
+
 from .exportpdf import generate_pdf_from_courses
 
 
@@ -90,7 +91,6 @@ class Student(models.Model):
 
     def elective_courses(self):
         """Return the list of elective courses for the student."""
-        print("ksdjfksdjfsijfd")
         return Enrollment.objects.filter(student=self, category="elective")
 
     def check_time_table(self):
