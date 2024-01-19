@@ -2,6 +2,7 @@ import csv
 from io import TextIOWrapper  # Import TextIOWrapper for handling file decoding
 
 from django.contrib import admin
+from django.core.exceptions import ValidationError
 from django.shortcuts import redirect, render
 from django.urls import path
 from django.urls.conf import include
@@ -162,7 +163,7 @@ def importCourseCSV(csv_file):
             print("------ " + f"Course {course} created")
 
         except Exception as e:
-            print(e)
+            print(type(e))
             error_rows.append([row["code"], e])  # Add row to error list
 
     return error_rows, created_rows
