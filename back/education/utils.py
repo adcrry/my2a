@@ -23,7 +23,6 @@ def importCourseCSV(csv_file):
     for row in csv_reader:
         try:
             code = row["code"]
-            print("------ " + f"Course code: {code}")
 
             # Check if course with the same code already exists
             if Course.objects.filter(code=code).exists():
@@ -45,7 +44,7 @@ def importCourseCSV(csv_file):
 
             # catch : Field 'ects' expected a number but got 'a'.
             try:
-                ects = int(ects)
+                ects = float(ects)
             except ValueError:
                 print("------ " + f"Ects {ects} is not a valid number")
                 error_rows.append(
@@ -112,43 +111,35 @@ def importCourseCSV(csv_file):
 
             day = day_mapping.get(day)
 
-            # # Si start_time et end_time ne sont pas des heures (devrait être accepté -> 8:30, 15:45)
-            # if start_time < "00:00" or start_time > "23:59":
-            #     print("------ " + f"Start time {start_time} is not a valid time")
-            #     error_rows.append(
-            #         [
-            #             row["code"],
-            #             "L'heure de début '"
-            #             + start_time
-            #             + "' n'est pas valide. Veuillez d'utiliser le format 'hh:mm'",
-            #         ]
-            #     )
-            #     continue
+            # # Catch “AAA” value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] format.
+            # try:
+            #     start_time = start_time.split(":")
+            #     start_time = int(start_time[0]) * 60 + int(
+            #         start_time[1]
+            #     )  # Convert start time to minutes
+            #     end_time = end_time.split(":")
+            #     end_time = int(end_time[0]) * 60 + int(
+            #         end_time[1]
+            #     )  # Convert end time to minutes
 
-            # if end_time < "00:00" or end_time > "23:59":
-            #     print("------ " + f"End time {end_time} is not a valid time")
+            #     if start_time > end_time:
+            #         print(
+            #             "------ "
+            #             + f"Start time {start_time} is after end time {end_time}"
+            #         )
+            #         error_rows.append(
+            #             [
+            #                 row["code"],
+            #                 "L'heure de début est après l'heure de fin",
+            #             ]
+            #         )
+            #         continue
+            # except Exception as e:
+            #     print("------ ", e)
             #     error_rows.append(
             #         [
             #             row["code"],
-            #             "L'heure de fin '"
-            #             + end_time
-            #             + "' n'est pas valide. Veuillez d'utiliser le format 'hh:mm'",
-            #         ]
-            #     )
-            #     continue
-
-            # if start_time > end_time:
-            #     print(
-            #         "------ " + f"Start time {start_time} is after end time {end_time}"
-            #     )
-            #     error_rows.append(
-            #         [
-            #             row["code"],
-            #             "L'heure de début '"
-            #             + start_time
-            #             + "' est après l'heure de fin '"
-            #             + end_time
-            #             + "'",
+            #             "L'horaire de début ou de fin n'est pas valide. Veuillez utiliser un format valide (HH:MM)",
             #         ]
             #     )
             #     continue

@@ -178,7 +178,7 @@ export default function Upload() {
                                     </Typography>
                                     <List sx={{ ml: 12 }}>
                                         {createdProcessing.map((code) => (
-                                            <ListItem key={code}>
+                                            <ListItem key={code} sx={{ height: 20 }}>
                                                 <ListItemText primary={<>-  <strong>{code}</strong></>} />
                                             </ListItem>
                                         ))}
@@ -198,7 +198,7 @@ export default function Upload() {
                                     </Typography>
                                     <List sx={{ ml: 12 }}>
                                         {failedProcessing.map(([code, err]) => (
-                                            <ListItem key={code}>
+                                            <ListItem key={code} sx={{ height: 45 }}>
                                                 {/* <ListItemIcon>
                                                     <FiberManualRecordIcon fontSize="tiny" />
                                                 </ListItemIcon> */}

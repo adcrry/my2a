@@ -382,26 +382,45 @@ class ImportCourseCSV(APIView):
         print("Handling POST request for importing course CSV")
         print("File received...")
 
-        # Add your CSV processing logic here
-        # Example: Check request.FILES for the uploaded file
-        csv_file = request.FILES.get("csv_file")
-        if csv_file:
-            print(f"Received CSV file: {csv_file.name}")
-            print("About to process it...")
-            failed, new = importCourseCSV(csv_file)
-            print("Done!")
+        try:
+            csv_file = request.FILES.get("csv_file")
+            if csv_file:
+                print(f"Received CSV file: {csv_file.name}")
+                print("About to process it...")
+                failed, created = importCourseCSV(csv_file)
+                print("Done!")
+                if failed:
+                    return Response(
+                        {
+                            "success": True,
+                            "error": "Some rows failed to import",
+                            "failed": failed,
+                            "created": created,
+                        },
+                        status=status.HTTP_200_OK,
+                    )
+                else:
+                    return Response(
+                        {
+                            "success": True,
+                            "error": "CSV file processed successfully",
+                            "failed": failed,
+                            "created": created,
+                        },
+                        status=status.HTTP_200_OK,
+                    )
+            else:
+                print("No CSV file provided")
+                return Response(
+                    {"success": False, "error": "No CSV file provided"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+        except Exception as e:
+            # Log the exception for debugging purposes
+            print(f"Exception occurred: {str(e)}")
+
+            # Return a meaningful error response
             return Response(
-                {
-                    "success": True,
-                    "message": "CSV file processed successfully",
-                    "failed": failed,
-                    "created": new,
-                },
-                status=status.HTTP_200_OK,
-            )
-        else:
-            print("No CSV file provided")
-            return Response(
-                {"success": False, "error": "No CSV file provided"},
-                status=status.HTTP_400_BAD_REQUEST,
+                {"success": False, "error": "An error occurred during processing"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
