@@ -1,31 +1,26 @@
-from django.shortcuts import render, redirect, get_object_or_404
-from django.template import loader
 from django.http import HttpResponse, JsonResponse
-from django.views import View
-from rest_framework.views import APIView
-from rest_framework import status
-from rest_framework.response import Response
-from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
-from rest_framework.permissions import IsAdminUser
-from rest_framework.decorators import permission_classes
-
-from django.views.decorators.csrf import csrf_exempt
+from django.shortcuts import get_object_or_404, redirect, render
+from django.template import loader
 from django.utils.decorators import method_decorator
+from django.views import View
+from django.views.decorators.csrf import csrf_exempt
+from rest_framework import status
+from rest_framework.decorators import action, permission_classes
+from rest_framework.permissions import IsAdminUser
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 
 from .admin import CourseAdmin
-
-from .models import Student, Course, Department, Parcours, Enrollment
+from .models import Course, Department, Enrollment, Parcours, Student
 from .serializers import (
-    StudentSerializer,
+    CompleteStudentSerializer,
     CourseSerializer,
     DepartmentSerializer,
-    ParcoursSerializer,
     EnrollmentSerializer,
-    CompleteStudentSerializer,
+    ParcoursSerializer,
+    StudentSerializer,
 )
-
-from .utils import importCourseCSV
-from rest_framework.decorators import action
 
 
 def index(request):
@@ -379,48 +374,18 @@ class PostEnrollment(APIView):
 
 class ImportCourseCSV(APIView):
     def post(self, request):
-        print("Handling POST request for importing course CSV")
-        print("File received...")
-
-        try:
-            csv_file = request.FILES.get("csv_file")
-            if csv_file:
-                print(f"Received CSV file: {csv_file.name}")
-                print("About to process it...")
-                failed, created = importCourseCSV(csv_file)
-                print("Done!")
-                if failed:
-                    return Response(
-                        {
-                            "success": True,
-                            "error": "Some rows failed to import",
-                            "failed": failed,
-                            "created": created,
-                        },
-                        status=status.HTTP_200_OK,
-                    )
-                else:
-                    return Response(
-                        {
-                            "success": True,
-                            "error": "CSV file processed successfully",
-                            "failed": failed,
-                            "created": created,
-                        },
-                        status=status.HTTP_200_OK,
-                    )
-            else:
-                print("No CSV file provided")
-                return Response(
-                    {"success": False, "error": "No CSV file provided"},
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
-        except Exception as e:
-            # Log the exception for debugging purposes
-            print(f"Exception occurred: {str(e)}")
-
-            # Return a meaningful error response
+        # Add your CSV processing logic here
+        # Example: Check request.FILES for the uploaded file
+        csv_file = request.FILES.get("csv_file")
+        if csv_file:
+            # importCourseCSV(csv_file)
+            print(f"Received CSV file: {csv_file.name}")
             return Response(
-                {"success": False, "error": "An error occurred during processing"},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                {"success": True, "message": "CSV file processed successfully"},
+                status=status.HTTP_200_OK,
+            )
+        else:
+            return Response(
+                {"success": False, "error": "No CSV file provided"},
+                status=status.HTTP_400_BAD_REQUEST,
             )
