@@ -19,9 +19,15 @@ def importCourseCSV(csv_file):
     error_rows = []  # List to store rows with errors
     for row in csv_reader:
         try:
-            print(row["code"])
-            name = row["name"]
             code = row["code"]
+
+            # Check if course with the same code already exists
+            if Course.objects.filter(code=code).exists():
+                print(f"Course with code {code} already exists")
+                error_rows.append({row["code"], "Course with this code already exists"})
+                continue
+
+            name = row["name"]
             department = row["department"]
             ects = row["ects"]
             description = row["description"]
@@ -68,23 +74,10 @@ def importCourseCSV(csv_file):
                 end_time=end_time,
             )
             course.save()
-            # Course.objects.create(
-            #     name=name,
-            #     code=code,
-            #     department=department,
-            #     ects=ects,
-            #     description=description,
-            #     teacher=teacher,
-            #     semester=semester,
-            #     day=day,
-            #     start_time=start_time,
-            #     end_time=end_time,
-            # )
 
         except Exception as e:
             print(e)
-            # error_rows.append(row.get("code", ""))  # Add row to error list
-            error_rows.append(row)  # Add row to error list
+            error_rows.append({row["code"], e})  # Add row to error list
 
     return error_rows
 
