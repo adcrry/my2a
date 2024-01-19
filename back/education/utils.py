@@ -10,6 +10,7 @@ from .models import Course, Department, Parcours, Student
 
 
 def importCourseCSV(csv_file):
+    print("--- Reading CSV file...")
     csv_file_wrapper = TextIOWrapper(
         csv_file.file, encoding="utf-8"
     )  # Use TextIOWrapper for decoding
@@ -17,18 +18,21 @@ def importCourseCSV(csv_file):
 
     # Create Course objects from passed-in data
     error_rows = []  # List to store rows with errors
+    print("--- Creating courses:")
     for row in csv_reader:
         try:
             code = row["code"]
 
             # Check if course with the same code already exists
             if Course.objects.filter(code=code).exists():
-                print(f"Course with code {code} already exists")
-                error_rows.append({row["code"], "Course with this code already exists"})
+                print("------ " + f"Course with code {code} already exists")
+                error_rows.append([row["code"], "Un cours avec ce code existe déjà"])
                 continue
 
             name = row["name"]
-            department = row["department"]
+            department_code = row[
+                "department"
+            ]  # Change variable name to department_code
             ects = row["ects"]
             description = row["description"]
             teacher = row["teacher"]
@@ -37,8 +41,15 @@ def importCourseCSV(csv_file):
             start_time = row["start_time"]
             end_time = row["end_time"]
 
-            # Match department name to department object
-            department = Department.objects.get(code=department)
+            # Check if department with the given code exists
+            try:
+                department = Department.objects.get(code=department_code)
+            except Department.DoesNotExist:
+                print("------ " + f"Department {department_code} does not exist")
+                error_rows.append(
+                    [row["code"], "Le département " + department_code + " n'existe pas"]
+                )
+                continue
 
             # Match semester name to semester value
             semester_mapping = {
@@ -55,6 +66,7 @@ def importCourseCSV(csv_file):
                 "Jeudi": Course.Day.JEU,
                 "Vendredi": Course.Day.VEN,
             }
+
             day = day_mapping.get(day)
 
             print(f"Department value from CSV: {department}")
@@ -75,9 +87,11 @@ def importCourseCSV(csv_file):
             )
             course.save()
 
+            print("------ " + f"Course {course} created")
+
         except Exception as e:
             print(e)
-            error_rows.append({row["code"], e})  # Add row to error list
+            error_rows.append([row["code"], e])  # Add row to error list
 
     return error_rows
 

@@ -380,13 +380,16 @@ class PostEnrollment(APIView):
 class ImportCourseCSV(APIView):
     def post(self, request):
         print("Handling POST request for importing course CSV")
+        print("File received...")
 
         # Add your CSV processing logic here
         # Example: Check request.FILES for the uploaded file
         csv_file = request.FILES.get("csv_file")
         if csv_file:
-            failed = importCourseCSV(csv_file)
             print(f"Received CSV file: {csv_file.name}")
+            print("About to process it...")
+            failed = importCourseCSV(csv_file)
+            print("Done!")
             return Response(
                 {
                     "success": True,
@@ -396,6 +399,7 @@ class ImportCourseCSV(APIView):
                 status=status.HTTP_200_OK,
             )
         else:
+            print("No CSV file provided")
             return Response(
                 {"success": False, "error": "No CSV file provided"},
                 status=status.HTTP_400_BAD_REQUEST,
