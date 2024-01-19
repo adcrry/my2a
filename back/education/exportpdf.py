@@ -23,7 +23,6 @@ def generate_pdf_from_courses(name, courses):
     Generate a pdf from a list of courses.
     """
     buffer = BytesIO()
-    pdf_file = "edt_" + name + ".pdf"
     doc = SimpleDocTemplate(buffer, pagesize=landscape(letter))
     elements = []
 

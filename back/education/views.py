@@ -191,8 +191,6 @@ class StudentViewset(ReadOnlyModelViewSet):
         response = HttpResponse(content_type="application/pdf")
         response["Content-Disposition"] = "filename=timetable.pdf"
         response.write(student.generate_timetable())
-        pdf = student.generate_timetable()
-
         return response
 
     @action(detail=False, methods=["get"], url_path="updatestatus")

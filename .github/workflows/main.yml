@@ -19,9 +19,9 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Build containers
-        run: docker compose -f docker-compose-prod.yml build
+        run: docker compose -f docker-compose-prod.yaml build
       - name: Start containers
-        run: docker compose -f up docker-compose-prod.yml -d
+        run: docker compose -f up docker-compose-prod.yaml -d
 
   test-lint:
     runs-on: ubuntu-latest
