@@ -43,14 +43,13 @@ export default function SectionBar(props) {
                             color="inherit">
                             <InfoIcon />
                         </IconButton>
-                        <Dialog open={openDialog} onClose={handleCloseDialog}>
+                        {/* <Dialog open={openDialog} onClose={handleCloseDialog}>
                             <DialogTitle>Explications</DialogTitle>
                             <DialogContent>
                                 <DialogContentText>
-                                    {props.infos}
                                 </DialogContentText>
                             </DialogContent>
-                        </Dialog>
+                        </Dialog> */}
                     </div>
                 )}
             </Toolbar>

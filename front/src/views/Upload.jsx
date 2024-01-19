@@ -6,7 +6,7 @@ import SectionBar from "../components/SectionBar";
 // import MySnackBar from '../components/SnackBar';
 
 
-import { Box, Grid } from '@mui/material';
+
 import InfoIcon from '@mui/icons-material/Info';
 import { styled, alpha } from '@mui/material/styles';
 import { IconButton } from '@mui/material';
@@ -19,6 +19,8 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import Slide from '@mui/material/Slide';
+import Grid from '@mui/material/Grid';
+import Box from '@mui/material/Box';
 
 
 const GridBreak = styled('div')(({ theme }) => ({
@@ -88,25 +90,25 @@ export default function Upload() {
     return (
         <div>
             <TopBar title="Gestion My2A > Imports" />
-            <Grid container style={{ marginTop: '30px', alignItems: "center", justifyContent: "center"}}>
+            <Grid container style={{ marginTop: '30px', alignItems: "center", justifyContent: "center" }}>
                 <Grid item md={6} rowGap={8} spacing={12}>
-                    <Box sx={{backgroundColor: "white", paddingBottom: 2}}>
-                    <SectionBar
-                        title="Importer des cours"
-                        infos="blabla"
-                    />
-                    {/* <Button variant="outlined" startIcon={<InfoIcon />}></Button> */}
-                    <div style={{ marginBottom: '20px' }}></div>
-                    <Grid container justifyContent="center" columnGap={4}>
-                        <Button component="label" variant="contained" disableElevation color="secondary" startIcon={<CloudUploadIcon />} disabled={selectedFile !== null}>
-                            Sélectionner un fichier
-                            <VisuallyHiddenInput type="file" onChange={handleFileChange} />
-                        </Button>
-                        <Button variant="contained" color="secondary" endIcon={<SendIcon />} disableElevation disabled={selectedFile === null} onClick={handleImportClick}>
-                            Importer
-                        </Button>
+                    <Box sx={{ backgroundColor: "white", paddingBottom: 2 }}>
+                        <SectionBar
+                            title="Importer des cours"
+                            infos="blabla"
+                        />
+                        {/* <Button variant="outlined" startIcon={<InfoIcon />}></Button> */}
+                        <div style={{ marginBottom: '20px' }}></div>
+                        <Grid container justifyContent="center" columnGap={4}>
+                            <Button component="label" variant="contained" disableElevation color="secondary" startIcon={<CloudUploadIcon />} disabled={selectedFile !== null}>
+                                Sélectionner un fichier
+                                <VisuallyHiddenInput type="file" onChange={handleFileChange} />
+                            </Button>
+                            <Button variant="contained" color="secondary" endIcon={<SendIcon />} disableElevation disabled={selectedFile === null} onClick={handleImportClick}>
+                                Importer
+                            </Button>
 
-                    </Grid>
+                        </Grid>
                     </Box>
                 </Grid>
                 <GridBreak />
