@@ -433,8 +433,8 @@ export default function Dashboard() {
                             <CustomProgressBar progress={progress} />
                         </Grid>
                         <Grid md={1}>
-                        <Box sx={{ position: 'relative', display: 'inline-flex', marginBottom: 4 }}>
-                                <CircularProgress color={student.ects < required_ects ? "warning" : "success"} variant="determinate" value={student.ects > required_ects ? 100 : student.ects/required_ects*100} size={120} thickness={3}/>
+                            <Box sx={{ position: 'relative', display: 'inline-flex', marginBottom: 4 }}>
+                                <CircularProgress color={student.ects < required_ects ? "warning" : "success"} variant="determinate" value={student.ects > required_ects ? 100 : student.ects / required_ects * 100} size={120} thickness={3} />
                                 <Box sx={{
                                     top: 0,
                                     left: 0,
@@ -446,7 +446,7 @@ export default function Dashboard() {
                                     alignItems: 'center',
                                     textAlign: 'center',
                                 }}>
-                                    <Typography sx={{fontWeight: 'bold', fontSize: 18}} variant="caption" component="div">{student.ects} / {required_ects} ECTS </Typography>
+                                    <Typography sx={{ fontWeight: 'bold', fontSize: 18 }} variant="caption" component="div">{student.ects} / {required_ects} ECTS </Typography>
                                 </Box>
                             </Box>
                         </Grid>
@@ -553,7 +553,7 @@ export default function Dashboard() {
                             <DialogContentText id="alert-dialog-slide-description">
                                 Attention: Cette action est irréversible. Aucun changement ultérieur ne pourra être effectué sauf en cas de demande auprès de l'administration.
                             </DialogContentText>
-                            <DialogContentText sx={{color: "red", fontWeight: "bold"}}>
+                            <DialogContentText sx={{ color: "red", fontWeight: "bold" }}>
                                 {student.ects < required_ects && "Vous n'avez que " + student.ects + " ECTS sur les " + required_ects + " requis. EN GROS TU VAS AVOIR DES PROBLEMES AVEC SANDRINE FAIS UN EFFORT"}
                             </DialogContentText>
                         </DialogContent>
