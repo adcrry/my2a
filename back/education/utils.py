@@ -53,7 +53,7 @@ def importCourseCSV(csv_file):
                         row["code"],
                         "Le nombre de crédits '"
                         + ects
-                        + "' n'est pas valide. Veuillez d'utiliser un nombre.",
+                        + "' n'est pas valide. Veuillez utiliser un nombre.",
                     ]
                 )
                 continue
