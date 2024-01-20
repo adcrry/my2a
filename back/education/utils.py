@@ -7,6 +7,9 @@ from django.shortcuts import redirect, render
 from django.urls import path
 from django.urls.conf import include
 
+from django.contrib.auth.models import User
+from django.contrib.auth import authenticate, login, logout
+
 from .models import Course, Department, Parcours, Student
 
 
@@ -169,5 +172,78 @@ def importCourseCSV(csv_file):
     return error_rows, created_rows
 
 
-# def importCourseCSV(csv_file):
-#     print("prout")
+def importStudentCSV(csv_file):
+    print("--- Reading CSV file...")
+    csv_file_wrapper = TextIOWrapper(
+        csv_file.file, encoding="utf-8"
+    )  # Use TextIOWrapper for decoding
+    csv_reader = csv.DictReader(csv_file_wrapper, delimiter=";")
+
+    # Create Student objects from passed-in data
+    error_rows = []  # List to store rows with errors
+    created_rows = []  # List to store rows that were created
+    print("--- Creating students:")
+    for row in csv_reader:
+        try:
+            email = row["email"]
+            name = row["name"]
+            surname = row["surname"]
+            department_code = row[
+                "department"
+            ]  # Change variable name to department_code
+
+            # Create user
+
+            username = email.split("@")[0]
+            password = User.objects.make_random_password()
+            user, created = User.objects.get_or_create(
+                last_name=surname,
+                first_name=name,
+                username=username,
+                email=email,
+            )
+
+            if created:
+                user.set_password(password)
+                user.save()
+                print("------ " + f"User {user} created")
+
+            try:
+                department = Department.objects.get(code=department_code)
+            except Department.DoesNotExist:
+                print("------ " + f"Department {department_code} does not exist")
+                error_rows.append(
+                    [
+                        row["surname"].upper() + " " + row["name"],
+                        "Le département '" + department_code + "' n'existe pas",
+                    ]
+                )
+                continue
+
+            if not created and Student.objects.filter(user=user).exists():
+                print("------ " + f"Student {user} already exists")
+                error_rows.append(
+                    [
+                        row["surname"].upper() + " " + row["name"],
+                        "Un étudiant avec cet email existe déjà",
+                    ]
+                )
+                continue
+
+            Student.objects.create(
+                user=user,
+                name=name,
+                surname=surname,
+                department=department,
+                editable=True,
+            )
+
+            created_rows.append(row["surname"].upper() + " " + row["name"])
+            print("------ " + f"Student {user} created")
+
+        except Exception as e:
+            print(type(e))
+            print(e)
+            error_rows.append([row["surname"].upper() + " " + row["name"], e])
+
+    return error_rows, created_rows
