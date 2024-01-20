@@ -49,7 +49,7 @@ const VisuallyHiddenInput = styled('input')({
     width: 1,
 });
 
-export default function Upload() {
+export default function UploadStudent() {
     const [students, setStudents] = useState([]);
     const [selectedFile, setSelectedFile] = useState(null);
     const [openDialog, setOpenDialog] = useState(false);
@@ -92,7 +92,7 @@ export default function Upload() {
         const formData = new FormData();
         formData.append("csv_file", selectedFile);
 
-        fetch("/api/upload/course", {
+        fetch("/api/upload/student", {
             method: "POST",
             credentials: "include",
             headers: {
@@ -106,12 +106,13 @@ export default function Upload() {
                 setSelectedFile(null);
                 if (result.success) {
                     setSuccessProcessing(true);
+                    setFailedProcessing(result.failed);
+                    setCreatedProcessing(result.created);
                     if (result.failed.length > 0) {
                         setOpenSnackbar(true);
                         setSnackbarMessage("Import partiellement réussi");
                         setSnackbarSeverity("warning");
-                        setFailedProcessing(result.failed);
-                        setCreatedProcessing(result.created);
+
                     }
                     else {
                         setOpenSnackbar(true);
@@ -149,10 +150,10 @@ export default function Upload() {
                 <Grid item md={6} rowGap={8} spacing={12}>
                     <Box sx={{ backgroundColor: "white", paddingBottom: 2, borderRadius: "0 0 16px 16px" }}>
                         <SectionBar
-                            title="Importer des cours"
+                            title="Importer des étudiants"
                             infos={"Le fichier doit être au format CSV. La première ligne doit être la même que dans l'exemple à télécharger ci-dessous."}
                             showInfo={true}
-                            exampleFile="../public/exempleCours.csv"
+                            exampleFile="../public/exempleEtudiant.csv"
                         />
                         {/* Les deux boutons pour importer */}
                         <div style={{ marginBottom: 40 }}></div>
@@ -177,19 +178,19 @@ export default function Upload() {
                             createdProcessing.length > 0 ? (
                                 <div>
                                     <Typography sx={{ mt: 6, ml: 8 }} variant="h6" component="div">
-                                        Les cours suivants ont été créés:
+                                        Les étudiants suivants ont été ajoutés:
                                     </Typography>
                                     <List sx={{ ml: 12 }}>
-                                        {createdProcessing.map((code) => (
-                                            <ListItem key={code} sx={{ height: 20 }}>
-                                                <ListItemText primary={<>-  <strong>{code}</strong></>} />
+                                        {createdProcessing.map((name) => (
+                                            <ListItem key={name} sx={{ height: 20 }}>
+                                                <ListItemText primary={<>-  <strong>{name}</strong></>} />
                                             </ListItem>
                                         ))}
                                     </List>
                                 </div>
                             ) : (
                                 <Typography sx={{ mt: 6, ml: 8 }} variant="h6" component="div">
-                                    Aucun cours n'a été ajouté.
+                                    Aucun étudiants n'a été ajouté.
                                 </Typography>
                             ))
                         }
@@ -197,24 +198,23 @@ export default function Upload() {
                             failedProcessing.length > 0 ? (
                                 <div>
                                     <Typography sx={{ mt: 0, ml: 8 }} variant="h6" component="div">
-                                        Les cours suivants n'on pas été ajoutés:
+                                        Les étudiants suivants n'ont pas été ajoutés:
                                     </Typography>
                                     <List sx={{ ml: 12 }}>
-                                        {failedProcessing.map(([code, err]) => (
-                                            <ListItem key={code} sx={{ height: 45 }}>
+                                        {failedProcessing.map(([name, err]) => (
+                                            <ListItem key={name} sx={{ height: 45 }}>
                                                 {/* <ListItemIcon>
                                                     <FiberManualRecordIcon fontSize="tiny" />
                                                 </ListItemIcon> */}
-                                                <ListItemText primary={<>-  <strong>{code}</strong>: <em>{err}</em></>} />
+                                                <ListItemText primary={<>-  <strong>{name}</strong>: <em>{err}</em></>} />
                                             </ListItem>
                                         ))}
                                     </List>
                                 </div>
-                            ) : (
-                                <Typography sx={{ mt: 0, ml: 8 }} variant="h6" component="div">
-                                    Tout a bien été importé !
-                                </Typography>
-                            )
+                            ) :
+                                // do nothing
+                                <div></div>
+
                         )
                         }
                     </Box>

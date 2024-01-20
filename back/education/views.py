@@ -22,7 +22,7 @@ from .serializers import (
     StudentSerializer,
 )
 
-from .utils import importCourseCSV
+from .utils import importCourseCSV, importStudentCSV
 
 
 def index(request):
@@ -424,19 +424,50 @@ class ImportCourseCSV(APIView):
 
 
 class ImportStudentCSV(APIView):
+    # @method_decorator(csrf_exempt)
     def post(self, request):
-        # Add your CSV processing logic here
-        # Example: Check request.FILES for the uploaded file
-        csv_file = request.FILES.get("csv_file")
-        if csv_file:
-            # importCourseCSV(csv_file)
-            print(f"Received CSV file: {csv_file.name}")
+        print("Handling POST request for importing student CSV")
+        print("File received...")
+
+        try:
+            csv_file = request.FILES.get("csv_file")
+            if csv_file:
+                print(f"Received CSV file: {csv_file.name}")
+                print("About to process it...")
+                failed, created = importStudentCSV(csv_file)
+                print("Done!")
+                if failed:
+                    return Response(
+                        {
+                            "success": True,
+                            "error": "Some rows failed to import",
+                            "failed": failed,
+                            "created": created,
+                        },
+                        status=status.HTTP_200_OK,
+                    )
+                else:
+                    return Response(
+                        {
+                            "success": True,
+                            "error": "CSV file processed successfully",
+                            "failed": failed,
+                            "created": created,
+                        },
+                        status=status.HTTP_200_OK,
+                    )
+            else:
+                print("No CSV file provided")
+                return Response(
+                    {"success": False, "error": "No CSV file provided"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+        except Exception as e:
+            # Log the exception for debugging purposes
+            print(f"Exception occurred: {str(e)}")
+
+            # Return a meaningful error response
             return Response(
-                {"success": True, "message": "CSV file processed successfully"},
-                status=status.HTTP_200_OK,
-            )
-        else:
-            return Response(
-                {"success": False, "error": "No CSV file provided"},
-                status=status.HTTP_400_BAD_REQUEST,
+                {"success": False, "error": str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )

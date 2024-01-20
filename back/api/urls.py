@@ -28,7 +28,7 @@ from education.views import (
     TranslationView,
 )
 
-from education.views import ImportCourseCSV
+from education.views import ImportCourseCSV, ImportStudentCSV
 
 # Create a router instance
 router = routers.SimpleRouter()
@@ -47,4 +47,5 @@ urlpatterns = [
     path("", include(router.urls)),
     path("labels/", TranslationView.as_view()),
     path("upload/course", ImportCourseCSV.as_view(), name="upload_course_csv"),
+    path("upload/student", ImportStudentCSV.as_view(), name="upload_student_csv"),
 ]
