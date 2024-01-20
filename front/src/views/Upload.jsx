@@ -155,7 +155,6 @@ export default function Upload() {
                         <Grid container justifyContent="center" columnGap={4}>
                             <Button component="label" variant="contained" disableElevation color="secondary" startIcon={<CloudUploadIcon />} disabled={selectedFile !== null}>
                                 {selectedFile ? selectedFile.name : "Sélectionner un fichier"}
-                                {console.log("prout")}
                                 <VisuallyHiddenInput type="file" onChange={handleFileChange} />
                             </Button>
                             {selectedFile && (
