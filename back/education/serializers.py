@@ -1,22 +1,15 @@
-from rest_framework.serializers import ModelSerializer
+from rest_framework import serializers
 
-from .models import Student, Course, Department, Parcours
+from .models import Student, Course, Department, Parcours, Enrollment
 
 
-class StudentSerializer(ModelSerializer):
+class StudentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Student
-        fields = [
-            "id",
-            "user",
-            "name",
-            "surname",
-            "department",
-            "parcours",
-        ]
+        fields = ["id", "user", "name", "surname", "department", "parcours", "editable"]
 
 
-class CourseSerializer(ModelSerializer):
+class CourseSerializer(serializers.ModelSerializer):
     class Meta:
         model = Course
         fields = [
@@ -37,7 +30,44 @@ class CourseSerializer(ModelSerializer):
         ]
 
 
-class DepartmentSerializer(ModelSerializer):
+class EnrollmentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Enrollment
+        fields = [
+            "id",
+            "student",
+            "course",
+            "category",
+        ]
+
+    course = CourseSerializer()
+
+
+class CompleteStudentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Student
+        fields = [
+            "id",
+            "user",
+            "name",
+            "surname",
+            "department",
+            "parcours",
+            "ects",
+            "mandatory_courses",
+            "elective_courses",
+            "editable",
+        ]
+
+    mandatory_courses = EnrollmentSerializer(many=True)
+    elective_courses = EnrollmentSerializer(many=True)
+    ects = serializers.SerializerMethodField()
+
+    def get_ects(self, obj):
+        return obj.count_ects()
+
+
+class DepartmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Department
         fields = [
@@ -48,7 +78,7 @@ class DepartmentSerializer(ModelSerializer):
         ]
 
 
-class ParcoursSerializer(ModelSerializer):
+class ParcoursSerializer(serializers.ModelSerializer):
     class Meta:
         model = Parcours
         fields = [

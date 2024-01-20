@@ -1,0 +1,54 @@
+version: "3.6"
+
+services:
+  back:
+    build:
+      context: back
+      dockerfile: Dockerfile
+      target: development
+    command: python manage.py runserver 0.0.0.0:8000
+    ports:
+      - "$BACK_PORT:8000"
+    environment:
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DEBUG: ${DEBUG}
+      DOMAIN_NAME: ${DOMAIN_NAME}
+      TRUSTED_ORIGIN: ${TRUSTED_ORIGIN}
+    restart: always
+    volumes:
+      - ./back:/src
+      - ./backups:/backups
+    networks:
+      - nginx_link
+  front:
+    build:
+      context: front
+      dockerfile: Dockerfile
+      target: production
+    volumes:
+      - ./front:/app
+    ports:
+      - 3000:3000
+    networks:
+      - nginx_link
+  nginx:
+    build: 
+      context: nginx
+      dockerfile: Dockerfile
+      target: production
+    ports:
+      - "127.0.0.1:80:80"
+    restart: always
+    networks:
+      - nginx_link
+    depends_on:
+      - back
+      - front
+    volumes:
+      - ./front:/front
+networks:
+  nginx_link:

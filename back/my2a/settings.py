@@ -24,10 +24,12 @@ SECRET_KEY = "django-insecure-qn$x7fp@9r*#=3z@&4=myk=)1!^w@afq+6pyt^7lbto%99h^9t
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-CORS_ORIGIN_ALLOW_ALL = True
+CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_CREDENTIALS = True
+CSRF_TRUSTED_ORIGINS = ["http://localhost"]
 
 if DEBUG:
-    ALLOWED_HOSTS = ['localhost']
+    ALLOWED_HOSTS = ["http://localhost", "localhost"]
 
 
 # Application definition
@@ -42,17 +44,29 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "rest_framework.authtoken",
+    "django_cas_ng",
 ]
+
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.SessionAuthentication",
+        "rest_framework.authentication.TokenAuthentication",
+        "rest_framework.authentication.BasicAuthentication",
+    ],
+    "DEFAULT_PERMISSION_CLASSES": ["rest_framework.permissions.IsAuthenticated"],
+}
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
-    'corsheaders.middleware.CorsMiddleware',
+    "corsheaders.middleware.CorsMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "django_cas_ng.middleware.CASMiddleware",
 ]
 
 ROOT_URLCONF = "my2a.urls"
@@ -71,6 +85,11 @@ TEMPLATES = [
             ],
         },
     },
+]
+
+AUTHENTICATION_BACKENDS = [
+    "django.contrib.auth.backends.ModelBackend",
+    "django_cas_ng.backends.CASBackend",
 ]
 
 WSGI_APPLICATION = "my2a.wsgi.application"
@@ -109,7 +128,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
 
-LANGUAGE_CODE = "en-us"
+LANGUAGE_CODE = "fr-fr"
 
 TIME_ZONE = "UTC"
 
@@ -129,3 +148,14 @@ STATIC_URL = "/static/"
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# SSO CONNECT
+CAS_SERVER_URL = "http://cas.enpc.fr/cas/"
+CAS_CREATE_USER = False
+CAS_CHECK_NEXT = False
+CAS_REDIRECT_URL = "/"
+CAS_ADMIN_PREFIX = "admin/"
+
+X_FRAME_OPTIONS = "SAMEORIGIN"
+
+XS_SHARING_ALLOWED_METHODS = ["POST", "GET", "OPTIONS", "PUT", "DELETE"]

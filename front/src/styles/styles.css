@@ -1,19 +1,28 @@
-.progress-bar-checkpoint-text{
-    margin-top: 60px;
+.progress-bar-checkpoint-text {
+  margin-top: 60px;
 }
 
 .indexedStep {
-    color: rgb(0, 0, 0);
-    width: 20px;
-    height: 20px;
-    font-size: 12px;
-    background-color: rgba(211, 211, 211, 0.8);
-    border-radius: 50%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-  
-  .indexedStep.accomplished {
-    background-color: rgba(0, 116, 217, 1);
-  }
+  color: rgb(0, 0, 0);
+  width: 20px;
+  height: 20px;
+  font-size: 12px;
+  background-color: rgba(211, 211, 211, 0.8);
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.indexedStep.accomplished {
+  background-color: rgb(31, 147, 249);
+}
+
+.indexedStep.intermediate {
+  background-color: rgb(31, 56, 249);
+}
+
+
+.pdf-viewer {
+  margin-left: 20
+}
