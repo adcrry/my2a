@@ -11,7 +11,7 @@ export default function TopBar(props) {
     return (
         <AppBar position="static" elevation={0}>
             <Toolbar variant="dense">
-                <img src="../light.png" alt="Light Icon" style={{ width: '3%', height: '3%', marginRight: 15 }} />
+                <img src="../../public/light.png" alt="Light Icon" style={{ width: '3%', height: '3%', marginRight: 15 }} />
 
                 {/* <IconButton edge="start" color="inherit" aria-label="menu" sx={{ mr: 2 }}>
                 </IconButton> */}
