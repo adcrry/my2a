@@ -4,9 +4,15 @@ from .models import Student, Course, Department, Parcours, Enrollment
 
 
 class StudentAdmin(admin.ModelAdmin):
-    search_fields = ["name", "surname", "department__name", "parcours__name"]
-    list_filter = ["department", "parcours"]
-    list_display = ["name", "surname", "department", "parcours"]
+    search_fields = [
+        "surname",
+        "name",
+        "department__name",
+        "parcours__name",
+        "editable",
+    ]
+    list_filter = ["department", "parcours", "editable"]
+    list_display = ["surname", "name", "department", "parcours", "editable"]
 
 
 class CourseAdmin(admin.ModelAdmin):
@@ -21,8 +27,19 @@ class ParcoursAdmin(admin.ModelAdmin):
     list_display = ["name", "department"]
 
 
+class EnrollmentAdmin(admin.ModelAdmin):
+    search_fields = ["student__surname", "student__name", "course__name", "category"]
+    list_filter = ["student", "course", "category"]
+    list_display = ["student", "course", "category"]
+
+
+class DepartmentAdmin(admin.ModelAdmin):
+    search_fields = ["code", "name"]
+    list_display = ["code", "name", "responsable"]
+
+
 admin.site.register(Student, StudentAdmin)
 admin.site.register(Course, CourseAdmin)
-admin.site.register(Department)
-admin.site.register(Enrollment)
+admin.site.register(Department, DepartmentAdmin)
+admin.site.register(Enrollment, EnrollmentAdmin)
 admin.site.register(Parcours, ParcoursAdmin)
