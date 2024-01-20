@@ -59,6 +59,7 @@ export default function Upload() {
     const [processed, setProcessed] = useState(false);
     const [failedProcessing, setFailedProcessing] = useState([]);
     const [createdProcessing, setCreatedProcessing] = useState([]);
+    const [successProcessing, setSuccessProcessing] = useState(false);
 
 
     const handleFileChange = (event) => {
@@ -66,6 +67,7 @@ export default function Upload() {
         const fileType = file.type;
         const validFileTypes = ['text/csv'];
         setProcessed(false);
+        setSuccessProcessing(false);
 
         if (validFileTypes.includes(fileType)) {
             setSelectedFile(file);
@@ -103,6 +105,7 @@ export default function Upload() {
                 setProcessed(true);
                 setSelectedFile(null);
                 if (result.success) {
+                    setSuccessProcessing(true);
                     if (result.failed.length > 0) {
                         setOpenSnackbar(true);
                         setSnackbarMessage("Import partiellement réussi");
@@ -116,6 +119,7 @@ export default function Upload() {
                         setSnackbarSeverity("success");
                     }
                 } else {
+                    setSuccessProcessing(false);
                     setOpenSnackbar(true);
                     setSnackbarMessage("Erreur lors de l'import");
                     setSnackbarSeverity("error");
@@ -189,7 +193,7 @@ export default function Upload() {
                                 </Typography>
                             ))
                         }
-                        {processed && (
+                        {processed && successProcessing && (
                             failedProcessing.length > 0 ? (
                                 <div>
                                     <Typography sx={{ mt: 0, ml: 8 }} variant="h6" component="div">
