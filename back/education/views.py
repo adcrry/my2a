@@ -1,9 +1,13 @@
-from django.http import HttpResponse, JsonResponse
+import io
+
+from django.http import FileResponse, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.template import loader
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
+from reportlab.lib.units import cm
+from reportlab.pdfgen import canvas
 from rest_framework import status
 from rest_framework.decorators import action, permission_classes
 from rest_framework.permissions import IsAdminUser
@@ -21,7 +25,6 @@ from .serializers import (
     ParcoursSerializer,
     StudentSerializer,
 )
-
 from .utils import importCourseCSV, importStudentCSV
 
 
@@ -202,7 +205,11 @@ class StudentViewset(ReadOnlyModelViewSet):
                 target_student.save()
                 return Response({"status": "ok"})
         else:
-            if student.editable:
+            if (
+                student.editable
+                and student.department is not None
+                and student.parcours is not None
+            ):
                 student.editable = False
                 student.save()
                 return Response({"status": "ok"})
@@ -471,3 +478,67 @@ class ImportStudentCSV(APIView):
                 {"success": False, "error": str(e)},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
+
+
+class ViewContractPDF(APIView):
+    def get(self, request, id=None):
+        user = request.user
+        if not user.is_superuser:
+            return Response({"status": "error", "message": "not authorized"})
+        student = get_object_or_404(Student, id=id)
+        if student.department is None or student.parcours is None:
+            return redirect("/inspector/")
+        buffer = io.BytesIO()
+        p = canvas.Canvas(buffer)
+        textobject = p.beginText(2 * cm, 29.7 * cm - 2 * cm)
+        textobject.textLine(
+            "Contrat de formation de " + student.name + " " + student.surname
+        )
+        textobject.textLine(" ")
+        textobject.textLine("Département: " + student.department.code)
+        textobject.textLine("Parcours: " + student.parcours.name)
+        textobject.textLine("Nombres d'ECTS: " + str(student.count_ects()))
+        textobject.textLine(" ")
+        textobject.textLine("Liste des cours:")
+        textobject.textLine(" ")
+        textobject.textLine("Obligatoire parcours:")
+        for course in student.parcours.courses_mandatory.all():
+            textobject.textLine(
+                course.name
+                + " - "
+                + course.semester
+                + " - "
+                + str(course.ects)
+                + " ECTS"
+            )
+
+        textobject.textLine(" ")
+        textobject.textLine("Obligatoire sur liste:")
+        for course in student.mandatory_courses():
+            textobject.textLine(
+                course.course.name
+                + " - "
+                + course.course.semester
+                + " - "
+                + str(course.course.ects)
+                + " ECTS"
+            )
+        textobject.textLine(" ")
+        textobject.textLine("Cours électifs: ")
+        for enrollment in student.elective_courses():
+            textobject.textLine(
+                enrollment.course.name
+                + " - "
+                + enrollment.course.semester
+                + " - "
+                + str(enrollment.course.ects)
+                + " ECTS"
+            )
+        textobject.textLine(" ")
+        p.drawText(textobject)
+        p.showPage()
+        p.save()
+        buffer.seek(0)
+        return FileResponse(
+            buffer, filename="contrat" + student.name + "_" + student.surname + ".pdf"
+        )

@@ -528,7 +528,7 @@ export default function Dashboard() {
                                 </AccordionDetails>
                             </Accordion>
                             {editable && (
-                                <Button variant="contained" disableElevation style={{ marginTop: 10, float: "right" }} onClick={() => {
+                                <Button disabled={departement == -1 || parcours == -1} variant="contained" disableElevation style={{ marginTop: 10, float: "right" }} onClick={() => {
                                     setConfirmationDialogState(true)
                                 }} endIcon={<SendIcon />}>
                                     Confirmer
@@ -554,7 +554,7 @@ export default function Dashboard() {
                                 Attention: Cette action est irréversible. Aucun changement ultérieur ne pourra être effectué sauf en cas de demande auprès de l'administration.
                             </DialogContentText>
                             <DialogContentText sx={{ color: "red", fontWeight: "bold" }}>
-                                {student.ects < required_ects && "Vous n'avez que " + student.ects + " ECTS sur les " + required_ects + " requis. EN GROS TU VAS AVOIR DES PROBLEMES AVEC SANDRINE FAIS UN EFFORT"}
+                                {student.ects < required_ects && "Vous n'avez que " + student.ects + " ECTS sur les " + required_ects + " requis."}
                             </DialogContentText>
                         </DialogContent>
                         <DialogActions>

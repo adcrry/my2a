@@ -16,19 +16,19 @@ Including another URLconf
 """
 
 from django.contrib import admin
-from django.urls import path, include
-from rest_framework import routers
-
+from django.urls import include, path
 from education.views import (
-    StudentViewset,
     CourseViewset,
     DepartmentViewset,
-    ParcoursViewset,
     EnrollmentViewset,
+    ImportCourseCSV,
+    ImportStudentCSV,
+    ParcoursViewset,
+    StudentViewset,
     TranslationView,
+    ViewContractPDF,
 )
-
-from education.views import ImportCourseCSV, ImportStudentCSV
+from rest_framework import routers
 
 # Create a router instance
 router = routers.SimpleRouter()
@@ -48,4 +48,5 @@ urlpatterns = [
     path("labels/", TranslationView.as_view()),
     path("upload/course", ImportCourseCSV.as_view(), name="upload_course_csv"),
     path("upload/student", ImportStudentCSV.as_view(), name="upload_student_csv"),
+    path("contract/<int:id>", ViewContractPDF.as_view(), name="contract_pdf"),
 ]

@@ -275,7 +275,7 @@ export default function Inspector() {
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>
-                    <Button color="secondary" variant="outlined" onClick={handleClose} startIcon={<DownloadIcon />} >Imprimer</Button>
+                    <Button color="secondary" variant="outlined" onClick={() => {window.location = "/api/contract/" + currentStudent.id}} startIcon={<DownloadIcon />} >Imprimer</Button>
                     <Button color="inherit" variant="outlined" onClick={handleClose}>Fermer</Button>
                 </DialogActions>
             </Dialog>
