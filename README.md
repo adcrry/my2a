@@ -40,7 +40,7 @@ To install and run this project for a development environment, follow these step
 
 Be careful: the container name 'my2a-back-1' can be different. If it doesn't work, see 'docker ps' and get the proper container name.  
 
-6. Open your web browser and visit `http://localhost/admin` to login with previous credentials.
+6. Open your web browser and visit `http://localhost/admin/` (the last / is very important !!!!! Do not forget it !!) to login with previous credentials.
 
 7. Visit `http://localhost/`.
 
