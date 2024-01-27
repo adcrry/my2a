@@ -7,9 +7,8 @@ import ListItemText from '@mui/material/ListItemText';
 import TopBar from "../components/TopBar"
 // import NavBar from "../components/NavBar"
 import SectionBar from "../components/SectionBar";
-import TextField from '@mui/material';
-
-import { Grid } from '@mui/material';
+import TextField from '@mui/material/TextField';
+import { Grid, Typography } from '@mui/material';
 import IconButton from "@mui/material/IconButton";
 import DownloadIcon from '@mui/icons-material/Download';
 import EditIcon from "@mui/icons-material/Edit";
@@ -25,6 +24,7 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import Slide from '@mui/material/Slide';
 import { required_ects } from "../utils/utils";
+import Cookies from 'js-cookie';
 
 const Transition = forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
@@ -78,9 +78,11 @@ export default function Courses(){
 
     const [courses, setCourses] = useState([])
     const [search, setSearch] = useState('')
-    const [currentCourse, setCurrentCourse] = useState({})
+    const [currentCourse, setCurrentCourse] = useState(null)
     const [editOpened, setEditOpened] = useState(false)
-
+    const [rebuild, setRebuild] = useState(false)
+    const [departments, setDepartments] = useState([])
+    
     const updateCourses = () => {
         fetch("/api/course/", {
             method: "GET",
@@ -97,7 +99,28 @@ export default function Courses(){
 
     useEffect(() => {
         updateCourses()
+
+        fetch("/api/department/", {
+            method: "GET",
+            credentials: "include",
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        })
+        .then((res) => res.json())
+        .then((result) => {
+            setDepartments(result)
+        })
     }, [])
+
+    const getDepartmentById = (id) => {
+        console.log("eosdk")
+        return departments.find(department => department.id === id).name
+    }
+
+    const getDepartmentIdByName = (name) => {
+        return departments.find(department => department.name === name).id
+    }
 
     const updateSearch = (search) => {
         fetch("/api/course/search?search=" + search, {
@@ -113,23 +136,20 @@ export default function Courses(){
         });
     };
 
-    const saveCourseDetails (course) => {
+    const saveCourseDetails = (course) => {
         fetch("/api/course/update/?id=" + course.id, {
             method: "POST",
             credentials: "include",
             headers: {
                 'Content-Type': 'application/json',
+                'X-CSRFToken': Cookies.get('csrftoken'),
             },
             body: JSON.stringify(course)
         })
             .then((res) => res.json())
             .then((result) => {
-                if (result.success) {
-                    setEditOpened(false)
-                    updateCourses()
-                } else {
-                    alert(result.message)
-                }
+                setEditOpened(false)
+                updateCourses()
         })
     }
 
@@ -166,7 +186,7 @@ export default function Courses(){
                                     disablePadding
                                     secondaryAction={<>
                                         <IconButton edge="end" aria-label="edit" onClick={() => {
-                                            setCurrentCourse(value);
+                                            setCurrentCourse(JSON.parse(JSON.stringify(value)));
                                             setEditOpened(true);
                                         } }>
                                             <EditIcon />
@@ -189,101 +209,106 @@ export default function Courses(){
             onClose={() => { setEditOpened(false); } }
             aria-describedby="alert-dialog-slide-description"
         >
-            <DialogTitle>{`Modifier les informations de ${currentCourse.name}`}</DialogTitle>
+            <DialogTitle>{`Modifier les informations de ${ currentCourse && currentCourse.name}`}</DialogTitle>
             
     <DialogContent>
-        <strong>Scolarité</strong>
-        <TextField
-            label="Code"
-            value={currentCourse.code}
+            <TextField sx={{marginTop: 2}}
+                placeholder="Code"
+                value={currentCourse && currentCourse.code}
+                onChange={(e) => {
+                    let tempCourse = currentCourse
+                    tempCourse.code = e.target.value
+                    setCurrentCourse(tempCourse)
+                    setRebuild(!rebuild)
+                }
+                }
+            />
+        <TextField sx={{marginTop: 2}}
+            placeholder="Département"
+            value={currentCourse && getDepartmentById(currentCourse.department)}
             onChange={(e) => {
                 let tempCourse = currentCourse
-                tempCourse.code = e.target.value
+                tempCourse.department = getDepartmentIdByName(e.target.value)
                 setCurrentCourse(tempCourse)
+                setRebuild(!rebuild)
             }
             }
         />
-        <TextField
-            label="Département"
-            value={currentCourse.department}
-            onChange={(e) => {
-                let tempCourse = currentCourse
-                tempCourse.department = e.target.value
-                setCurrentCourse(tempCourse)
-            }
-            }
-        />
-        <TextField
-            label="ECTS"
-            value={currentCourse.ects}
+        <TextField sx={{marginTop: 2}}
+            placeholder="ECTS"
+            value={currentCourse && currentCourse.ects}
             onChange={(e) => {
                 let tempCourse = currentCourse
                 tempCourse.ects = e.target.value
                 setCurrentCourse(tempCourse)
+                setRebuild(!rebuild)
             }
             }
         />
 
-        <strong>Détails</strong>
-        <TextField
-            label="Description"
-            value={currentCourse.description}
+        <TextField sx={{marginTop: 2}}
+            placeholder="Description"
+            value={currentCourse && currentCourse.description}
             onChange={(e) => {
                 let tempCourse = currentCourse
                 tempCourse.description = e.target.value
                 setCurrentCourse(tempCourse)
+                setRebuild(!rebuild)
             }
             }
         />
-        <TextField
-            label="Enseignant"
-            value={currentCourse.teacher}
+        <TextField sx={{marginTop: 2}}
+            placeholder="Enseignant"
+            value={currentCourse && currentCourse.teacher}
             onChange={(e) => {
                 let tempCourse = currentCourse
                 tempCourse.teacher = e.target.value
                 setCurrentCourse(tempCourse)
+                setRebuild(!rebuild)
             }
             }
         />
-
-        <strong>Horaires</strong>
-        <TextField
-            label="Semestre"
-            value={currentCourse.semester}
+        <TextField sx={{marginTop: 2}}
+            placeholder="Semestre"
+            value={currentCourse && currentCourse.semester}
             onChange={(e) => {
                 let tempCourse = currentCourse
                 tempCourse.semester = e.target.value
                 setCurrentCourse(tempCourse)
+                setRebuild(!rebuild)
             }
             }
         />
-        <TextField
-            label="Jour"
-            value={currentCourse.day}
+        <TextField sx={{marginTop: 2}}
+            placeholder="Jour"
+            value={currentCourse && currentCourse.day}
             onChange={(e) => {
                 let tempCourse = currentCourse
                 tempCourse.day = e.target.value
                 setCurrentCourse(tempCourse)
+                setRebuild(!rebuild)
             }
             }
         />
-        <TextField
-            label="Heure de début"
-            value={currentCourse.start_time}
+        <TextField sx={{marginTop: 2}}
+            placeholder="Heure de début"
+            value={currentCourse && currentCourse.start_time}
             onChange={(e) => {
                 let tempCourse = currentCourse
                 tempCourse.start_time = e.target.value
                 setCurrentCourse(tempCourse)
+                setRebuild(!rebuild)
             }
             }
         />
-        <TextField
-            label="Heure de fin"
-            value={currentCourse.end_time}
+        <TextField sx={{marginTop: 2}}
+            placeholder="Heure de fin"
+            value={currentCourse && currentCourse.end_time}
             onChange={(e) => {
                 let tempCourse = currentCourse
                 tempCourse.end_time = e.target.value
                 setCurrentCourse(tempCourse)
+                setRebuild(!rebuild)
             }
             }
         />
