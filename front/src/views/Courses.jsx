@@ -78,13 +78,8 @@ export default function Courses(){
 
     const [courses, setCourses] = useState([])
     const [search, setSearch] = useState('')
-    const [open, setOpen] = useState(false);
     const [currentCourse, setCurrentCourse] = useState({})
     const [editOpened, setEditOpened] = useState(false)
-
-    const handleClose = () => {
-      setOpen(false);
-    };
 
     const updateCourses = () => {
         fetch("/api/course/", {
@@ -151,8 +146,7 @@ export default function Courses(){
                         <StyledInputBase
                             placeholder="Search…"
                             inputProps={{ 'aria-label': 'search' }}
-                            onChange={(event) => setSearch(event.target.value)}
-                        />
+                            onChange={(event) => setSearch(event.target.value)} />
                     </Search>
                 </Grid>
                 <GridBreak />
@@ -165,23 +159,14 @@ export default function Courses(){
                                 <ListItem
                                     key={value.name}
                                     disablePadding
-                                    secondaryAction={
-                                        <>
-                                            <IconButton edge="end" aria-label="removeredeye" onClick={() => {
-                                                fetchCourseData(value.id)
-                                            }}>
-                                                <RemoveRedEyeIcon />
-                                            </IconButton>
-                                            <IconButton aria-label="edit" style={{ marginLeft: '10px' }} onClick={
-                                                () => {
-                                                    setCurrentCourse(value)
-                                                    setEditOpened(true)
-                                                }
-                                            }>
-                                                <EditIcon />
-                                            </IconButton>
-                                        </>
-                                    }
+                                    secondaryAction={<>
+                                        <IconButton edge="end" aria-label="edit" onClick={() => {
+                                            setCurrentCourse(value);
+                                            setEditOpened(true);
+                                        } }>
+                                            <EditIcon />
+                                        </IconButton>
+                                    </>}
                                 >
                                     {/* Rq : mettre dans l'ordre alphabétique */}
                                     <ListItemButton>
@@ -193,36 +178,70 @@ export default function Courses(){
                     </List>
                 </Grid>
             </Grid>
-            <Dialog
-                open={open}
-                TransitionComponent={Transition}
-                keepMounted
-                onClose={handleClose}
-                aria-describedby="alert-dialog-slide-description"
-            >
-                <DialogTitle>{`Modifier les informations de ${currentCourse.name}`}</DialogTitle>
-                <DialogContent>
-                    <DialogContentText>
-                        <DialogContentText>
-                            <strong>Département</strong> : {currentCourse.department}
-                        </DialogContentText>
-                    </DialogContentText>
-                    <DialogContentText>
-                    <strong>ECTS</strong> : <span style={{ fontWeight: 'normal', color: 'black' }}>{currentCourse.ects}</span>
-                    </DialogContentText>
-                </DialogContent>
-                <DialogActions>
-                    <Button color="inherit" variant="outlined" onClick={handleClose}>Fermer</Button>
-                </DialogActions>
-            </Dialog>
-            <Dialog
-                open={editOpened}
-                TransitionComponent={Transition}
-                keepMounted
-                onClose={() => { setEditOpened(false) }}
-                aria-describedby="alert-dialog-slide-description"
-            >
-            </Dialog>
+            <Dialog open={editOpened}
+            TransitionComponent={Transition}
+            keepMounted
+            onClose={() => { setEditOpened(false); } }
+            aria-describedby="alert-dialog-slide-description"
+        >
+            <DialogTitle>{`Modifier les informations de ${currentCourse.name}`}</DialogTitle>
+            
+    <DialogContent>
+        <strong>Scolarité</strong>
+        <TextField
+            label="Code"
+            value={currentCourse.code}
+            onChange={(e) => handleInputChange('code', e.target.value)}
+        />
+        <TextField
+            label="Département"
+            value={currentCourse.department}
+            onChange={(e) => handleInputChange('department', e.target.value)}
+        />
+        <TextField
+            label="ECTS"
+            value={currentCourse.ects}
+            onChange={(e) => handleInputChange('ects', e.target.value)}
+        />
+
+        <strong>Détails</strong>
+        <TextField
+            label="Description"
+            value={currentCourse.description}
+            onChange={(e) => handleInputChange('description', e.target.value)}
+        />
+        <TextField
+            label="Enseignant"
+            value={currentCourse.teacher}
+            onChange={(e) => handleInputChange('teacher', e.target.value)}
+        />
+
+        <strong>Horaires</strong>
+        <TextField
+            label="Semestre"
+            value={currentCourse.semester}
+            onChange={(e) => handleInputChange('semester', e.target.value)}
+        />
+        <TextField
+            label="Jour"
+            value={currentCourse.day}
+            onChange={(e) => handleInputChange('day', e.target.value)}
+        />
+        <TextField
+            label="Heure de début"
+            value={currentCourse.start_time}
+            onChange={(e) => handleInputChange('start_time', e.target.value)}
+        />
+        <TextField
+            label="Heure de fin"
+            value={currentCourse.end_time}
+            onChange={(e) => handleInputChange('end_time', e.target.value)}
+        />
+    </DialogContent>
+    <DialogActions>
+        <Button color="inherit" variant="outlined" onClick={handleClose}>Fermer</Button>
+    </DialogActions>
+</Dialog>
         </div>
     )
 }
