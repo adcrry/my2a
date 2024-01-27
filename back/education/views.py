@@ -266,7 +266,12 @@ class CourseViewset(ReadOnlyModelViewSet):
                 )
 
         return queryset
-
+    
+    @action(detail=False, methods=["get"])
+    def search(self, request):
+        courses = Course.objects.filter(name__contains=request.GET["search"])
+        serializer = CourseSerializer(courses, many=True)
+        return Response(serializer.data)
 
 class DepartmentViewset(ReadOnlyModelViewSet):
     """
