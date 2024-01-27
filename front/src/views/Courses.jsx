@@ -200,7 +200,7 @@ export default function Courses(){
                 onClose={handleClose}
                 aria-describedby="alert-dialog-slide-description"
             >
-                <DialogTitle>{currentCourse.name}</DialogTitle>
+                <DialogTitle>{`Modifier les informations de ${currentCourse.name}`}</DialogTitle>
                 <DialogContent>
                     <DialogContentText>
                         <DialogContentText>
