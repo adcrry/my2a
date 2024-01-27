@@ -7,7 +7,7 @@ import ListItemText from '@mui/material/ListItemText';
 import TopBar from "../components/TopBar"
 // import NavBar from "../components/NavBar"
 import SectionBar from "../components/SectionBar";
-
+import TextField from '@mui/material';
 
 import { Grid } from '@mui/material';
 import IconButton from "@mui/material/IconButton";
@@ -113,20 +113,25 @@ export default function Courses(){
         });
     };
 
-    const fetchCourseData = (id) => {
-        fetch("/api/course/" + id, {
-            method: "GET",
+    const saveCourseDetails (course) => {
+        fetch("/api/course/update/?id=" + course.id, {
+            method: "POST",
             credentials: "include",
             headers: {
                 'Content-Type': 'application/json',
             },
+            body: JSON.stringify(course)
         })
-        .then((res) => res.json())
-        .then((result) => {
-            setCurrentCourse(result);
-            setOpen(true);
-        });
-    };
+            .then((res) => res.json())
+            .then((result) => {
+                if (result.success) {
+                    setEditOpened(false)
+                    updateCourses()
+                } else {
+                    alert(result.message)
+                }
+        })
+    }
 
     useEffect(() => {
         updateSearch(search)
@@ -134,7 +139,7 @@ export default function Courses(){
 
     return (
         <div>
-            <TopBar title="Gestion My2A" />
+            <TopBar title="Gestion My2A > Cours" />
             <Grid container style={{ marginTop: '30px', alignItems: "center", justifyContent: "center" }}>
                 <Grid item md={6}>
                     <SectionBar title="Parcourir les cours" />
@@ -191,56 +196,101 @@ export default function Courses(){
         <TextField
             label="Code"
             value={currentCourse.code}
-            onChange={(e) => handleInputChange('code', e.target.value)}
+            onChange={(e) => {
+                let tempCourse = currentCourse
+                tempCourse.code = e.target.value
+                setCurrentCourse(tempCourse)
+            }
+            }
         />
         <TextField
             label="Département"
             value={currentCourse.department}
-            onChange={(e) => handleInputChange('department', e.target.value)}
+            onChange={(e) => {
+                let tempCourse = currentCourse
+                tempCourse.department = e.target.value
+                setCurrentCourse(tempCourse)
+            }
+            }
         />
         <TextField
             label="ECTS"
             value={currentCourse.ects}
-            onChange={(e) => handleInputChange('ects', e.target.value)}
+            onChange={(e) => {
+                let tempCourse = currentCourse
+                tempCourse.ects = e.target.value
+                setCurrentCourse(tempCourse)
+            }
+            }
         />
 
         <strong>Détails</strong>
         <TextField
             label="Description"
             value={currentCourse.description}
-            onChange={(e) => handleInputChange('description', e.target.value)}
+            onChange={(e) => {
+                let tempCourse = currentCourse
+                tempCourse.description = e.target.value
+                setCurrentCourse(tempCourse)
+            }
+            }
         />
         <TextField
             label="Enseignant"
             value={currentCourse.teacher}
-            onChange={(e) => handleInputChange('teacher', e.target.value)}
+            onChange={(e) => {
+                let tempCourse = currentCourse
+                tempCourse.teacher = e.target.value
+                setCurrentCourse(tempCourse)
+            }
+            }
         />
 
         <strong>Horaires</strong>
         <TextField
             label="Semestre"
             value={currentCourse.semester}
-            onChange={(e) => handleInputChange('semester', e.target.value)}
+            onChange={(e) => {
+                let tempCourse = currentCourse
+                tempCourse.semester = e.target.value
+                setCurrentCourse(tempCourse)
+            }
+            }
         />
         <TextField
             label="Jour"
             value={currentCourse.day}
-            onChange={(e) => handleInputChange('day', e.target.value)}
+            onChange={(e) => {
+                let tempCourse = currentCourse
+                tempCourse.day = e.target.value
+                setCurrentCourse(tempCourse)
+            }
+            }
         />
         <TextField
             label="Heure de début"
             value={currentCourse.start_time}
-            onChange={(e) => handleInputChange('start_time', e.target.value)}
+            onChange={(e) => {
+                let tempCourse = currentCourse
+                tempCourse.start_time = e.target.value
+                setCurrentCourse(tempCourse)
+            }
+            }
         />
         <TextField
             label="Heure de fin"
             value={currentCourse.end_time}
-            onChange={(e) => handleInputChange('end_time', e.target.value)}
+            onChange={(e) => {
+                let tempCourse = currentCourse
+                tempCourse.end_time = e.target.value
+                setCurrentCourse(tempCourse)
+            }
+            }
         />
     </DialogContent>
     <DialogActions>
-        <Button color="inherit" variant="outlined" onClick={handleClose}>Fermer</Button>
-    </DialogActions>
+                    <Button onClick={() => { saveCourseDetails(currentCourse) }}>Enregistrer</Button>
+                </DialogActions>
 </Dialog>
         </div>
     )

@@ -272,6 +272,21 @@ class CourseViewset(ReadOnlyModelViewSet):
         courses = Course.objects.filter(name__contains=request.GET["search"])
         serializer = CourseSerializer(courses, many=True)
         return Response(serializer.data)
+    
+    @action(detail=False, methods=["post"], url_path="update/id")
+    def update(self, request):
+        course = get_object_or_404(Course, id=request.GET["id"])
+        course.name = request.GET["name"]
+        course.code = request.GET["code"]
+        course.ects = request.GET["ects"]
+        course.semester = request.GET["semester"]
+        course.day = request.GET["day"]
+        course.start_time = request.GET["start_time"]
+        course.end_time = request.GET["end_time"]
+        course.description = request.GET["description"]
+        course.department = Department.objects.get(code=request.GET["department"])
+        course.save()
+    
 
 class DepartmentViewset(ReadOnlyModelViewSet):
     """
