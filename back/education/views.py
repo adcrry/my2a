@@ -1,3 +1,4 @@
+import csv
 import io
 
 from django.http import FileResponse, HttpResponse, JsonResponse
@@ -25,7 +26,7 @@ from .serializers import (
     ParcoursSerializer,
     StudentSerializer,
 )
-from .utils import importCourseCSV, importStudentCSV
+from .utils import course_list_to_string, importCourseCSV, importStudentCSV
 
 
 def index(request):
@@ -55,6 +56,7 @@ class StudentViewset(ReadOnlyModelViewSet):
 
     serializer_class = StudentSerializer
 
+    @permission_classes([IsAdminUser])
     def get_queryset(self):
         """
         Returns a queryset of all Student objects.
@@ -194,22 +196,23 @@ class StudentViewset(ReadOnlyModelViewSet):
         response.write(student.generate_timetable())
         return response
 
-    @action(detail=False, methods=["get"], url_path="updatestatus")
+    @action(detail=False, methods=["post"], url_path="updatestatus")
     def change_status(self, request):
         # check if user is admin or is self
         student = get_object_or_404(Student, user=request.user)
-        if "id" in request.GET:
-            if student.user.is_superuser:
-                target_student = get_object_or_404(Student, id=request.GET["id"])
-                target_student.editable = not target_student.editable
-                target_student.save()
-                return Response({"status": "ok"})
-        else:
+        if "id" in request.data and student.user.is_superuser:
+            target_student = get_object_or_404(Student, id=request.data["id"])
+            target_student.editable = not target_student.editable
+            target_student.save()
+            return Response({"status": "ok"})
+        elif "id" not in request.data:
             if (
                 student.editable
                 and student.department is not None
                 and student.parcours is not None
             ):
+                if "comment" in request.data:
+                    student.comment = request.data["comment"]
                 student.editable = False
                 student.save()
                 return Response({"status": "ok"})
@@ -383,16 +386,10 @@ class PostEnrollment(APIView):
 
 class ImportCourseCSV(APIView):
     def post(self, request):
-        print("Handling POST request for importing course CSV")
-        print("File received...")
-
         try:
             csv_file = request.FILES.get("csv_file")
             if csv_file:
-                print(f"Received CSV file: {csv_file.name}")
-                print("About to process it...")
                 failed, created = importCourseCSV(csv_file)
-                print("Done!")
                 if failed:
                     return Response(
                         {
@@ -414,16 +411,11 @@ class ImportCourseCSV(APIView):
                         status=status.HTTP_200_OK,
                     )
             else:
-                print("No CSV file provided")
                 return Response(
                     {"success": False, "error": "No CSV file provided"},
                     status=status.HTTP_400_BAD_REQUEST,
                 )
         except Exception as e:
-            # Log the exception for debugging purposes
-            print(f"Exception occurred: {str(e)}")
-
-            # Return a meaningful error response
             return Response(
                 {"success": False, "error": str(e)},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -431,18 +423,11 @@ class ImportCourseCSV(APIView):
 
 
 class ImportStudentCSV(APIView):
-    # @method_decorator(csrf_exempt)
     def post(self, request):
-        print("Handling POST request for importing student CSV")
-        print("File received...")
-
         try:
             csv_file = request.FILES.get("csv_file")
             if csv_file:
-                print(f"Received CSV file: {csv_file.name}")
-                print("About to process it...")
                 failed, created = importStudentCSV(csv_file)
-                print("Done!")
                 if failed:
                     return Response(
                         {
@@ -464,16 +449,11 @@ class ImportStudentCSV(APIView):
                         status=status.HTTP_200_OK,
                     )
             else:
-                print("No CSV file provided")
                 return Response(
                     {"success": False, "error": "No CSV file provided"},
                     status=status.HTTP_400_BAD_REQUEST,
                 )
         except Exception as e:
-            # Log the exception for debugging purposes
-            print(f"Exception occurred: {str(e)}")
-
-            # Return a meaningful error response
             return Response(
                 {"success": False, "error": str(e)},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -542,3 +522,43 @@ class ViewContractPDF(APIView):
         return FileResponse(
             buffer, filename="contrat" + student.name + "_" + student.surname + ".pdf"
         )
+
+
+class ExportStudentsView(APIView):
+
+    permission_classes = [IsAdminUser]
+
+    def get(self, request):
+        response = HttpResponse(
+            content_type="text/csv",
+            headers={"Content-Disposition": 'attachment; filename="etudiants.csv"'},
+        )
+
+        writer = csv.writer(response)
+        writer.writerow(
+            [
+                "Nom",
+                "Prénom",
+                "Département",
+                "Parcours",
+                "Cours obligatoires sur liste",
+                "Cours électifs",
+                "Total ECTS",
+                "Commentaire",
+            ]
+        )
+        students = Student.objects.all().filter(editable=False)
+        for student in students:
+            writer.writerow(
+                [
+                    student.name,
+                    student.surname,
+                    student.department,
+                    student.parcours,
+                    course_list_to_string(student.mandatory_courses()),
+                    course_list_to_string(student.elective_courses()),
+                    student.count_ects(),
+                    student.comment,
+                ]
+            )
+        return response

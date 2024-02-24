@@ -2,13 +2,12 @@ import csv
 from io import TextIOWrapper  # Import TextIOWrapper for handling file decoding
 
 from django.contrib import admin
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.shortcuts import redirect, render
 from django.urls import path
 from django.urls.conf import include
-
-from django.contrib.auth.models import User
-from django.contrib.auth import authenticate, login, logout
 
 from .models import Course, Department, Parcours, Student
 
@@ -247,3 +246,12 @@ def importStudentCSV(csv_file):
             error_rows.append([row["surname"].upper() + " " + row["name"], e])
 
     return error_rows, created_rows
+
+
+def course_list_to_string(course_list):
+    text = ""
+    for course in course_list:
+        text += course.course.name + ", "
+    if len(text) > 2:
+        text = text[:-2]
+    return text

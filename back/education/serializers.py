@@ -1,12 +1,26 @@
 from rest_framework import serializers
 
-from .models import Student, Course, Department, Parcours, Enrollment
+from .models import Course, Department, Enrollment, Parcours, Student
 
 
 class StudentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Student
-        fields = ["id", "user", "name", "surname", "department", "parcours", "editable"]
+        fields = [
+            "id",
+            "user",
+            "name",
+            "surname",
+            "department",
+            "parcours",
+            "editable",
+            "is_admin",
+        ]
+
+    is_admin = serializers.SerializerMethodField()
+
+    def get_is_admin(self, obj):
+        return obj.user.is_superuser
 
 
 class CourseSerializer(serializers.ModelSerializer):

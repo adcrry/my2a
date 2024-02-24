@@ -19,8 +19,9 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import Slide from '@mui/material/Slide';
 import CircularProgress from '@mui/material/CircularProgress';
-import { required_ects } from "../utils/utils";
+import { required_ects, required_mandatory_courses } from "../utils/utils";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import TextField from "@mui/material/TextField";
 
 const Transition = forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
@@ -42,7 +43,7 @@ export default function Dashboard() {
     const [editable, setEditable] = useState(false)
     const [confirmationDialogState, setConfirmationDialogState] = useState(false)
     const [student, setStudent] = useState({})
-
+    const [comment, setComment] = useState('')
     const handleChange = (panel) => {
         if (opened != panel) setOpened(panel)
     }
@@ -97,7 +98,7 @@ export default function Dashboard() {
     const changeDepartment = (code) => {
         setDepartement(code)
         setParcours(-1)
-        fetch('http://localhost/api/student/current/department/', {
+        fetch('/api/student/current/department/', {
             method: 'POST',
             credentials: "include",
             headers: {
@@ -118,7 +119,7 @@ export default function Dashboard() {
 
     const changeParcours = (code) => {
         setParcours(code)
-        fetch('http://localhost/api/student/current/parcours/', {
+        fetch('/api/student/current/parcours/', {
             method: 'POST',
             credentials: "include",
             headers: {
@@ -138,7 +139,7 @@ export default function Dashboard() {
     }
 
     const changeEnrollment = (course, is_enrolled, category) => {
-        fetch('http://localhost/api/student/current/enroll/', {
+        fetch('/api/student/current/enroll/', {
             method: 'POST',
             credentials: "include",
             headers: {
@@ -149,7 +150,7 @@ export default function Dashboard() {
         })
             .then((res) => res.json())
             .then((result) => {
-                fetch('http://localhost/api/student/current/courses/available', {
+                fetch('/api/student/current/courses/available', {
                     method: 'GET',
                     credentials: "include",
                     headers: {
@@ -158,7 +159,7 @@ export default function Dashboard() {
                 })
                     .then((res) => res.json())
                     .then((result_available) => {
-                        fetch('http://localhost/api/student/current/courses/available_electives', {
+                        fetch('/api/student/current/courses/available_electives', {
                             method: 'GET',
                             credentials: "include",
                             headers: {
@@ -168,7 +169,7 @@ export default function Dashboard() {
                             .then((res) => res.json())
                             .then((result) => {
                                 setElectiveCourses(result)
-                                fetch('http://localhost/api/student/current/id/', {
+                                fetch('/api/student/current/id/', {
                                     method: 'GET',
                                     credentials: "include",
                                     headers: {
@@ -210,11 +211,13 @@ export default function Dashboard() {
 
     const validateForm = () => {
         fetch('/api/student/updatestatus/', {
-            method: 'GET',
+            method: 'POST',
             credentials: "include",
             headers: {
                 'Content-Type': 'application/json',
+                'X-CSRFToken': Cookies.get('csrftoken'),
             },
+            body: JSON.stringify({ comment: comment }),
         })
             .then((res) => res.json)
             .then((result) => {
@@ -224,7 +227,7 @@ export default function Dashboard() {
     }
 
     useEffect(() => {
-        fetch('http://localhost/api/student/current/', {
+        fetch('/api/student/current/', {
             method: 'GET',
             credentials: "include",
             headers: {
@@ -233,11 +236,11 @@ export default function Dashboard() {
         })
             .then((res) => res.json())
             .then((result) => {
-                if (result.detail != null && result.detail == 'Authentication credentials were not provided.') {
+                if (result.detail != null && result.detail == "Informations d'authentification non fournies.") {
                     window.location.href = '/cas/login/'
                 } else {
                     setIsLogged(true)
-                    fetch('http://localhost/api/department/', {
+                    fetch('/api/department/', {
                         method: 'GET',
                         credentials: "include",
                         headers: {
@@ -252,7 +255,7 @@ export default function Dashboard() {
                                 console.log(error);
                             })
 
-                    fetch('http://localhost/api/student/current/id/', {
+                    fetch('/api/student/current/id/', {
                         method: 'GET',
                         credentials: "include",
                         headers: {
@@ -300,7 +303,7 @@ export default function Dashboard() {
 
     useEffect(() => {
         if (departement != -1) {
-            fetch('http://localhost/api/parcours/?department=' + departement, {
+            fetch('/api/parcours/?department=' + departement, {
                 method: 'GET',
                 credentials: "include",
                 headers: {
@@ -319,7 +322,7 @@ export default function Dashboard() {
 
     useEffect(() => {
         if (parcours != -1) {
-            fetch('http://localhost/api/course/?parcours=' + parcours + '&on_list=true', {
+            fetch('/api/course/?parcours=' + parcours + '&on_list=true', {
                 method: 'GET',
                 credentials: "include",
                 headers: {
@@ -334,7 +337,7 @@ export default function Dashboard() {
                         console.log(error);
                     })
 
-            fetch('http://localhost/api/student/current/courses/available', {
+            fetch('/api/student/current/courses/available', {
                 method: 'GET',
                 credentials: "include",
                 headers: {
@@ -343,7 +346,7 @@ export default function Dashboard() {
             })
                 .then((res) => res.json())
                 .then((result_available) => {
-                    fetch('http://localhost/api/student/current/courses/available_electives', {
+                    fetch('/api/student/current/courses/available_electives', {
                         method: 'GET',
                         credentials: "include",
                         headers: {
@@ -353,7 +356,7 @@ export default function Dashboard() {
                         .then((res) => res.json())
                         .then((result) => {
                             setElectiveCourses(result)
-                            fetch('http://localhost/api/student/current/id/', {
+                            fetch('/api/student/current/id/', {
                                 method: 'GET',
                                 credentials: "include",
                                 headers: {
@@ -393,7 +396,7 @@ export default function Dashboard() {
     }, [parcours]);
 
     useEffect(() => {
-        fetch('http://localhost/api/student/current/courses/available', {
+        fetch('/api/student/current/courses/available', {
             method: 'GET',
             credentials: "include",
             headers: {
@@ -403,7 +406,7 @@ export default function Dashboard() {
             .then((res) => res.json())
             .then((result) => {
                 setCompatibleCourses(result)
-                fetch('http://localhost/api/student/current/courses/available_electives', {
+                fetch('/api/student/current/courses/available_electives', {
                     method: 'GET',
                     credentials: "include",
                     headers: {
@@ -537,7 +540,7 @@ export default function Dashboard() {
                         </Grid>
                         <Grid item md={6} xs={11} sm={11}>
                             <div className="pdf-viewer">
-                                <iframe key={mandatoryCourses + choosenElectiveCourses + choosenMandatoryCourses} src="http://localhost/api/student/current/timetable/" width="100%" height="500px" />
+                                <iframe key={mandatoryCourses + choosenElectiveCourses + choosenMandatoryCourses} src="/api/student/current/timetable/" width="100%" height="500px" />
                             </div>
                         </Grid>
                     </Grid>
@@ -556,7 +559,11 @@ export default function Dashboard() {
                             <DialogContentText sx={{ color: "red", fontWeight: "bold" }}>
                                 {student.ects < required_ects && "Vous n'avez que " + student.ects + " ECTS sur les " + required_ects + " requis."}
                             </DialogContentText>
+                            <DialogContentText sx={{ color: "red", fontWeight: "bold" }}>
+                                {choosenMandatoryCourses.length < required_mandatory_courses && "Vous devez choisir au moins 2 cours obligatoires sur liste."}
+                            </DialogContentText>
                         </DialogContent>
+                        <TextField sx={{margin: 'auto', width: "90%"}} placeholder="Commentaire" value={comment} onChange={(e) => setComment(e.target.value)}/>
                         <DialogActions>
                             <Button onClick={() => {
                                 validateForm()

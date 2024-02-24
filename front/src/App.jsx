@@ -17,7 +17,6 @@ function App() {
           <Route path="/inspector/upload/course" element={<Upload />} />
           <Route path="/inspector/upload/student" element={<UploadStudent />} />
           <Route path="*" element={<Dashboard />} />
-          <Route path="/test/:id" element={<Dashboard />} />
         </Routes>
       </Router>
     </React.Fragment>

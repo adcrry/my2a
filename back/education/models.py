@@ -84,6 +84,7 @@ class Student(models.Model):
         Department, on_delete=models.CASCADE, null=True, blank=True
     )
     editable = models.BooleanField()
+    comment = models.TextField(null=True, blank=True)
 
     def mandatory_courses(self):
         """Return the list of mandatory courses for the student."""

@@ -25,6 +25,7 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import Slide from '@mui/material/Slide';
 import { required_ects } from "../utils/utils";
+import Cookies from 'js-cookie';
 
 const Transition = forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
@@ -82,6 +83,7 @@ export default function Inspector() {
     const [currentStudent, setCurrentStudent] = useState([])
     const [editOpened, setEditOpened] = useState(false)
     const [labels, setLabels] = useState({})
+    const [isAdmin, setIsAdmin] = useState(false)
 
     const handleClose = () => {
         setOpen(false);
@@ -102,20 +104,35 @@ export default function Inspector() {
     }
 
     useEffect(() => {
-        updateStudents()
-        console.log("oaziufsofsopfi")
-        fetch("/api/labels/", {
+        fetch("/api/student/current", {
             method: "GET",
             credentials: "include",
             headers: {
-                'Content-Type': 'application/json'
-            }
+                'Content-Type': 'application/json',
+            },
         })
-        .then((res) => res.json())
-        .then((result) => {
-            setLabels(result)
-            console.log(result)
-        })
+            .then((res) => res.json())
+            .then((result) => {
+                if (result.is_admin === false) {
+                    window.location = "/"
+                } else {
+                    setIsAdmin(true)
+                    updateStudents()
+                    fetch("/api/labels/", {
+                        method: "GET",
+                        credentials: "include",
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    })
+                        .then((res) => res.json())
+                        .then((result) => {
+                            setLabels(result)
+                            console.log(result)
+                        })
+                }
+            })
+
     }, [])
 
     const updateSearch = (search) => {
@@ -148,12 +165,14 @@ export default function Inspector() {
     }
 
     const changeStudentStatus = (id) => {
-        fetch("/api/student/updatestatus/?id=" + id, {
-            method: "GET",
+        fetch("/api/student/updatestatus/", {
+            method: "POST",
             credentials: "include",
             headers: {
                 'Content-Type': 'application/json',
+                'X-CSRFToken': Cookies.get('csrftoken'),
             },
+            body: JSON.stringify({ id: id })
         })
             .then((res) => res.json())
             .then((result) => {
@@ -168,135 +187,143 @@ export default function Inspector() {
 
     return (
         <div>
-            <TopBar title="Gestion My2A" />
-            <Grid container style={{ marginTop: '30px', alignItems: "center", justifyContent: "center" }}>
-                <Grid item md={6}>
-                    <SectionBar title="Parcourir les étudiants" />
-                    <div style={{ marginBottom: '10px' }}></div>
-                    <Search>
-                        <SearchIconWrapper>
-                            <SearchIcon />
-                        </SearchIconWrapper>
-                        <StyledInputBase
-                            placeholder="Search…"
-                            inputProps={{ 'aria-label': 'search' }}
-                            onChange={(event) => setSearch(event.target.value)}
-                        />
-                    </Search>
-                </Grid>
-                <GridBreak />
-                <Grid item md={6} xs={11} sm={11}>
 
-                    <List dense sx={{ bgcolor: 'background.paper' }}>
-                        {students.map((value) => {
-                            const labelId = `checkbox-list-secondary-label-${value}`;
-                            return (
-                                <ListItem
-                                    key={value.surname}
-                                    disablePadding
-                                    style={{ backgroundColor: value.editable ? 'rgba(255, 0, 0, 0.2)' : 'rgba(0, 255, 0, 0.2)' }}
-                                    secondaryAction={
-                                        <>
-                                            <IconButton edge="end" aria-label="removeredeye" onClick={() => {
-                                                fetchStudentData(value.id)
-                                            }}>
-                                                <RemoveRedEyeIcon />
-                                            </IconButton>
-                                            <IconButton aria-label="edit" style={{ marginLeft: '10px' }} onClick={
-                                                () => {
-                                                    setCurrentStudent(value)
-                                                    setEditOpened(true)
-                                                }
-                                            }>
-                                                <EditIcon />
-                                            </IconButton>
-                                        </>
-                                    }
-                                >
-                                    {/* Rq : mettre dans l'ordre alphabétique */}
-                                    <ListItemButton>
-                                        <ListItemText id={labelId} primary={`${value.surname}` + ` ${value.name}`} />
-                                    </ListItemButton>
-                                </ListItem>
-                            );
-                        })}
-                    </List>
-                </Grid>
-            </Grid>
-            <Dialog
-                open={open}
-                TransitionComponent={Transition}
-                keepMounted
-                onClose={handleClose}
-                aria-describedby="alert-dialog-slide-description"
-            >
-                <DialogTitle>{currentStudent.surname} {currentStudent.name}</DialogTitle>
-                <DialogContent>
-                    <DialogContentText>
-                        <DialogContentText>
-                            <strong>Département</strong> : {labels.departments && labels.departments[currentStudent.department-1]}
-                        </DialogContentText>
-                    </DialogContentText>
-                    <DialogContentText>
-                    <strong>Parcours</strong> : {labels.parcours && labels.parcours[currentStudent.parcours-1]}
-                    </DialogContentText>
-                    <DialogContentText>
-                    <strong>ECTS</strong> : <span style={{ fontWeight:  currentStudent.ects < required_ects ? 'bold' : 'normal',  color: currentStudent.ects < required_ects ? 'red' : 'black' }}>{currentStudent.ects}</span>
-                    </DialogContentText>
-                    <DialogContentText id="alert-dialog-slide-description">
-                    <strong>Cours obligatoires</strong>
-                        <List dense sx={{ bgcolor: 'background.paper' }}>
-                            {currentStudent.mandatory_courses && currentStudent.mandatory_courses.map((value) => {
-                                const labelId = `checkbox-list-secondary-label-${value}`;
-                                return (
-                                    <ListItem
-                                        key={value.id}
-                                        disablePadding
-                                    >
-                                        <ListItemText id={labelId} primary={`- ${value.course.name}`} />
-                                    </ListItem>
-                                );
-                            })}
-                        </List>
-                        <strong>Courses électifs </strong>
-                        <List dense sx={{ bgcolor: 'background.paper' }}>
-                            {currentStudent.elective_courses && currentStudent.elective_courses.map((value) => {
-                                const labelId = `checkbox-list-secondary-label-${value}`;
-                                return (
-                                    <ListItem
-                                        key={value.id}
-                                        disablePadding
-                                    >
-                                        <ListItemText id={labelId} primary={`- ${value.course.name}`} />
-                                    </ListItem>
-                                );
-                            })}
-                        </List>
-                    </DialogContentText>
-                </DialogContent>
-                <DialogActions>
-                    <Button color="secondary" variant="outlined" onClick={() => {window.location = "/api/contract/" + currentStudent.id}} startIcon={<DownloadIcon />} >Imprimer</Button>
-                    <Button color="inherit" variant="outlined" onClick={handleClose}>Fermer</Button>
-                </DialogActions>
-            </Dialog>
-            <Dialog
-                open={editOpened}
-                TransitionComponent={Transition}
-                keepMounted
-                onClose={() => { setEditOpened(false) }}
-                aria-describedby="alert-dialog-slide-description"
-            >
-                <DialogTitle>Rendre le profil de {currentStudent.name} {currentStudent.surname} modifiable ?</DialogTitle>
-                <DialogContent>
-                    <DialogContentText id="alert-dialog-slide-description">
-                        Attention: {currentStudent.name} pourra à nouveau modifier ses choix de cours.
-                    </DialogContentText>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={() => { changeStudentStatus(currentStudent.id) }}>Confirmer</Button>
-                    <Button onClick={() => { setEditOpened(false) }}>Annuler</Button>
-                </DialogActions>
-            </Dialog>
+            {isAdmin && (
+                <div>
+                    <TopBar title="Gestion My2A" />
+                    <Grid container style={{ marginTop: '30px', alignItems: "center", justifyContent: "center" }}>
+                        <Grid item md={6}>
+                            <SectionBar title="Parcourir les étudiants" />
+                            <div style={{ marginBottom: '10px' }}></div>
+                            <Search>
+                                <SearchIconWrapper>
+                                    <SearchIcon />
+                                </SearchIconWrapper>
+                                <StyledInputBase
+                                    placeholder="Search…"
+                                    inputProps={{ 'aria-label': 'search' }}
+                                    onChange={(event) => setSearch(event.target.value)}
+                                />
+                            </Search>
+                        </Grid>
+                        <GridBreak />
+
+                        <Grid item md={6} xs={11} sm={11}>
+                            <Button sx={{ marginBottom: 2 }} variant="outlined" onClick={() => { window.location = "/api/students/export" }} startIcon={<DownloadIcon />} >Télécharger l'Excel</Button>
+                            <Button sx={{ marginBottom: 2, marginLeft: 2 }} variant="outlined" onClick={() => { window.location = "/inspector/upload/course" }} startIcon={<DownloadIcon />} >Ajouter des cours</Button>
+                            <Button sx={{ marginBottom: 2, marginLeft: 2 }} variant="outlined" onClick={() => { window.location = "/inspector/upload/student" }} startIcon={<DownloadIcon />} >Ajouter des élèves</Button>
+                            <List dense sx={{ bgcolor: 'background.paper' }}>
+                                {students.map((value) => {
+                                    const labelId = `checkbox-list-secondary-label-${value}`;
+                                    return (
+                                        <ListItem
+                                            key={value.surname}
+                                            disablePadding
+                                            style={{ backgroundColor: value.editable ? 'rgba(255, 0, 0, 0.2)' : 'rgba(0, 255, 0, 0.2)' }}
+                                            secondaryAction={
+                                                <>
+                                                    <IconButton edge="end" aria-label="removeredeye" onClick={() => {
+                                                        fetchStudentData(value.id)
+                                                    }}>
+                                                        <RemoveRedEyeIcon />
+                                                    </IconButton>
+                                                    <IconButton aria-label="edit" style={{ marginLeft: '10px' }} onClick={
+                                                        () => {
+                                                            setCurrentStudent(value)
+                                                            setEditOpened(true)
+                                                        }
+                                                    }>
+                                                        <EditIcon />
+                                                    </IconButton>
+                                                </>
+                                            }
+                                        >
+                                            {/* Rq : mettre dans l'ordre alphabétique */}
+                                            <ListItemButton>
+                                                <ListItemText id={labelId} primary={`${value.surname}` + ` ${value.name}`} />
+                                            </ListItemButton>
+                                        </ListItem>
+                                    );
+                                })}
+                            </List>
+                        </Grid>
+                    </Grid>
+                    <Dialog
+                        open={open}
+                        TransitionComponent={Transition}
+                        keepMounted
+                        onClose={handleClose}
+                        aria-describedby="alert-dialog-slide-description"
+                    >
+                        <DialogTitle>{currentStudent.surname} {currentStudent.name}</DialogTitle>
+                        <DialogContent>
+                            <DialogContentText>
+                                <DialogContentText>
+                                    <strong>Département</strong> : {labels.departments && labels.departments[currentStudent.department - 1]}
+                                </DialogContentText>
+                            </DialogContentText>
+                            <DialogContentText>
+                                <strong>Parcours</strong> : {labels.parcours && labels.parcours[currentStudent.parcours - 1]}
+                            </DialogContentText>
+                            <DialogContentText>
+                                <strong>ECTS</strong> : <span style={{ fontWeight: currentStudent.ects < required_ects ? 'bold' : 'normal', color: currentStudent.ects < required_ects ? 'red' : 'black' }}>{currentStudent.ects}</span>
+                            </DialogContentText>
+                            <DialogContentText id="alert-dialog-slide-description">
+                                <strong>Cours obligatoires</strong>
+                                <List dense sx={{ bgcolor: 'background.paper' }}>
+                                    {currentStudent.mandatory_courses && currentStudent.mandatory_courses.map((value) => {
+                                        const labelId = `checkbox-list-secondary-label-${value}`;
+                                        return (
+                                            <ListItem
+                                                key={value.id}
+                                                disablePadding
+                                            >
+                                                <ListItemText id={labelId} primary={`- ${value.course.name}`} />
+                                            </ListItem>
+                                        );
+                                    })}
+                                </List>
+                                <strong>Courses électifs </strong>
+                                <List dense sx={{ bgcolor: 'background.paper' }}>
+                                    {currentStudent.elective_courses && currentStudent.elective_courses.map((value) => {
+                                        const labelId = `checkbox-list-secondary-label-${value}`;
+                                        return (
+                                            <ListItem
+                                                key={value.id}
+                                                disablePadding
+                                            >
+                                                <ListItemText id={labelId} primary={`- ${value.course.name}`} />
+                                            </ListItem>
+                                        );
+                                    })}
+                                </List>
+                            </DialogContentText>
+                        </DialogContent>
+                        <DialogActions>
+                            <Button color="secondary" variant="outlined" onClick={() => { window.location = "/api/contract/" + currentStudent.id }} startIcon={<DownloadIcon />} >Imprimer</Button>
+                            <Button color="inherit" variant="outlined" onClick={handleClose}>Fermer</Button>
+                        </DialogActions>
+                    </Dialog>
+                    <Dialog
+                        open={editOpened}
+                        TransitionComponent={Transition}
+                        keepMounted
+                        onClose={() => { setEditOpened(false) }}
+                        aria-describedby="alert-dialog-slide-description"
+                    >
+                        <DialogTitle>Rendre le profil de {currentStudent.name} {currentStudent.surname} modifiable ?</DialogTitle>
+                        <DialogContent>
+                            <DialogContentText id="alert-dialog-slide-description">
+                                Attention: {currentStudent.name} pourra à nouveau modifier ses choix de cours.
+                            </DialogContentText>
+                        </DialogContent>
+                        <DialogActions>
+                            <Button onClick={() => { changeStudentStatus(currentStudent.id) }}>Confirmer</Button>
+                            <Button onClick={() => { setEditOpened(false) }}>Annuler</Button>
+                        </DialogActions>
+                    </Dialog>
+                </div>
+            )}
         </div>
     )
 }

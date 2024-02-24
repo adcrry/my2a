@@ -21,6 +21,7 @@ from education.views import (
     CourseViewset,
     DepartmentViewset,
     EnrollmentViewset,
+    ExportStudentsView,
     ImportCourseCSV,
     ImportStudentCSV,
     ParcoursViewset,
@@ -49,4 +50,5 @@ urlpatterns = [
     path("upload/course", ImportCourseCSV.as_view(), name="upload_course_csv"),
     path("upload/student", ImportStudentCSV.as_view(), name="upload_student_csv"),
     path("contract/<int:id>", ViewContractPDF.as_view(), name="contract_pdf"),
+    path("students/export", ExportStudentsView.as_view(), name="export_students"),
 ]
