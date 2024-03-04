@@ -62,4 +62,4 @@ COPY ./entrypoint-prod.sh /usr/local/bin/
 RUN sed -i 's/\r$//g' /usr/local/bin/entrypoint-prod.sh \
     && chmod +x /usr/local/bin/entrypoint-prod.sh
 
-ENTRYPOINT ["/src/entrypoint-prod.sh"]
+ENTRYPOINT ["/usr/local/bin/entrypoint-dev.sh"]
