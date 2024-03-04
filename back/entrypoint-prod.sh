@@ -1,3 +1,5 @@
+#!/bin/sh
+
 echo "Checking deployment..."
 python3 manage.py check --deploy
 
