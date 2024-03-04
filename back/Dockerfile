@@ -58,9 +58,8 @@ ENTRYPOINT ["/usr/local/bin/entrypoint-dev.sh"]
 # `production` image is used in production
 FROM runtime-base as production
 
-COPY . .
-RUN sed -i 's/\r$//g' /src/entrypoint-prod.sh \
-    && chmod +x /src/entrypoint-prod.sh \
-    && rm entrypoint-dev.sh pyproject.toml poetry.lock Dockerfile
+COPY ./entrypoint-prod.sh /usr/local/bin/
+RUN sed -i 's/\r$//g' /usr/local/bin/entrypoint-prod.sh \
+    && chmod +x /usr/local/bin/entrypoint-prod.sh
 
 ENTRYPOINT ["/src/entrypoint-prod.sh"]
