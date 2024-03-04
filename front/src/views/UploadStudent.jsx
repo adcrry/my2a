@@ -158,7 +158,7 @@ export default function UploadStudent() {
                                     title="Importer des étudiants"
                                     infos={"Le fichier doit être au format CSV. La première ligne doit être la même que dans l'exemple à télécharger ci-dessous."}
                                     showInfo={true}
-                                    exampleFile="../public/exempleEtudiant.csv"
+                                    exampleFile="/exempleEtudiant.csv"
                                 />
                                 {/* Les deux boutons pour importer */}
                                 <div style={{ marginBottom: 40 }}></div>

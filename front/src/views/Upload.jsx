@@ -169,7 +169,7 @@ export default function Upload() {
                                 title="Importer des cours"
                                 infos={"Le fichier doit être au format CSV. La première ligne doit être la même que dans l'exemple à télécharger ci-dessous."}
                                 showInfo={true}
-                                exampleFile="../public/exempleCours.csv"
+                                exampleFile="/exempleCours.csv"
                             />
                             {/* Les deux boutons pour importer */}
                             <div style={{ marginBottom: 40 }}></div>
