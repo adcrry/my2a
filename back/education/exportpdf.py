@@ -1,17 +1,16 @@
+import datetime
+from io import BytesIO
+
 from reportlab.lib import colors
-from reportlab.lib.pagesizes import letter, landscape
+from reportlab.lib.pagesizes import landscape, letter
+from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.platypus import (
+    PageBreak,
+    Paragraph,
     SimpleDocTemplate,
     Table,
     TableStyle,
-    Paragraph,
-    PageBreak,
 )
-from reportlab.lib.styles import getSampleStyleSheet
-
-from io import BytesIO
-
-import datetime
 
 
 def date_to_hour_id(date: datetime.datetime):
@@ -156,8 +155,11 @@ def generate_table(elements, courses, semester):
         )
 
         middle_line = (start_line + end_line) // 2
-
-        table_data[middle_line][table_data[0].index(course["day"])] = course["name"]
+        # table_data[middle_line-1][table_data[0].index(course["day"])] = course["name"]
+        table_data[middle_line][table_data[0].index(course["day"])] = course["code"]
+        table_data[middle_line + 1][table_data[0].index(course["day"])] = (
+            str(course["ects"]) + " ECTS"
+        )
 
         for line in range(start_line, end_line + 1):
             style.add(

@@ -41,6 +41,7 @@ router.register("course", CourseViewset, basename="course")
 router.register("department", DepartmentViewset, basename="department")
 router.register("parcours", ParcoursViewset, basename="parcours")
 router.register("enrollment", EnrollmentViewset, basename="enrollment")
+router.register("parcours", ParcoursViewset, basename="parcours")
 
 # ----- API -----
 urlpatterns = [

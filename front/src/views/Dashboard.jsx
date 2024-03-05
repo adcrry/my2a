@@ -19,7 +19,7 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import Slide from '@mui/material/Slide';
 import CircularProgress from '@mui/material/CircularProgress';
-import { required_ects, required_mandatory_courses } from "../utils/utils";
+import { ects_base, required_ects, required_mandatory_courses, total_required_ects } from "../utils/utils";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import TextField from "@mui/material/TextField";
 
@@ -432,10 +432,11 @@ export default function Dashboard() {
                 <div>
                     <TopBar title="Mon parcours" />
                     <Grid container columnGap={10} style={{ marginTop: '30px', alignItems: "center", justifyContent: "center" }}>
-                        <Grid item md={8} xs={11} sm={11}>
+                        <Grid item md={7} xs={11} sm={11}>
                             <CustomProgressBar progress={progress} />
                         </Grid>
                         <Grid md={1}>
+                            <Typography sx={{textAlign: "center", fontWeight: "bold"}}>ECTS scientifiques</Typography>
                             <Box sx={{ position: 'relative', display: 'inline-flex', marginBottom: 4 }}>
                                 <CircularProgress color={student.ects < required_ects ? "warning" : "success"} variant="determinate" value={student.ects > required_ects ? 100 : student.ects / required_ects * 100} size={120} thickness={3} />
                                 <Box sx={{
@@ -453,6 +454,26 @@ export default function Dashboard() {
                                 </Box>
                             </Box>
                         </Grid>
+                        <Grid md={1}>
+                            <Typography sx={{textAlign: "center", fontWeight: "bold"}}>Total ECTS</Typography>
+                            <Box sx={{ position: 'relative', display: 'inline-flex', marginBottom: 4 }}>
+                                <CircularProgress color={ects_base + student.ects < total_required_ects ? "warning" : "success"} variant="determinate" value={ects_base + student.ects > total_required_ects ? 100 : (student.ects + ects_base) / total_required_ects * 100} size={120} thickness={3} />
+                                <Box sx={{
+                                    top: 0,
+                                    left: 0,
+                                    bottom: 0,
+                                    right: 0,
+                                    width: 120,
+                                    position: 'absolute',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    textAlign: 'center',
+                                }}>
+                                    <Typography sx={{ fontWeight: 'bold', fontSize: 18 }} variant="caption" component="div">{ects_base + student.ects} / {total_required_ects} ECTS </Typography>
+                                </Box>
+                            </Box>
+                        </Grid>
+                        
                     </Grid>
                     <Grid container spacing={5} style={{ marginTop: '10px', justifyContent: "center" }}>
                         <Grid item md={5} xs={11} sm={11}>
@@ -557,7 +578,7 @@ export default function Dashboard() {
                                 Attention: Cette action est irréversible. Aucun changement ultérieur ne pourra être effectué sauf en cas de demande auprès de l'administration.
                             </DialogContentText>
                             <DialogContentText sx={{ color: "red", fontWeight: "bold" }}>
-                                {student.ects < required_ects && "Vous n'avez que " + student.ects + " ECTS sur les " + required_ects + " requis."}
+                                {student.ects < required_ects && "Vous n'avez que " + student.ects + " ECTS sur les " + required_ects + " scientifiques requis."}
                             </DialogContentText>
                             <DialogContentText sx={{ color: "red", fontWeight: "bold" }}>
                                 {choosenMandatoryCourses.length < required_mandatory_courses && "Vous devez choisir au moins 2 cours obligatoires sur liste."}

@@ -14,7 +14,7 @@ from rest_framework.decorators import action, permission_classes
 from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
+from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet, ViewSet
 
 from .admin import CourseAdmin
 from .models import Course, Department, Enrollment, Parcours, Student
@@ -310,33 +310,6 @@ class DepartmentViewset(ReadOnlyModelViewSet):
         return queryset
 
 
-class ParcoursViewset(ReadOnlyModelViewSet):
-    """
-    A viewset for retrieving Parcours objects.
-
-    This viewset allows for retrieving all Parcours objects, one in particular.
-    """
-
-    # Example:
-    # /api/parcours/ (all contacts)
-    # /api/parcours/4/ (contact with id 4)
-    # /api/parcours/?department=IMI (The parcours from IMI dpt)
-
-    serializer_class = ParcoursSerializer
-
-    def get_queryset(self):
-        """
-        Returns a queryset of all Parcours objects.
-        """
-
-        queryset = Parcours.objects.all()
-        dpt = self.request.GET.get("department")
-        if dpt is not None:
-            queryset = queryset.filter(department=dpt)
-
-        return queryset
-
-
 # create a view to return the parcours of a departement
 # api/IMI/parcours
 
@@ -562,3 +535,67 @@ class ExportStudentsView(APIView):
                 ]
             )
         return response
+
+
+class ParcoursViewset(ViewSet):
+
+    permission_classes = [IsAdminUser]
+
+    def list(self, request):
+        if "department" not in request.GET:
+            return Response({"error": "department not provided"}, status=400)
+        department = get_object_or_404(Department, pk=request.GET["department"])
+        parcours = Parcours.objects.filter(department=department)
+        serializer = ParcoursSerializer(parcours, many=True)
+        return Response(serializer.data)
+
+    @action(detail=False, methods=["get"], permission_classes=[IsAdminUser])
+    def mandatory(self, request):
+        if "parcours" not in request.GET:
+            return Response({"error": "parcours not provided"}, status=400)
+        parcours = get_object_or_404(Parcours, pk=request.GET["parcours"])
+        mandatory_courses = parcours.courses_mandatory.all()
+        serializer = CourseSerializer(mandatory_courses, many=True)
+        return Response(serializer.data)
+
+    @action(detail=False, methods=["post"], permission_classes=[IsAdminUser])
+    def add_mandatory(self, request):
+        if "parcours" not in request.data:
+            return Response({"error": "parcours not provided"}, status=400)
+        parcours = get_object_or_404(Parcours, pk=request.data["parcours"])
+        if "course" not in request.data:
+            return Response({"error": "course not provided"}, status=400)
+        course = get_object_or_404(Course, pk=request.data["course"])
+        parcours.courses_mandatory.add(course)
+        parcours.save()
+        mandatory_courses = parcours.courses_mandatory.all()
+        serializer = CourseSerializer(mandatory_courses, many=True)
+        return Response(serializer.data)
+
+    @action(detail=False, methods=["post"], permission_classes=[IsAdminUser])
+    def remove_mandatory(self, request):
+        if "parcours" not in request.data:
+            return Response({"error": "parcours not provided"}, status=400)
+        parcours = get_object_or_404(Parcours, pk=request.data["parcours"])
+        if "course" not in request.data:
+            return Response({"error": "course not provided"}, status=400)
+        course = get_object_or_404(Course, pk=request.data["course"])
+        parcours.courses_mandatory.remove(course)
+        parcours.save()
+        mandatory_courses = parcours.courses_mandatory.all()
+        serializer = CourseSerializer(mandatory_courses, many=True)
+        return Response(serializer.data)
+
+    @action(detail=False, methods=["get"], permission_classes=[IsAdminUser])
+    def avalaible_mandatory(self, request):
+        if "department" not in request.GET:
+            return Response({"error": "department not provided"}, status=400)
+        department = get_object_or_404(Department, pk=request.GET["department"])
+        if "parcours" not in request.GET:
+            return Response({"error": "parcours not provided"}, status=400)
+        parcours = get_object_or_404(Parcours, pk=request.GET["parcours"])
+        courses = Course.objects.filter(department=department).exclude(
+            id__in=parcours.courses_mandatory.all()
+        )
+        serializer = CourseSerializer(courses, many=True)
+        return Response(serializer.data)

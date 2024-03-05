@@ -219,7 +219,7 @@ export default function Inspector() {
                                         <ListItem
                                             key={value.surname}
                                             disablePadding
-                                            style={{ backgroundColor: value.editable ? 'rgba(255, 0, 0, 0.2)' : 'rgba(0, 255, 0, 0.2)' }}
+                                            style={{ backgroundColor: value.editable ? (value.has_logged_in ? 'rgba(255, 120, 0, 0.47)' : 'rgba(255, 0, 0, 0.2)') : 'rgba(0, 255, 0, 0.2)' }}
                                             secondaryAction={
                                                 <>
                                                     <IconButton edge="end" aria-label="removeredeye" onClick={() => {

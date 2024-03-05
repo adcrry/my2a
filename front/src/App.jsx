@@ -4,8 +4,7 @@ import Dashboard from './views/Dashboard'
 import Inspector from './views/Inspector'
 import Upload from './views/Upload'
 import UploadStudent from './views/UploadStudent'
-
-
+import Parcours from './views/Parcours'
 
 function App() {
 
@@ -14,6 +13,7 @@ function App() {
       <Router>
         <Routes>
           <Route path="/inspector/" element={<Inspector />} />
+          <Route path="/inspector/parcours" element={<Parcours />} />
           <Route path="/inspector/upload/course" element={<Upload />} />
           <Route path="/inspector/upload/student" element={<UploadStudent />} />
           <Route path="*" element={<Dashboard />} />

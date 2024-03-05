@@ -15,12 +15,17 @@ class StudentSerializer(serializers.ModelSerializer):
             "parcours",
             "editable",
             "is_admin",
+            "has_logged_in",
         ]
 
     is_admin = serializers.SerializerMethodField()
+    has_logged_in = serializers.SerializerMethodField()
 
     def get_is_admin(self, obj):
         return obj.user.is_superuser
+
+    def get_has_logged_in(self, obj):
+        return obj.user.last_login is not None
 
 
 class CourseSerializer(serializers.ModelSerializer):
@@ -71,14 +76,19 @@ class CompleteStudentSerializer(serializers.ModelSerializer):
             "mandatory_courses",
             "elective_courses",
             "editable",
+            "has_logged_in",
         ]
 
     mandatory_courses = EnrollmentSerializer(many=True)
     elective_courses = EnrollmentSerializer(many=True)
     ects = serializers.SerializerMethodField()
+    has_logged_in = serializers.SerializerMethodField()
 
     def get_ects(self, obj):
         return obj.count_ects()
+
+    def get_has_logged_in(self, obj):
+        return obj.user.last_login is not None
 
 
 class DepartmentSerializer(serializers.ModelSerializer):
@@ -103,3 +113,7 @@ class ParcoursSerializer(serializers.ModelSerializer):
             "courses_mandatory",
             "courses_on_list",
         ]
+
+    department = DepartmentSerializer()
+    courses_mandatory = CourseSerializer(many=True)
+    courses_on_list = CourseSerializer(many=True)

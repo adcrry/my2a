@@ -156,11 +156,13 @@ class Student(models.Model):
         ]
         courses = [
             {
-                "name": course.code,
+                "name": course.name,
+                "code": course.code,
                 "day": course.day,
                 "start_time": course.start_time,
                 "end_time": course.end_time,
                 "semester": course.semester,
+                "ects": course.ects,
             }
             for course in courses
         ]
@@ -182,12 +184,12 @@ class Enrollment(models.Model):
         return self.student.name + " " + self.course.code
 
 
-"""
-class Department(models.TextChoices):
-         IMI = "Ingénierie mathématique et informatique"
-         GCC = "Génie civil et construction"
-         GMM = "Génie mécanique et matériaux"
-         SEGF = "Sciences économiques, gestion, finance"
-         VET = "Ville, environnement, transport"
-         GI = "Génie industriel"
-"""
+class Parameter(models.Model):
+    name = models.CharField(max_length=100)
+    value = models.CharField(max_length=100)
+    department = models.ForeignKey(
+        Department, on_delete=models.CASCADE, null=True, blank=True
+    )
+
+    def __str__(self):
+        return self.name
