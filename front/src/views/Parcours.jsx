@@ -214,7 +214,8 @@ export default function Parcours() {
     }, [search])
 
     useEffect(() => {
-        fetch("/api/parcours/?department=" + currentDepartment + "&parcours=" + currentParcours,
+        if(currentParcours){
+            fetch("/api/parcours/?department=" + currentDepartment + "&parcours=" + currentParcours,
             {
                 method: "GET",
                 credentials: "include",
@@ -226,6 +227,7 @@ export default function Parcours() {
             .then((result) => {
                 setParcours(result)
             })
+        }
     }, [currentParcours])
 
     return (
