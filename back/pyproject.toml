@@ -16,4 +16,5 @@ opencv-python = "^4.8.0"
 psycopg2 = "2.9.9"
 python = "3.11.6"
 reportlab = "^4.0.8"
+django-templated-email = "^3.0.1"
 [tool.poetry.dev-dependencies]

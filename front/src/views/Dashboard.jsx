@@ -495,7 +495,7 @@ export default function Dashboard() {
                                                 changeDepartment(e.target.value)
                                             }}
                                             placeholder="Département"
-                                            disabled={!editable}
+                                            disabled={true}
                                         >
                                             {getDepartmentItems()}
                                         </Select>

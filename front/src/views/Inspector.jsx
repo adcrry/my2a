@@ -9,7 +9,7 @@ import TopBar from "../components/TopBar"
 import SectionBar from "../components/SectionBar";
 
 
-import { Grid } from '@mui/material';
+import { Grid, MenuItem } from '@mui/material';
 import IconButton from "@mui/material/IconButton";
 import DownloadIcon from '@mui/icons-material/Download';
 import EditIcon from "@mui/icons-material/Edit";
@@ -26,6 +26,9 @@ import DialogTitle from '@mui/material/DialogTitle';
 import Slide from '@mui/material/Slide';
 import { required_ects } from "../utils/utils";
 import Cookies from 'js-cookie';
+import FormControl from '@mui/material/FormControl';
+import InputLabel from '@mui/material/InputLabel';
+import Select from '@mui/material/Select';
 
 const Transition = forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
@@ -84,13 +87,15 @@ export default function Inspector() {
     const [editOpened, setEditOpened] = useState(false)
     const [labels, setLabels] = useState({})
     const [isAdmin, setIsAdmin] = useState(false)
+    const [departments, setDepartments] = useState([])
+    const [currentDepartment, setCurrentDepartment] = useState(null)
 
     const handleClose = () => {
         setOpen(false);
     };
 
     const updateStudents = () => {
-        fetch("/api/student/", {
+        fetch("/api/student/" + (currentDepartment != null ? "?department=" + currentDepartment : ""), {
             method: "GET",
             credentials: "include",
             headers: {
@@ -128,15 +133,24 @@ export default function Inspector() {
                         .then((res) => res.json())
                         .then((result) => {
                             setLabels(result)
-                            console.log(result)
                         })
                 }
             })
-
+            fetch("/api/department/", {
+                method: "GET",
+                credentials: "include",
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+                .then((res) => res.json())
+                .then((result) => {
+                    setDepartments(result)
+                })
     }, [])
 
     const updateSearch = (search) => {
-        fetch("/api/student/search?search=" + search, {
+        fetch("/api/student/search?search=" + search + (currentDepartment != null ? "&department=" + currentDepartment : ""), {
             method: "GET",
             credentials: "include",
             headers: {
@@ -182,8 +196,21 @@ export default function Inspector() {
     }
 
     useEffect(() => {
+        updateStudents()
+    }, [currentDepartment])
+
+
+    useEffect(() => {
         updateSearch(search)
     }, [search])
+
+    const getDepartmentItems = () => {
+        return departments.map((department) => {
+            return (
+                <MenuItem value={department.id}>{department.code}</MenuItem>
+            )
+        })
+    }
 
     return (
         <div>
@@ -193,6 +220,20 @@ export default function Inspector() {
                     <TopBar title="Gestion My2A" />
                     <Grid container style={{ marginTop: '30px', alignItems: "center", justifyContent: "center" }}>
                         <Grid item md={6}>
+                            <FormControl sx={{marginBottom: 3}} fullWidth>
+                                <InputLabel>Département</InputLabel>
+                                <Select
+                                    labelId="demo-simple-select-label"
+                                    id="demo-simple-select"
+                                    value={currentDepartment}
+                                    label="Département"
+                                    onChange={(e) => {
+                                        setCurrentDepartment(e.target.value)
+                                    }}
+                                >
+                                    {getDepartmentItems()}
+                                </Select>
+                            </FormControl>
                             <SectionBar title="Parcourir les étudiants" />
                             <div style={{ marginBottom: '10px' }}></div>
                             <Search>
@@ -209,15 +250,17 @@ export default function Inspector() {
                         <GridBreak />
 
                         <Grid item md={6} xs={11} sm={11}>
-                            <Button sx={{ marginBottom: 2 }} variant="outlined" onClick={() => { window.location = "/api/students/export" }} startIcon={<DownloadIcon />} >Télécharger l'Excel</Button>
-                            <Button sx={{ marginBottom: 2, marginLeft: 2 }} variant="outlined" onClick={() => { window.location = "/inspector/upload/course" }} startIcon={<DownloadIcon />} >Ajouter des cours</Button>
-                            <Button sx={{ marginBottom: 2, marginLeft: 2 }} variant="outlined" onClick={() => { window.location = "/inspector/upload/student" }} startIcon={<DownloadIcon />} >Ajouter des élèves</Button>
+                            <Button sx={{ marginBottom: 2, marginRight: 2}} variant="outlined" onClick={() => { window.location = "/api/students/export" }} startIcon={<DownloadIcon />} >Télécharger l'Excel</Button>
+                            <Button sx={{ marginBottom: 2, marginRight: 2}} variant="outlined" onClick={() => { window.location = "/inspector/upload/course" }} startIcon={<DownloadIcon />} >Ajouter des cours</Button>
+                            <Button sx={{ marginBottom: 2, marginRight: 2}} variant="outlined" onClick={() => { window.location = "/inspector/upload/student" }} startIcon={<DownloadIcon />} >Ajouter des élèves</Button>
+                            <Button sx={{ marginBottom: 2, marginRight: 2}} variant="outlined" onClick={() => { window.location = "/inspector/parcours" }} startIcon={<RemoveRedEyeIcon />} >Modifier les parcours</Button>
+                            <Button sx={{ marginBottom: 2, marginRight: 2}} variant="outlined" onClick={() => { window.location = "/inspector/courses" }} startIcon={<RemoveRedEyeIcon />} >Voir la liste des cours</Button>
                             <List dense sx={{ bgcolor: 'background.paper' }}>
                                 {students.map((value) => {
                                     const labelId = `checkbox-list-secondary-label-${value}`;
                                     return (
                                         <ListItem
-                                            key={value.surname}
+                                            key={value.surname + value.name}
                                             disablePadding
                                             style={{ backgroundColor: value.editable ? (value.has_logged_in ? 'rgba(255, 120, 0, 0.47)' : 'rgba(255, 0, 0, 0.2)') : 'rgba(0, 255, 0, 0.2)' }}
                                             secondaryAction={

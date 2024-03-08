@@ -5,6 +5,7 @@ import Inspector from './views/Inspector'
 import Upload from './views/Upload'
 import UploadStudent from './views/UploadStudent'
 import Parcours from './views/Parcours'
+import CoursesDashboard from './views/Courses'
 
 function App() {
 
@@ -16,6 +17,7 @@ function App() {
           <Route path="/inspector/parcours" element={<Parcours />} />
           <Route path="/inspector/upload/course" element={<Upload />} />
           <Route path="/inspector/upload/student" element={<UploadStudent />} />
+          <Route path="/inspector/courses" element={<CoursesDashboard />} />
           <Route path="*" element={<Dashboard />} />
         </Routes>
       </Router>

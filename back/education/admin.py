@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Student, Course, Department, Parcours, Enrollment
+from .models import Course, Department, Enrollment, Parameter, Parcours, Student
 
 
 class StudentAdmin(admin.ModelAdmin):
@@ -43,3 +43,4 @@ admin.site.register(Course, CourseAdmin)
 admin.site.register(Department, DepartmentAdmin)
 admin.site.register(Enrollment, EnrollmentAdmin)
 admin.site.register(Parcours, ParcoursAdmin)
+admin.site.register(Parameter)

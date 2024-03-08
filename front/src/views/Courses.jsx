@@ -11,6 +11,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { styled, alpha } from '@mui/material/styles';
 import InputBase from '@mui/material/InputBase';
 import SearchIcon from '@mui/icons-material/Search'
+import Edit from '@mui/icons-material/Edit';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
@@ -74,12 +75,13 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
     },
 }));
 
-export default function Parcours() {
+export default function CoursesDashboard() {
 
     const [students, setStudents] = useState([])
     const [search, setSearch] = useState('')
     const [open, setOpen] = useState(false);
     const [currentStudent, setCurrentStudent] = useState([])
+    const [courses, setCourses] = useState([])
     const [deleteOpened, setDeleteOpened] = useState(false)
     const [isAdmin, setIsAdmin] = useState(false)
     const [departments, setDepartments] = useState([])
@@ -87,10 +89,11 @@ export default function Parcours() {
     const [parcours, setParcours] = useState([])
     const [currentParcours, setCurrentParcours] = useState(null)
     const [currentCourse, setCurrentCourse] = useState(null)
-    const [addOpened, setAddOpened] = useState(false)
+    const [edit, setEdit] = useState(false)
     const [addType, setAddType] = useState("mandatory")
     const [avalaibleCourses, setAvalaibleCourses] = useState([])
     const [currentAddCourse, setCurrentAddCourse] = useState(null)
+    const [currentCourseObject, setCurrentCourseObject] = useState(null)
 
     const handleClose = () => {
         setOpen(false);
@@ -142,7 +145,7 @@ export default function Parcours() {
 
     useEffect(() => {
         if (currentDepartment != null) {
-            fetch("/api/parcours/?department=" + currentDepartment,
+            fetch("/api/course/?department=" + currentDepartment,
                 {
                     method: "GET",
                     credentials: "include",
@@ -152,74 +155,32 @@ export default function Parcours() {
                 })
                 .then((res) => res.json())
                 .then((result) => {
-                    setParcours(result)
-                    setCurrentParcours(null)
+                    setCourses(result)
+                    console.log(result)
                 })
         }
     }, [currentDepartment])
 
-    const deleteCourseFromParcours = (id, type) => {
-        fetch("/api/parcours/remove_course/",
+    const deleteCourse = (id) => {
+        fetch("/api/course/delete/",
                 {
-                    method: "POST",
+                    method: "DELETE",
                     credentials: "include",
                     headers: {
                         'Content-Type': 'application/json',
                         'X-CSRFToken': Cookies.get('csrftoken'),
                     },
-                    body: JSON.stringify({ type: addType, department: currentDepartment, parcours: currentParcours, course: currentCourse})
+                    body: JSON.stringify({id: id})
                 })
                 .then((res) => res.json())
                 .then((result) => {
-                    let tempParcours = parcours
-                    if(type == "mandatory"){
-                        for (let i = 0; i < tempParcours.length; i++) {
-                            if (tempParcours[i].id === currentParcours) {
-                                tempParcours[i].courses_mandatory = result
-                            }
-                        }
-                    }else {
-                        for (let i = 0; i < tempParcours.length; i++) {
-                            if (tempParcours[i].id === currentParcours) {
-                                tempParcours[i].courses_on_list = result
-                            }
-                        }
-                    }
-                    setParcours(tempParcours)
+                    setCourses(result)
                     setDeleteOpened(false)
                 })
     }
 
-    const confirmAddCourse = (id, type) => {
-        fetch("/api/parcours/add_course/",
-                {
-                    method: "POST",
-                    credentials: "include",
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRFToken': Cookies.get('csrftoken'),
-                    },
-                    body: JSON.stringify({type: type, department: currentDepartment, parcours: currentParcours, course: currentAddCourse})
-                })
-                .then((res) => res.json())
-                .then((result) => {
-                    let tempParcours = parcours
-                    if(type == "mandatory"){
-                        for (let i = 0; i < tempParcours.length; i++) {
-                            if (tempParcours[i].id === currentParcours) {
-                                tempParcours[i].courses_mandatory = result
-                            }
-                        }
-                    }else {
-                        for (let i = 0; i < tempParcours.length; i++) {
-                            if (tempParcours[i].id === currentParcours) {
-                                tempParcours[i].courses_on_list = result
-                            }
-                        }
-                    }
-                    setParcours(tempParcours)
-                    setAddOpened(false)
-                })
+    const confirmCourseChange = (id) => {
+        
     } 
 
     const updateSearch = (search) => {
@@ -302,7 +263,7 @@ export default function Parcours() {
                     <TopBar title="Gestion My2A" />
                     <Grid container style={{ marginTop: '30px', alignItems: "center", justifyContent: "center" }}>
                         <Grid item md={6}>
-                            <FormControl fullWidth>
+                            <FormControl sx={{marginBottom: 3}} fullWidth>
                                 <InputLabel>Département</InputLabel>
                                 <Select
                                     labelId="demo-simple-select-label"
@@ -316,21 +277,6 @@ export default function Parcours() {
                                     {getDepartmentItems()}
                                 </Select>
                             </FormControl>
-                            <FormControl fullWidth sx={{ marginTop: 3, marginBottom: 3 }}>
-                                <InputLabel>Parcours</InputLabel>
-                                <Select
-                                    labelId="demo-simple-select-label"
-                                    id="demo-simple-select"
-                                    value={currentParcours}
-                                    label="Parcours"
-                                    onChange={(e) => {
-                                        setCurrentParcours(e.target.value)
-                                    }}
-                                    placeholder="Parcours"
-                                >
-                                    {getParcoursItems()}
-                                </Select>
-                            </FormControl>
                         </Grid>
                         <GridBreak />
                         <Grid item md={6}>
@@ -338,13 +284,9 @@ export default function Parcours() {
                         <GridBreak />
 
                         <Grid item md={6} xs={11} sm={11}>
-                            <SectionBar title="Parcourir les cours obligatoires" />
-                            <Button sx={{ marginBottom: 2, marginTop: 2 }} variant="outlined" onClick={() => { 
-                                setAddOpened(true)
-                                setAddType("mandatory")
-                            }} startIcon={<AddCircleOutlineIcon />} >Ajouter un cours obligatoire</Button>
+                            <SectionBar title="Parcourir les cours" />
                             <List dense sx={{ bgcolor: 'background.paper', marginBottom: 3}}>
-                                {currentParcours && parcours.find(p => p.id === currentParcours).courses_mandatory.map((value) => {
+                                {courses && courses.map((value) => {
                                     const labelId = `checkbox-list-secondary-label-${value}`;
                                     return (
                                         <ListItem
@@ -355,46 +297,20 @@ export default function Parcours() {
                                                     <IconButton aria-label="edit" style={{ marginLeft: '10px' }} onClick={
                                                         () => {
                                                             setCurrentCourse(value.id)
-                                                            setAddType("mandatory")
                                                             setDeleteOpened(true)
                                                         }
                                                     }>
                                                         <DeleteIcon />
                                                     </IconButton>
-                                                </>
-                                            }
-                                        >
-                                            {/* Rq : mettre dans l'ordre alphabétique */}
-                                            <ListItemButton>
-                                                <ListItemText id={labelId} primary={"[" + value.code + "] " + value.name} />
-                                            </ListItemButton>
-                                        </ListItem>
-                                    );
-                                })}
-                            </List>
-                            <SectionBar title="Parcourir les cours obligatoires sur liste"/>
-                            <Button sx={{ marginBottom: 2, marginTop: 2 }} variant="outlined" onClick={() => { 
-                                setAddOpened(true)
-                                setAddType("on_list")
-                            }} startIcon={<AddCircleOutlineIcon />} >Ajouter un cours obligatoire sur liste</Button>
-                            <List dense sx={{ bgcolor: 'background.paper'}}>
-                                {currentParcours && parcours.find(p => p.id === currentParcours).courses_on_list.map((value) => {
-                                    const labelId = `checkbox-list-secondary-label-${value}`;
-                                    return (
-                                        <ListItem
-                                            key={value.code}
-                                            disablePadding
-                                            secondaryAction={
-                                                <>
-                                                    <IconButton aria-label="edit" style={{ marginLeft: '10px' }} onClick={
+                                                    {/*<IconButton aria-label="edit" style={{ marginLeft: '10px' }} onClick={
                                                         () => {
                                                             setCurrentCourse(value.id)
-                                                            setAddType("on_list")
-                                                            setDeleteOpened(true)
+                                                            setCurrentCourseObject(value)
+                                                            setEdit(true)
                                                         }
                                                     }>
-                                                        <DeleteIcon />
-                                                    </IconButton>
+                                                        <Edit />
+                                                </IconButton>*/}
                                                 </>
                                             }
                                         >
@@ -418,22 +334,22 @@ export default function Parcours() {
                         <DialogTitle>Supprimer le cours</DialogTitle>
                         <DialogContent>
                             <DialogContentText id="alert-dialog-slide-description">
-                                Êtes-vous sûr de vouloir supprimer ce cours de la liste? 
+                                Êtes-vous sûr de vouloir supprimer ce cours définitivement? 
                             </DialogContentText>
                         </DialogContent>
                         <DialogActions>
-                            <Button onClick={() => { deleteCourseFromParcours(currentCourse, addType) }}>Confirmer</Button>
+                            <Button onClick={() => { deleteCourse(currentCourse, addType) }}>Confirmer</Button>
                             <Button onClick={() => { setDeleteOpened(false) }}>Annuler</Button>
                         </DialogActions>
                     </Dialog>
                     <Dialog
-                        open={addOpened}
+                        open={edit}
                         TransitionComponent={Transition}
                         keepMounted
-                        onClose={() => { setAddOpened(false) }}
+                        onClose={() => { setEdit(false) }}
                         aria-describedby="alert-dialog-slide-description"
                     >
-                        <DialogTitle>Ajouter un cours à la liste</DialogTitle>
+                        <DialogTitle>Modifer le cours {currentCourseObject && currentCourseObject.name}</DialogTitle>
                         <DialogContent>
                         <FormControl fullWidth sx={{ marginTop: 3, marginBottom: 3 }}>
                             <InputLabel>Cours</InputLabel>
@@ -452,8 +368,8 @@ export default function Parcours() {
                             </FormControl>
                         </DialogContent>
                         <DialogActions>
-                            <Button onClick={() => { confirmAddCourse(currentCourse, addType) }}>Confirmer</Button>
-                            <Button onClick={() => { setAddOpened(false) }}>Annuler</Button>
+                            <Button onClick={() => { confirmCourseChange(currentCourse) }}>Confirmer</Button>
+                            <Button onClick={() => { setEdit(false) }}>Annuler</Button>
                         </DialogActions>
                     </Dialog>
                 </div>

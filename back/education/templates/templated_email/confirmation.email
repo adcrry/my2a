@@ -1,0 +1,57 @@
+{% block subject %}[2A] Confirmation du choix des cours ({{student.name}} {{student.surname}}){% endblock %}
+
+{% block html %}
+<!doctype html>
+<html>
+<body style="font-family: sans-serif;-webkit-font-smoothing: antialiased;line-height: 1.4;-ms-text-size-adjust: 100%;-webkit-text-size-adjust: 100%;">
+
+  <p>
+    Bonjour {{ student.name}} {{ student.surname }},
+  </p>
+
+  <p>
+    Tu as bien rempli tes choix de cours pour ta 2A dans le département <strong>{{ student.department.name }}</strong>, parcours <strong>{{ parcours_name }}</strong> :
+  </p>
+
+  <table style="border: 1px solid black;margin: 25px;padding: 15px;width: calc(100% - 50px);border-collapse: collapse;">
+    <thead style="text-align: center;background-color: #d9d9d9;">
+      <tr>
+        <th>Cours</th>
+        <th>ECTS</th>
+        <th>Période</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for course in mandatory_courses %}
+      <tr>
+        <td>{{ course.name }}</td>
+        <td style="text-align: center;">{{ course.ects }}</td>
+        <td style="text-align: center;">{{ course.semester }}</td>
+      </tr>
+    {% endfor %}
+    {% for course in onlist_courses %}
+      <tr>
+        <td>{{ course.course.name }}</td>
+        <td style="text-align: center;">{{ course.course.ects }}</td>
+        <td style="text-align: center;">{{ course.course.semester }}</td>
+      </tr>
+    {% endfor %}
+    {% for course in elective_courses %}
+      <tr>
+        <td>{{ course.course.name }}</td>
+        <td style="text-align: center;">{{ course.course.ects }}</td>
+        <td style="text-align: center;">{{ course.course.semester }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  <p>
+    <strong>Commentaire :</strong> {{ student.comment | default:'N/A' }}
+  </p>
+
+  <p>
+    Si tu souhaites changer ton option ou changer ton choix de cours, tu dois te rapprocher de ton département qui pourra alors débloquer ton choix.
+  </p>
+</body>
+</html>
+{% endblock %}

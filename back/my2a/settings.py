@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -74,7 +75,7 @@ ROOT_URLCONF = "my2a.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [os.path.join(BASE_DIR, "templates")],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -159,3 +160,15 @@ CAS_ADMIN_PREFIX = "admin/"
 X_FRAME_OPTIONS = "SAMEORIGIN"
 
 XS_SHARING_ALLOWED_METHODS = ["POST", "GET", "OPTIONS", "PUT", "DELETE"]
+
+SENDGRID_API_KEY = os.environ.get("SENDGRID_API_KEY")
+
+EMAIL_HOST = "smtp.sendgrid.net"
+EMAIL_HOST_USER = "apikey"  # this is exactly the value 'apikey'
+EMAIL_HOST_PASSWORD = SENDGRID_API_KEY
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+
+TEMPLATED_EMAIL_BACKEND = "templated_email.backends.vanilla_django.TemplateBackend"
+TEMPLATED_EMAIL_TEMPLATE_DIR = "templated_email/"  # use '' for top level template dir, ensure there is a trailing slash
+TEMPLATED_EMAIL_FILE_EXTENSION = "email"
