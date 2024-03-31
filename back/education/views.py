@@ -543,6 +543,8 @@ class ExportStudentsView(APIView):
             ]
         )
         students = Student.objects.all().filter(editable=False)
+        if "dep" in request.GET:
+            students = students.filter(department__code=request.GET["dep"])
         for student in students:
             writer.writerow(
                 [

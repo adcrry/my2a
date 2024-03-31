@@ -27,7 +27,7 @@ export default function SectionBar(props) {
     const handleDownload = () => {
         const link = document.createElement('a');
         link.href = props.exampleFile;
-        link.download = 'exampleFile';
+        link.download = 'exemple.csv';
         link.click();
     };
 
