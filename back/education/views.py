@@ -461,8 +461,6 @@ class ViewContractPDF(APIView):
         if not user.is_superuser:
             return Response({"status": "error", "message": "not authorized"})
         student = get_object_or_404(Student, id=id)
-        if student.department is None or student.parcours is None:
-            return redirect("/inspector/")
         buffer = io.BytesIO()
         p = canvas.Canvas(buffer)
         textobject = p.beginText(2 * cm, 29.7 * cm - 2 * cm)
@@ -474,41 +472,44 @@ class ViewContractPDF(APIView):
         textobject.textLine("Parcours: " + student.parcours.name)
         textobject.textLine("Nombres d'ECTS: " + str(student.count_ects()))
         textobject.textLine(" ")
-        textobject.textLine("Liste des cours:")
-        textobject.textLine(" ")
-        textobject.textLine("Obligatoire parcours:")
-        for course in student.parcours.courses_mandatory.all():
-            textobject.textLine(
-                course.name
-                + " - "
-                + course.semester
-                + " - "
-                + str(course.ects)
-                + " ECTS"
-            )
+        if student.parcours is not None:
+            textobject.textLine("Liste des cours:")
+            textobject.textLine(" ")
+            textobject.textLine("Obligatoire parcours:")
+            for course in student.parcours.courses_mandatory.all():
+                textobject.textLine(
+                    course.name
+                    + " - "
+                    + course.semester
+                    + " - "
+                    + str(course.ects)
+                    + " ECTS"
+                )
 
-        textobject.textLine(" ")
-        textobject.textLine("Obligatoire sur liste:")
-        for course in student.mandatory_courses():
-            textobject.textLine(
-                course.course.name
-                + " - "
-                + course.course.semester
-                + " - "
-                + str(course.course.ects)
-                + " ECTS"
-            )
-        textobject.textLine(" ")
-        textobject.textLine("Cours électifs: ")
-        for enrollment in student.elective_courses():
-            textobject.textLine(
-                enrollment.course.name
-                + " - "
-                + enrollment.course.semester
-                + " - "
-                + str(enrollment.course.ects)
-                + " ECTS"
-            )
+            textobject.textLine(" ")
+            textobject.textLine("Obligatoire sur liste:")
+            for course in student.mandatory_courses():
+                textobject.textLine(
+                    course.course.name
+                    + " - "
+                    + course.course.semester
+                    + " - "
+                    + str(course.course.ects)
+                    + " ECTS"
+                )
+            textobject.textLine(" ")
+            textobject.textLine("Cours électifs: ")
+            for enrollment in student.elective_courses():
+                textobject.textLine(
+                    enrollment.course.name
+                    + " - "
+                    + enrollment.course.semester
+                    + " - "
+                    + str(enrollment.course.ects)
+                    + " ECTS"
+                )
+        else:
+            textobject.textLine("Pas de parcours sélectionné par l'étudiant")
         textobject.textLine(" ")
         p.drawText(textobject)
         p.showPage()
@@ -544,7 +545,8 @@ class ExportStudentsView(APIView):
         )
         students = Student.objects.all().filter(editable=False)
         if "dep" in request.GET:
-            students = students.filter(department__code=request.GET["dep"])
+            students = students.filter(department__pk=request.GET["dep"])
+            print(students)
         for student in students:
             writer.writerow(
                 [
