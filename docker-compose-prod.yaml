@@ -5,23 +5,14 @@ services:
     build:
       context: back
       dockerfile: Dockerfile
-      target: development
-    command: python manage.py runserver 0.0.0.0:8000
-    ports:
-      - "$BACK_PORT:8000"
-    environment:
-      DB_HOST: ${DB_HOST}
-      DB_PORT: ${DB_PORT}
-      DB_NAME: ${DB_NAME}
-      DB_USER: ${DB_USER}
-      DB_PASSWORD: ${DB_PASSWORD}
-      DEBUG: ${DEBUG}
-      DOMAIN_NAME: ${DOMAIN_NAME}
-      TRUSTED_ORIGIN: ${TRUSTED_ORIGIN}
+      target: production
+    command: gunicorn my2a.wsgi:application --bind 0.0.0.0:8000
+    env_file: .env
     restart: always
     volumes:
       - ./back:/src
       - ./backups:/backups
+      - backdata:/src/static
     networks:
       - nginx_link
   front:
@@ -31,8 +22,7 @@ services:
       target: production
     volumes:
       - ./front:/app
-    ports:
-      - 3000:3000
+      - webdata:/output
     networks:
       - nginx_link
   nginx:
@@ -41,7 +31,7 @@ services:
       dockerfile: Dockerfile
       target: production
     ports:
-      - "127.0.0.1:80:80"
+      - "3154:80"
     restart: always
     networks:
       - nginx_link
@@ -49,6 +39,12 @@ services:
       - back
       - front
     volumes:
-      - ./front:/front
+      - webdata:/webdata
+      - backdata:/backdata/static
 networks:
   nginx_link:
+    driver: bridge
+
+volumes:
+  webdata:
+  backdata:
