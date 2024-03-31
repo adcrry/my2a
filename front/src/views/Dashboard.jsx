@@ -561,7 +561,7 @@ export default function Dashboard() {
                         </Grid>
                         <Grid item md={6} xs={11} sm={11}>
                             <div className="pdf-viewer">
-                                <iframe key={mandatoryCourses + choosenElectiveCourses + choosenMandatoryCourses} src="/api/student/current/timetable/" width="100%" height="500px" />
+                                <iframe key={mandatoryCourses + choosenElectiveCourses + choosenMandatoryCourses + parcours} src="/api/student/current/timetable/" width="100%" height="500px" />
                             </div>
                         </Grid>
                     </Grid>
