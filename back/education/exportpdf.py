@@ -13,7 +13,28 @@ from reportlab.platypus import (
 )
 
 
-def date_to_hour_id(date: datetime.datetime):
+def round_time(time):
+    """
+    Round a time to the nearest slot.
+    """
+    minutes = time.minute
+    if minutes < 30:
+        minutes = 0
+    else:
+        minutes = 30
+    return datetime.time(time.hour, minutes)
+
+
+def ceil_time(time):
+    minutes = time.minute
+    if minutes > 30:
+        minutes = 30
+    else:
+        minutes = 0
+    return datetime.time(time.hour, minutes)
+
+
+def date_to_hour_id(date: datetime.time):
     return str(date.hour) + ("h" + str(date.minute)).replace("h0", "h00")
 
 
@@ -137,8 +158,8 @@ def generate_table(elements, courses, semester):
     for course in courses:
         if not course["semester"] == semester:
             continue
-        start_line = hour_to_line[date_to_hour_id(course["start_time"])]
-        end_line = hour_to_line[date_to_hour_id(course["end_time"])]
+        start_line = hour_to_line[date_to_hour_id(round_time(course["start_time"]))]
+        end_line = hour_to_line[date_to_hour_id(ceil_time(course["end_time"]))]
         style.add(
             "LINEBELOW",
             (table_data[0].index(course["day"]), start_line - 1),
