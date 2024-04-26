@@ -1,5 +1,4 @@
 version: "3.6"
-
 services:
   back:
     build:
@@ -9,13 +8,17 @@ services:
     command: python manage.py runserver 0.0.0.0:8000
     ports:
       - "$BACK_PORT:8000"
-    env_file: .env
     restart: always
     volumes:
       - ./back:/src
       - ./backups:/backups
     networks:
       - nginx_link
+    env_file:
+      - path: ./.env-example
+        required: true 
+      - path: ./.env
+        required: false
   front:
     build:
       context: front
