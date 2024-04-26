@@ -279,7 +279,8 @@ export default function Parcours() {
                 setParcours(result)
             })
 
-            fetch("/api/parcours/avalaible_mandatory/?department=" + currentDepartment + "&parcours=" + currentParcours,
+            //fetch("/api/parcours/avalaible_mandatory/?department=" + currentDepartment + "&parcours=" + currentParcours,
+            fetch("/api/course/",
             {
                 method: "GET",
                 credentials: "include",
