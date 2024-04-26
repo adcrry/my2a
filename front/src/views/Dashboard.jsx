@@ -78,7 +78,7 @@ export default function Dashboard() {
             return (
                 <FormControlLabel control={<Checkbox defaultChecked={choosenMandatoryCourses.includes(course.name)} onClick={(e) => {
                     changeEnrollment(course.name, e.target.checked, 'mandatory')
-                }} />} disabled={!editable || !isCourseCompitable(course.name) && !choosenMandatoryCourses.includes(course.name)} label={course.name + ' (' + course.ects + ' ECTS)'} />
+                }} />} disabled={!editable || !isCourseCompitable(course.name) && !choosenMandatoryCourses.includes(course.name)} label={'[' + course.code.replaceAll(" ", "") + '] ' + course.name + ' (' + course.ects + ' ECTS)'} />
             )
         })
 
@@ -89,7 +89,7 @@ export default function Dashboard() {
             return (
                 <FormControlLabel control={<Checkbox defaultChecked={choosenElectiveCourses.includes(course.name)} onClick={(e) => {
                     changeEnrollment(course.name, e.target.checked, 'elective')
-                }} />} disabled={!editable || !isCourseCompitable(course.name) && !choosenElectiveCourses.includes(course.name)} label={course.name + ' (' + course.ects + ' ECTS)'} />
+                }} />} disabled={!editable || !isCourseCompitable(course.name) && !choosenElectiveCourses.includes(course.name)} label={'[' + course.code + '] ' + course.name + ' (' + course.ects + ' ECTS)'} />
             )
         })
 
@@ -436,7 +436,7 @@ export default function Dashboard() {
                             <CustomProgressBar progress={progress} />
                         </Grid>
                         <Grid md={1}>
-                            <Typography sx={{textAlign: "center", fontWeight: "bold"}}>ECTS scientifiques</Typography>
+                            <Typography sx={{ textAlign: "center", fontWeight: "bold" }}>ECTS scientifiques</Typography>
                             <Box sx={{ position: 'relative', display: 'inline-flex', marginBottom: 4 }}>
                                 <CircularProgress color={student.ects < required_ects ? "warning" : "success"} variant="determinate" value={student.ects > required_ects ? 100 : student.ects / required_ects * 100} size={120} thickness={3} />
                                 <Box sx={{
@@ -455,7 +455,7 @@ export default function Dashboard() {
                             </Box>
                         </Grid>
                         <Grid md={1}>
-                            <Typography sx={{textAlign: "center", fontWeight: "bold"}}>Total ECTS</Typography>
+                            <Typography sx={{ textAlign: "center", fontWeight: "bold" }}>Total ECTS</Typography>
                             <Box sx={{ position: 'relative', display: 'inline-flex', marginBottom: 4 }}>
                                 <CircularProgress color={ects_base + student.ects < total_required_ects ? "warning" : "success"} variant="determinate" value={ects_base + student.ects > total_required_ects ? 100 : (student.ects + ects_base) / total_required_ects * 100} size={120} thickness={3} />
                                 <Box sx={{
@@ -473,11 +473,11 @@ export default function Dashboard() {
                                 </Box>
                             </Box>
                         </Grid>
-                        
+
                     </Grid>
                     <Grid container spacing={5} style={{ marginTop: '10px', justifyContent: "center" }}>
                         <Grid item md={5} xs={11} sm={11}>
-                            <Accordion expanded={opened === 'departement'} onChange={(e, expanded) => {
+                            {/* <Accordion expanded={opened === 'departement'} onChange={(e, expanded) => {
                                 if (expanded) handleChange('departement')
                             }}>
                                 <AccordionSummary aria-controls="panel1d-content" id="panel1d-header" expandIcon={<ExpandMoreIcon />}>
@@ -501,7 +501,7 @@ export default function Dashboard() {
                                         </Select>
                                     </FormControl>
                                 </AccordionDetails>
-                            </Accordion>
+                            </Accordion>*/}
                             <Accordion disabled={progress < 33} expanded={opened === 'parcours'} onChange={(e, expanded) => {
                                 if (expanded) handleChange('parcours')
                             }}>
@@ -584,7 +584,7 @@ export default function Dashboard() {
                                 {choosenMandatoryCourses.length < required_mandatory_courses && "Vous devez choisir au moins 2 cours obligatoires sur liste."}
                             </DialogContentText>
                         </DialogContent>
-                        <TextField sx={{margin: 'auto', width: "90%"}} placeholder="Commentaire" value={comment} onChange={(e) => setComment(e.target.value)}/>
+                        <TextField sx={{ margin: 'auto', width: "90%" }} placeholder="Commentaire" value={comment} onChange={(e) => setComment(e.target.value)} />
                         <DialogActions>
                             <Button onClick={() => {
                                 validateForm()

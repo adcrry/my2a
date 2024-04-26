@@ -14,11 +14,7 @@ services:
       - ./backups:/backups
     networks:
       - nginx_link
-    env_file:
-      - path: ./.env-example
-        required: true 
-      - path: ./.env
-        required: false
+    env_file: .env
   front:
     build:
       context: front

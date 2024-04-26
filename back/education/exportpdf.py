@@ -47,7 +47,7 @@ def generate_pdf_from_courses(name, courses):
     elements = []
 
     title_style = getSampleStyleSheet()["Title"]
-    title_text = "Emploi du temps de " + name
+    title_text = ""
     title = Paragraph(title_text, title_style)
     elements.append(title)
     generate_table(elements, courses, "S3")
@@ -98,6 +98,7 @@ def generate_table(elements, courses, semester):
         colors.lightskyblue,
         colors.lightsteelblue,
         colors.lightyellow,
+        colors.lightcyan,
     ]
 
     style = TableStyle(
@@ -195,7 +196,7 @@ def generate_table(elements, courses, semester):
                 "BACKGROUND",
                 (table_data[0].index(course["day"]), line),
                 (table_data[0].index(course["day"]), line),
-                colors_list[courses.index(course)],
+                colors_list[courses.index(course) % len(colors_list)],
             )
 
     table = Table(table_data, colWidths=100, rowHeights=15)
