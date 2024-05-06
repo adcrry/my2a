@@ -175,7 +175,7 @@ def importCourseCSV(csv_file):
 def importStudentCSV(csv_file):
     print("--- Reading CSV file...")
     csv_file_wrapper = TextIOWrapper(
-        csv_file.file, encoding="utf-8"
+        csv_file.file, encoding="utf-8-sig"
     )  # Use TextIOWrapper for decoding
     csv_reader = csv.DictReader(csv_file_wrapper, delimiter=";")
 
