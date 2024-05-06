@@ -19,7 +19,7 @@ class Department(models.Model):
 
 
 class Course(models.Model):
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=200)
     code = models.CharField(max_length=10)
     department = models.ForeignKey(Department, on_delete=models.CASCADE)
     description = models.TextField(null=True, blank=True)
