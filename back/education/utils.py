@@ -15,7 +15,7 @@ from .models import Course, Department, Parcours, Student
 def importCourseCSV(csv_file):
     print("--- Reading CSV file...")
     csv_file_wrapper = TextIOWrapper(
-        csv_file.file, encoding="utf-8"
+        csv_file.file, encoding="utf-8-sig"
     )  # Use TextIOWrapper for decoding
     csv_reader = csv.DictReader(csv_file_wrapper, delimiter=";")
 
@@ -24,6 +24,7 @@ def importCourseCSV(csv_file):
     created_rows = []  # List to store rows that were created
     print("--- Creating courses:")
     for row in csv_reader:
+        print(row)
         try:
             code = row["code"]
 
