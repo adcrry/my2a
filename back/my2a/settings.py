@@ -172,3 +172,14 @@ EMAIL_USE_TLS = True
 TEMPLATED_EMAIL_BACKEND = "templated_email.backends.vanilla_django.TemplateBackend"
 TEMPLATED_EMAIL_TEMPLATE_DIR = "templated_email/"  # use '' for top level template dir, ensure there is a trailing slash
 TEMPLATED_EMAIL_FILE_EXTENSION = "email"
+
+LOGIN_REDIRECT_URL = '/'
+
+# Celery settings
+REDIS_HOST = os.environ["REDIS_HOST"]
+REDIS_PASSWORD = os.environ["REDIS_PASSWORD"]
+CELERY_BROKER_URL = f"redis://:{REDIS_PASSWORD}@{REDIS_HOST}:6379/0"
+CELERY_RESULT_BACKEND = f"redis://:{REDIS_PASSWORD}@{REDIS_HOST}:6379/0"
+CELERY_ACCEPT_CONTENT = ["application/json"]
+CELERY_RESULT_SERIALIZER = "json"
+CELERY_TASK_SERIALIZER = "json"

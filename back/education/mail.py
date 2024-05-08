@@ -1,13 +1,15 @@
 from education.models import Parameter
 from templated_email import send_templated_mail
-
+from celery import shared_task
+from education.models import Student
 
 def get_department_admins(department):
     """Return the list of admins for a department."""
     return [p.value for p in Parameter.objects.filter(name=department.code + "_admin")]
 
-
-def send_confirmation_mail(student):
+@shared_task
+def send_confirmation_mail(studentId):
+    student = Student.objects.get(id=studentId)
     send_templated_mail(
         template_name="confirmation",
         from_email="my2a@enpc.org",
@@ -20,4 +22,17 @@ def send_confirmation_mail(student):
             "elective_courses": student.elective_courses(),
         },
         cc=get_department_admins(student.department),
+    )
+
+@shared_task
+def send_account_creation_mail(mail, first_name, last_name, password):
+    send_templated_mail(
+        template_name="creation",
+        from_email="my2a@enpc.org",
+        recipient_list=[mail],
+        context={
+            "first_name": first_name,
+            "last_name": last_name,
+            "password": password,
+        },
     )

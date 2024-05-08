@@ -24,4 +24,5 @@ urlpatterns = [
     path("api/", include("api.urls")),
     path("cas/login/", django_cas_ng.views.LoginView.as_view(), name="cas_ng_login"),
     path("cas/logout/", django_cas_ng.views.LogoutView.as_view(), name="cas_ng_logout"),
+    path("accounts/", include("django.contrib.auth.urls")), 
 ]

@@ -57,6 +57,7 @@ export default function Dashboard() {
     }
 
     const getParcoursItems = () => {
+        console.log(parcoursList)
         return parcoursList.map((parcours) => {
             return (
                 <MenuItem value={parcours.id}>{parcours.name}</MenuItem>
@@ -237,7 +238,7 @@ export default function Dashboard() {
             .then((res) => res.json())
             .then((result) => {
                 if (result.detail != null && result.detail == "Informations d'authentification non fournies.") {
-                    window.location.href = '/cas/login/'
+                    window.location.href = '/accounts/login/'
                 } else {
                     setIsLogged(true)
                     fetch('/api/department/', {

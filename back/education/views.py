@@ -11,7 +11,7 @@ from reportlab.lib.units import cm
 from reportlab.pdfgen import canvas
 from rest_framework import status
 from rest_framework.decorators import action, permission_classes
-from rest_framework.permissions import IsAdminUser
+from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet, ViewSet
@@ -224,7 +224,7 @@ class StudentViewset(ReadOnlyModelViewSet):
                 if "comment" in request.data:
                     student.comment = request.data["comment"]
                 student.editable = False
-                send_confirmation_mail(student)
+                send_confirmation_mail(student.id)
                 student.save()
                 return Response({"status": "ok"})
         return Response({"status": "error"})
@@ -565,7 +565,7 @@ class ExportStudentsView(APIView):
 
 class ParcoursViewset(ViewSet):
 
-    permission_classes = [IsAdminUser]
+    permission_classes = [IsAuthenticated]
 
     def list(self, request):
         if "department" not in request.GET:

@@ -17,4 +17,6 @@ psycopg2 = "2.9.9"
 python = "3.11.6"
 reportlab = "^4.0.8"
 django-templated-email = "^3.0.1"
+redis = "^5.0.1"
+celery = "^5.2.7"
 [tool.poetry.dev-dependencies]

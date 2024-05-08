@@ -15,6 +15,19 @@ services:
       - backdata:/src/static
     networks:
       - nginx_link
+  redis:
+    image: redis:7.2.2-bookworm
+    command: redis-server --save 60 1 --loglevel notice --requirepass ${REDIS_PASSWORD}
+    restart: always
+    volumes:
+      - cache:/data
+    networks:
+      - cache_link
+    healthcheck:
+        test: echo 'auth ${REDIS_PASSWORD}\nping' | redis-cli | grep PONG
+        interval: 5s
+        timeout: 3s
+        retries: 5
   front:
     build:
       context: front
@@ -44,7 +57,10 @@ services:
 networks:
   nginx_link:
     driver: bridge
+  cache_link:
 
 volumes:
   webdata:
   backdata:
+  cache:
+

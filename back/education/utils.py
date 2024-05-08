@@ -11,6 +11,8 @@ from django.urls.conf import include
 
 from .models import Course, Department, Parcours, Student
 
+from .mail import send_account_creation_mail
+
 
 def importCourseCSV(csv_file):
     print("--- Reading CSV file...")
@@ -184,6 +186,7 @@ def importStudentCSV(csv_file):
     created_rows = []  # List to store rows that were created
     print("--- Creating students:")
     for row in csv_reader:
+        print(row)
         try:
             email = row["email"]
             name = row["name"]
@@ -193,8 +196,11 @@ def importStudentCSV(csv_file):
             ]  # Change variable name to department_code
 
             # Create user
-
-            username = email.split("@")[0]
+            split = email.split("@")
+            if split[1] == "eleves.enpc.fr":
+                username = email.split("@")[0]
+            else: 
+                username = email
             password = User.objects.make_random_password()
             user, created = User.objects.get_or_create(
                 last_name=surname,
@@ -207,6 +213,10 @@ def importStudentCSV(csv_file):
                 user.set_password(password)
                 user.save()
                 print("------ " + f"User {user} created")
+                # Send email
+                if email.split("@")[1] != "eleves.enpc.fr":
+                    print("------ " + f"Sending email to {email}")
+                    send_account_creation_mail(email, name, surname, password)
 
             try:
                 department = Department.objects.get(code=department_code)

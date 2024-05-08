@@ -8,13 +8,25 @@ services:
     command: python manage.py runserver 0.0.0.0:8000
     ports:
       - "$BACK_PORT:8000"
-    restart: always
     volumes:
       - ./back:/src
       - ./backups:/backups
     networks:
       - nginx_link
+      - cache_link
     env_file: .env
+  redis:
+    image: redis:7.2.2-bookworm
+    command: redis-server --save 60 1 --loglevel notice --requirepass ${REDIS_PASSWORD}
+    volumes:
+      - cache:/data
+    networks:
+      - cache_link
+    healthcheck:
+        test: echo 'auth ${REDIS_PASSWORD}\nping' | redis-cli | grep PONG
+        interval: 5s
+        timeout: 3s
+        retries: 5
   front:
     build:
       context: front
@@ -33,7 +45,6 @@ services:
       target: development
     ports:
       - "127.0.0.1:80:80"
-    restart: always
     networks:
       - nginx_link
     depends_on:
@@ -41,3 +52,7 @@ services:
       - front
 networks:
   nginx_link:
+  cache_link:
+
+volumes: 
+  cache:

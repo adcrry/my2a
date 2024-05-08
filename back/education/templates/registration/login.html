@@ -1,0 +1,31 @@
+<div style="margin: auto 0">
+  <h2 style="font-family: sans-serif;">Connexion à My2A</h2>
+  <p style="font-family: sans-serif;">Si vous possédez déjà un compte ENPC, merci de bien vouloir vous connecter via ce
+    dernier en cliquant sur "Se connecter avec son compte ENPC".</p>
+  <form method="post">
+    {% csrf_token %}
+    <form role="form" class="form-horizontal" method="post" action="">{% csrf_token %}
+      <div class="form-group">
+        {% for field in form %}
+        <div class="input-group">
+          {% if field.name == 'password' %}
+          <input style="height: 40px;margin-bottom: 20px;width: 400px;" id="{{ field.id_for_label }}" maxlength="30"
+            name="{{ field.html_name }}" placeholder="Mot de passe" value="" type="text" />
+          {% else %}
+          <input style="height: 40px;margin-bottom: 20px;width: 400px;" id="{{ field.id_for_label }}" maxlength="30"
+            name="{{ field.html_name }}" placeholder="Adresse email" type="text" />
+          {% endif %}
+          {{ field.errors }}
+        </div>
+        {% endfor %}
+        <input type="submit"
+          style="font-size: 18px; margin-bottom: 20px; cursor: pointer;border: none;background-color: #4ea8f2; padding: 10px; text-decoration: none; color: white; font-weight: bold; font-family: sans-serif;margin-top: 20px"
+          value="Se connecter" />
+        <input type="hidden" name="next" value="{{ next }}" />
+      </div>
+    </form>
+  </form>
+  <a href="/cas/login/"
+    style="font-size: 18px;background-color: #4ea8f2; padding: 10px; text-decoration: none; color: white; font-weight: bold; font-family: sans-serif;">Se
+    connecter avec son compte ENPC</a>
+</div>
