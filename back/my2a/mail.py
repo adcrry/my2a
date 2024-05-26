@@ -7,7 +7,7 @@ def get_department_admins(department):
     """Return the list of admins for a department."""
     return [p.value for p in Parameter.objects.filter(name=department.code + "_admin")]
 
-@shared_task
+@shared_task(name="send_confirmation_mail")
 def send_confirmation_mail(studentId):
     student = Student.objects.get(id=studentId)
     send_templated_mail(
@@ -24,7 +24,7 @@ def send_confirmation_mail(studentId):
         cc=get_department_admins(student.department),
     )
 
-@shared_task
+@shared_task(name="send_account_creation_mail")
 def send_account_creation_mail(mail, first_name, last_name, password):
     send_templated_mail(
         template_name="creation",

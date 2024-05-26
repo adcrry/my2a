@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Course, Department, Enrollment, Parcours, Student
+from .models import Course, Department, Enrollment, Parcours, Student, Parameter
 
 
 class StudentSerializer(serializers.ModelSerializer):
@@ -117,3 +117,12 @@ class ParcoursSerializer(serializers.ModelSerializer):
     department = DepartmentSerializer()
     courses_mandatory = CourseSerializer(many=True)
     courses_on_list = CourseSerializer(many=True)
+
+
+class ParameterSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Parameter
+        fields = [
+            "name",
+            "value",
+        ]

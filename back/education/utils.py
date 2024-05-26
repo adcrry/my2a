@@ -11,7 +11,7 @@ from django.urls.conf import include
 
 from .models import Course, Department, Parcours, Student
 
-from .mail import send_account_creation_mail
+from my2a.mail import send_account_creation_mail
 
 
 def importCourseCSV(csv_file):
@@ -216,7 +216,7 @@ def importStudentCSV(csv_file):
                 # Send email
                 if email.split("@")[1] != "eleves.enpc.fr":
                     print("------ " + f"Sending email to {email}")
-                    send_account_creation_mail(email, name, surname, password)
+                    send_account_creation_mail.delay(email, name, surname, password)
 
             try:
                 department = Department.objects.get(code=department_code)

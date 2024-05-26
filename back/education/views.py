@@ -17,8 +17,8 @@ from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet, ViewSet
 
 from .admin import CourseAdmin
-from .mail import send_confirmation_mail
-from .models import Course, Department, Enrollment, Parcours, Student
+from my2a.mail import send_confirmation_mail
+from .models import Course, Department, Enrollment, Parcours, Student, Parameter
 from .serializers import (
     CompleteStudentSerializer,
     CourseSerializer,
@@ -26,6 +26,7 @@ from .serializers import (
     EnrollmentSerializer,
     ParcoursSerializer,
     StudentSerializer,
+    ParameterSerializer
 )
 from .utils import course_list_to_string, importCourseCSV, importStudentCSV
 
@@ -224,7 +225,7 @@ class StudentViewset(ReadOnlyModelViewSet):
                 if "comment" in request.data:
                     student.comment = request.data["comment"]
                 student.editable = False
-                send_confirmation_mail(student.id)
+                send_confirmation_mail.delay(student.id)
                 student.save()
                 return Response({"status": "ok"})
         return Response({"status": "error"})
@@ -644,4 +645,14 @@ class ParcoursViewset(ViewSet):
             .order_by("name")
         )
         serializer = CourseSerializer(courses, many=True)
+        return Response(serializer.data)
+
+
+class ParameterView(APIView):
+    def get(self, request, format=None):
+        """
+        Return a list of all users.
+        """
+        parameters = Parameter.objects.filter(show=True)
+        serializer = ParameterSerializer(parameters, many=True)
         return Response(serializer.data)

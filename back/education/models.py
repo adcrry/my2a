@@ -190,6 +190,6 @@ class Parameter(models.Model):
     department = models.ForeignKey(
         Department, on_delete=models.CASCADE, null=True, blank=True
     )
-
+    show = models.BooleanField(default=True)
     def __str__(self):
         return self.name
