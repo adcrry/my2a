@@ -44,6 +44,7 @@ export default function Dashboard() {
     const [confirmationDialogState, setConfirmationDialogState] = useState(false)
     const [student, setStudent] = useState({})
     const [comment, setComment] = useState('')
+    const [parameters, setParameters] = useState({})
     const handleChange = (panel) => {
         if (opened != panel) setOpened(panel)
     }
@@ -57,7 +58,6 @@ export default function Dashboard() {
     }
 
     const getParcoursItems = () => {
-        console.log(parcoursList)
         return parcoursList.map((parcours) => {
             return (
                 <MenuItem value={parcours.id}>{parcours.name}</MenuItem>
@@ -228,6 +228,21 @@ export default function Dashboard() {
     }
 
     useEffect(() => {
+        fetch('/api/parameters', {
+            method: 'GET',
+            credentials: "include",
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        })
+            .then((res) => res.json())
+            .then((result) => {
+                const temp = {}
+                for (const index in result) {
+                    temp[result[index].name] = result[index].value
+                }
+                setParameters(temp)
+            })
         fetch('/api/student/current/', {
             method: 'GET',
             credentials: "include",
@@ -478,31 +493,6 @@ export default function Dashboard() {
                     </Grid>
                     <Grid container spacing={5} style={{ marginTop: '10px', justifyContent: "center" }}>
                         <Grid item md={5} xs={11} sm={11}>
-                            {/* <Accordion expanded={opened === 'departement'} onChange={(e, expanded) => {
-                                if (expanded) handleChange('departement')
-                            }}>
-                                <AccordionSummary aria-controls="panel1d-content" id="panel1d-header" expandIcon={<ExpandMoreIcon />}>
-                                    <Typography><b>Choix du département</b></Typography>
-                                </AccordionSummary>
-                                <AccordionDetails>
-                                    <FormControl fullWidth>
-                                        <InputLabel>Département</InputLabel>
-                                        <Select
-                                            labelId="demo-simple-select-label"
-                                            id="demo-simple-select"
-                                            value={departement}
-                                            label="Département"
-                                            onChange={(e) => {
-                                                changeDepartment(e.target.value)
-                                            }}
-                                            placeholder="Département"
-                                            disabled={true}
-                                        >
-                                            {getDepartmentItems()}
-                                        </Select>
-                                    </FormControl>
-                                </AccordionDetails>
-                            </Accordion>*/}
                             <Accordion disabled={progress < 33} expanded={opened === 'parcours'} onChange={(e, expanded) => {
                                 if (expanded) handleChange('parcours')
                             }}>
@@ -526,6 +516,7 @@ export default function Dashboard() {
                                             {getParcoursItems()}
                                         </Select>
                                     </FormControl>
+                                    {parcoursList.filter((p) => p.id == parcours).length == 1 && parameters[parcoursList.filter((p) => p.id == parcours)[0].name + "_desc"] &&  parameters[parcoursList.filter((p) => p.id == parcours)[0].name + "_desc"].split("\\n").map((line) => (<Typography>{line}</Typography>))}
                                 </AccordionDetails>
                             </Accordion>
                             <Accordion disabled={progress < 66} expanded={opened === 'obligatoires'} onChange={(e, expanded) => {
@@ -535,6 +526,7 @@ export default function Dashboard() {
                                     <Typography><b>Choix des cours obligatoires sur liste</b></Typography>
                                 </AccordionSummary>
                                 <AccordionDetails>
+                                    <Typography sx={{fontSize: "20px", marginBottom: "20px"}}>{departments.filter((dep) => dep.id == departement).length == 1 && parameters[departments.filter((dep) => dep.id == departement)[0].code + "_mandatory_on_list_text"]}</Typography>
                                     <FormGroup>
                                         {getMandatoryCourses()}
                                     </FormGroup>
