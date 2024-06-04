@@ -7,6 +7,7 @@ from django.template import loader
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
+from django.contrib import auth
 from reportlab.lib.units import cm
 from reportlab.pdfgen import canvas
 from rest_framework import status
@@ -34,6 +35,25 @@ from .utils import course_list_to_string, importCourseCSV, importStudentCSV
 def index(request):
     return HttpResponse("Hello, world. You're at the polls index.")
 
+def auth_view(request):
+    if request.method == 'GET':
+        if request.user.is_authenticated and request.user.is_superuser:
+            return redirect('/inspector/')
+        elif request.user.is_authenticated:
+            return render(request, '/')
+        return render(request, 'registration/login.html')
+    username = request.POST.get('mail', '')
+    password = request.POST.get('password', '')
+    print(username, password)
+    user = auth.authenticate(username=username, password=password)
+
+    if user is not None:
+        if user.is_active:
+            auth.login(request, user)
+            return redirect('/')
+
+    else :
+        return render(request, 'registration/login.html', {'error': 'Mauvaise adresse email ou mot de passe'})
 
 class TranslationView(APIView):
     def get(self, request, format=None):

@@ -17,6 +17,7 @@ Including another URLconf
 import django_cas_ng.views
 from django.contrib import admin
 from django.urls import include, path
+from education.views import auth_view
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -24,5 +25,6 @@ urlpatterns = [
     path("api/", include("api.urls")),
     path("cas/login/", django_cas_ng.views.LoginView.as_view(), name="cas_ng_login"),
     path("cas/logout/", django_cas_ng.views.LogoutView.as_view(), name="cas_ng_logout"),
+    path("accounts/login/", auth_view, name="login"),
     path("accounts/", include("django.contrib.auth.urls")), 
 ]

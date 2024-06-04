@@ -186,7 +186,7 @@ class Enrollment(models.Model):
 
 class Parameter(models.Model):
     name = models.CharField(max_length=100)
-    value = models.CharField(max_length=100)
+    value = models.TextField()
     department = models.ForeignKey(
         Department, on_delete=models.CASCADE, null=True, blank=True
     )
