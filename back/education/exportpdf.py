@@ -38,17 +38,18 @@ def date_to_hour_id(date: datetime.time):
     return str(date.hour) + ("h" + str(date.minute)).replace("h0", "h00")
 
 
-def generate_pdf_from_courses(name, courses):
+def generate_pdf_from_courses(name, courses, intro):
     """
     Generate a pdf from a list of courses.
     """
     buffer = BytesIO()
-    doc = SimpleDocTemplate(buffer, pagesize=landscape(letter))
+    doc = SimpleDocTemplate(buffer, rightMargin=0, leftMargin=0, topMargin=0, bottomMargin=0)
     elements = []
 
-    title_style = getSampleStyleSheet()["Title"]
-    title_text = ""
+    title_style = getSampleStyleSheet()["Normal"]
+    title_text = intro.replace("\n", "<br/>") + "<br/><br/>"
     title = Paragraph(title_text, title_style)
+
     elements.append(title)
     generate_table(elements, courses, "S3")
     elements.append(PageBreak())

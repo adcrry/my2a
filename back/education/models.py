@@ -14,6 +14,7 @@ class Department(models.Model):
         User, on_delete=models.CASCADE, null=True, blank=True
     )
     description = models.TextField(null=True, blank=True)
+    timetable_intro = models.TextField(null=True, blank=True, default="")
 
     def __str__(self):
         return self.code
@@ -159,6 +160,7 @@ class Student(models.Model):
         courses = [e.course for e in Enrollment.objects.filter(student=self)] + [
             course for course in self.parcours.courses_mandatory.all()
         ]
+        intro = self.department.timetable_intro
         courses = [
             {
                 "name": course.name,
@@ -171,7 +173,7 @@ class Student(models.Model):
             }
             for course in courses
         ]
-        return generate_pdf_from_courses(self.name, courses)
+        return generate_pdf_from_courses(self.name, courses, intro)
 
 
 class Enrollment(models.Model):
