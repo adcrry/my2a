@@ -77,7 +77,7 @@ export default function Dashboard() {
             return (
                 <FormControlLabel control={<Checkbox defaultChecked={choosenMandatoryCourses.includes(course.name)} onClick={(e) => {
                     changeEnrollment(course.name, e.target.checked, 'mandatory')
-                }} />} disabled={!editable || !isCourseCompitable(course.name) && !choosenMandatoryCourses.includes(course.name)} label={'[' + course.code.replaceAll(" ", "") + '] ' + course.name + ' (' + course.ects + ' ECTS)'} />
+                }} />} disabled={!editable || !isCourseCompitable(course.name) && !choosenMandatoryCourses.includes(course.name) || (!choosenMandatoryCourses.includes(course.name) && choosenMandatoryCourses.length >= 2)} label={'[' + course.code.replaceAll(" ", "") + '] ' + course.name + ' (' + course.ects + ' ECTS)'} />
             )
         })
 
@@ -191,7 +191,10 @@ export default function Dashboard() {
                                             tempMandatory.push(result.mandatory_courses[index].course.name)
                                         }
                                         setChoosenMandatoryCourses(tempMandatory)
-
+                                        if (tempMandatory.length >= 2) {
+                                            setProgress(100)
+                                            setOpened('electifs')
+                                        }
                                         const tempElective = []
                                         for (const index in result.elective_courses) {
                                             tempElective.push(result.elective_courses[index].course.name)
@@ -303,6 +306,10 @@ export default function Dashboard() {
                             const tempMandatory = []
                             for (const index in result.mandatory_courses) {
                                 tempMandatory.push(result.mandatory_courses[index].course.name)
+                            }
+                            if (tempMandatory.length >= 2) {
+                                setProgress(100)
+                                setOpened('electifs')
                             }
                             setChoosenMandatoryCourses(tempMandatory)
 
