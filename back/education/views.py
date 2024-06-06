@@ -44,7 +44,6 @@ def auth_view(request):
         return render(request, 'registration/login.html')
     username = request.POST.get('mail', '')
     password = request.POST.get('password', '')
-    print(username, password)
     user = auth.authenticate(username=username, password=password)
 
     if user is not None:

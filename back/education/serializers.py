@@ -98,6 +98,7 @@ class DepartmentSerializer(serializers.ModelSerializer):
             "id",
             "name",
             "code",
+            "description",
             "responsable",
         ]
 
@@ -112,6 +113,10 @@ class ParcoursSerializer(serializers.ModelSerializer):
             "description",
             "courses_mandatory",
             "courses_on_list",
+            "mandatory_text",
+            "elective_text",
+            "base_ects",
+            "academic_base_ects",
         ]
 
     department = DepartmentSerializer()

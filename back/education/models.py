@@ -13,6 +13,7 @@ class Department(models.Model):
     responsable = models.OneToOneField(
         User, on_delete=models.CASCADE, null=True, blank=True
     )
+    description = models.TextField(null=True, blank=True)
 
     def __str__(self):
         return self.code
@@ -59,6 +60,10 @@ class Parcours(models.Model):
     name = models.CharField(max_length=100)
     department = models.ForeignKey(Department, on_delete=models.CASCADE)
     description = models.TextField(null=True, blank=True)
+    mandatory_text = models.TextField(null=True, blank=True)
+    elective_text = models.TextField(null=True, blank=True)
+    base_ects = models.FloatField()
+    academic_base_ects = models.FloatField()
     courses_mandatory = models.ManyToManyField(
         Course, blank=True, related_name="mandatory_parcours"
     )  # ajouter les cours du tronc commun dedans

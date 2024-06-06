@@ -49,14 +49,6 @@ export default function Dashboard() {
         if (opened != panel) setOpened(panel)
     }
 
-    const getDepartmentItems = () => {
-        return departments.map((department) => {
-            return (
-                <MenuItem value={department.id}>{department.code}</MenuItem>
-            )
-        })
-    }
-
     const getParcoursItems = () => {
         return parcoursList.map((parcours) => {
             return (
@@ -72,6 +64,12 @@ export default function Dashboard() {
             }
         }
         return false
+    }
+
+    const getDepartmentCode = (id) => {
+        const temp = departments.filter((dep) => dep.id == id)
+        if (temp.length == 1) return temp[0].code
+        else return null
     }
 
     const getMandatoryCourses = () => {
@@ -96,26 +94,34 @@ export default function Dashboard() {
 
     }
 
-    const changeDepartment = (code) => {
-        setDepartement(code)
-        setParcours(-1)
-        fetch('/api/student/current/department/', {
-            method: 'POST',
-            credentials: "include",
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': Cookies.get('csrftoken'),
-            },
-            body: JSON.stringify({ department: code }),
-        })
-            .then((res) => res.json())
-            .then((result) => {
-                setOpened('parcours')
-                setProgress(34)
-            },
-                (error) => {
-                    console.log(error)
-                })
+    const getParcoursAcademicBaseECTS = (parcours) => {
+        const temp = parcoursList.filter((p) => p.id == parcours)
+        if (temp.length == 1) return temp[0].academic_base_ects
+        else return 0
+    }
+
+    const getDepartmentDescription = (code) => {
+        const temp = departments.filter((dep) => dep.id == code)
+        if (temp.length == 1) return temp[0].description
+        else return null
+    }
+
+    const getParcoursDescription = (code) => {
+        const temp = parcoursList.filter((p) => p.id == code)
+        if (temp.length == 1) return temp[0].description
+        else return null
+    }
+
+    const getListCoursesHint = (parcours) => {
+        const temp = parcoursList.filter((p) => p.id == parcours)
+        if (temp.length == 1) return temp[0].mandatory_text
+        else return null
+    }
+
+    const getElectiveCoursesHint = (parcours) => {
+        const temp = parcoursList.filter((p) => p.id == parcours)
+        if (temp.length == 1) return temp[0].elective_text
+        else return null
     }
 
     const changeParcours = (code) => {
@@ -329,6 +335,7 @@ export default function Dashboard() {
                 .then((res) => res.json())
                 .then((result) => {
                     setParcoursList(result)
+                    console.log("parcours list ", result)
                 },
                     (error) => {
                         console.log(error);
@@ -452,9 +459,9 @@ export default function Dashboard() {
                             <CustomProgressBar progress={progress} />
                         </Grid>
                         <Grid md={1}>
-                            <Typography sx={{ textAlign: "center", fontWeight: "bold" }}>ECTS scientifiques</Typography>
+                            {/*<Typography sx={{ textAlign: "center", fontWeight: "bold" }}>ECTS</Typography>*/}
                             <Box sx={{ position: 'relative', display: 'inline-flex', marginBottom: 4 }}>
-                                <CircularProgress color={student.ects < required_ects ? "warning" : "success"} variant="determinate" value={student.ects > required_ects ? 100 : student.ects / required_ects * 100} size={120} thickness={3} />
+                                <CircularProgress color={getParcoursAcademicBaseECTS(parcours) + student.ects < required_ects ? "warning" : "success"} variant="determinate" value={getParcoursAcademicBaseECTS(parcours) + student.ects > required_ects ? 100 : (getParcoursAcademicBaseECTS(parcours) + student.ects) / required_ects * 100} size={120} thickness={3} />
                                 <Box sx={{
                                     top: 0,
                                     left: 0,
@@ -466,32 +473,43 @@ export default function Dashboard() {
                                     alignItems: 'center',
                                     textAlign: 'center',
                                 }}>
-                                    <Typography sx={{ fontWeight: 'bold', fontSize: 18 }} variant="caption" component="div">{student.ects} / {required_ects} ECTS </Typography>
+                                    <Typography sx={{ fontWeight: 'bold', fontSize: 18 }} variant="caption" component="div">{getParcoursAcademicBaseECTS(parcours) + student.ects} / {required_ects} ECTS </Typography>
                                 </Box>
                             </Box>
                         </Grid>
-                        <Grid md={1}>
-                            <Typography sx={{ textAlign: "center", fontWeight: "bold" }}>Total ECTS</Typography>
-                            <Box sx={{ position: 'relative', display: 'inline-flex', marginBottom: 4 }}>
-                                <CircularProgress color={ects_base + student.ects < total_required_ects ? "warning" : "success"} variant="determinate" value={ects_base + student.ects > total_required_ects ? 100 : (student.ects + ects_base) / total_required_ects * 100} size={120} thickness={3} />
-                                <Box sx={{
-                                    top: 0,
-                                    left: 0,
-                                    bottom: 0,
-                                    right: 0,
-                                    width: 120,
-                                    position: 'absolute',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    textAlign: 'center',
-                                }}>
-                                    <Typography sx={{ fontWeight: 'bold', fontSize: 18 }} variant="caption" component="div">{ects_base + student.ects} / {total_required_ects} ECTS </Typography>
+                        {getDepartmentCode(departement) == 'e' && (
+                            <Grid md={1}>
+                                <Typography sx={{ textAlign: "center", fontWeight: "bold" }}>Total ECTS</Typography>
+                                <Box sx={{ position: 'relative', display: 'inline-flex', marginBottom: 4 }}>
+                                    <CircularProgress color={ects_base + student.ects < total_required_ects ? "warning" : "success"} variant="determinate" value={ects_base + student.ects > total_required_ects ? 100 : (student.ects + ects_base) / total_required_ects * 100} size={120} thickness={3} />
+                                    <Box sx={{
+                                        top: 0,
+                                        left: 0,
+                                        bottom: 0,
+                                        right: 0,
+                                        width: 120,
+                                        position: 'absolute',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        textAlign: 'center',
+                                    }}>
+                                        <Typography sx={{ fontWeight: 'bold', fontSize: 18 }} variant="caption" component="div">{ects_base + student.ects} / {total_required_ects} ECTS </Typography>
+                                    </Box>
                                 </Box>
-                            </Box>
-                        </Grid>
-
+                            </Grid>
+                        )}
                     </Grid>
                     <Grid container spacing={5} style={{ marginTop: '10px', justifyContent: "center" }}>
+                        <Grid item xs={12}>
+                            {getDepartmentDescription(departement) && (
+                                <Box sx={{ textAlign: "center" }}>
+                                    {
+                                        getDepartmentDescription(departement).split("\r\n").map((part) => (
+                                            <Typography sx={{ fontSize: "15px", marginBottom: "20px" }}>{part}</Typography>
+                                        ))}
+                                </Box>
+                            )}
+                        </Grid>
                         <Grid item md={5} xs={11} sm={11}>
                             <Accordion disabled={progress < 33} expanded={opened === 'parcours'} onChange={(e, expanded) => {
                                 if (expanded) handleChange('parcours')
@@ -516,9 +534,11 @@ export default function Dashboard() {
                                             {getParcoursItems()}
                                         </Select>
                                     </FormControl>
-                                    {parcoursList.filter((p) => p.id == parcours).length == 1 && parameters[parcoursList.filter((p) => p.id == parcours)[0].name + "_desc"] &&  parameters[parcoursList.filter((p) => p.id == parcours)[0].name + "_desc"].split("\\n").map((line) => (<Typography>{line}</Typography>))}
                                 </AccordionDetails>
                             </Accordion>
+                            {getParcoursDescription(parcours) && getParcoursDescription(parcours).split("\r\n").map((line) => (
+                                <Typography sx={{ marginTop: "20px", marginLeft: "5px" }}>{line}</Typography>
+                            ))}
                             <Accordion disabled={progress < 66} expanded={opened === 'obligatoires'} onChange={(e, expanded) => {
                                 if (expanded) handleChange('obligatoires')
                             }}>
@@ -526,7 +546,9 @@ export default function Dashboard() {
                                     <Typography><b>Choix des cours obligatoires sur liste</b></Typography>
                                 </AccordionSummary>
                                 <AccordionDetails>
-                                    <Typography sx={{fontSize: "20px", marginBottom: "20px"}}>{departments.filter((dep) => dep.id == departement).length == 1 && parameters[departments.filter((dep) => dep.id == departement)[0].code + "_mandatory_on_list_text"]}</Typography>
+                                    <Typography sx={{ fontWeight: "bold", textDecoration: 'underline', fontSize: "15px", marginBottom: "20px" }}>
+                                        {getListCoursesHint(parcours) && getListCoursesHint(parcours)}
+                                    </Typography>
                                     <FormGroup>
                                         {getMandatoryCourses()}
                                     </FormGroup>
@@ -539,6 +561,9 @@ export default function Dashboard() {
                                     <Typography><b>Choix des cours électifs</b></Typography>
                                 </AccordionSummary>
                                 <AccordionDetails>
+                                    <Typography sx={{ fontWeight: "bold", textDecoration: 'underline', fontSize: "15px", marginBottom: "20px" }}>
+                                        {getElectiveCoursesHint(parcours) && getElectiveCoursesHint(parcours)}
+                                    </Typography>
                                     <FormGroup>
                                         {getElectiveCourses()}
                                     </FormGroup>
@@ -568,7 +593,7 @@ export default function Dashboard() {
                         <DialogTitle>{"Confirmer mes choix de cours ?"}</DialogTitle>
                         <DialogContent>
                             <DialogContentText id="alert-dialog-slide-description">
-                                Attention: Cette action est irréversible. Aucun changement ultérieur ne pourra être effectué sauf en cas de demande auprès de l'administration.
+                                Attention: Cette action est irréversible. Aucun changement ultérieur ne pourra être effectué sauf en cas de demande auprès de ton responsable de département.
                             </DialogContentText>
                             <DialogContentText sx={{ color: "red", fontWeight: "bold" }}>
                                 {student.ects < required_ects && "Vous n'avez que " + student.ects + " ECTS sur les " + required_ects + " scientifiques requis."}
