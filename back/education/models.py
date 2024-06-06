@@ -156,7 +156,7 @@ class Student(models.Model):
     def generate_timetable(self):
         """Return the timetable of the student."""
         if self.department is None or self.parcours is None:
-            return generate_pdf_from_courses(self.name, [])
+            return generate_pdf_from_courses(self.name, [], "")
         courses = [e.course for e in Enrollment.objects.filter(student=self)] + [
             course for course in self.parcours.courses_mandatory.all()
         ]
