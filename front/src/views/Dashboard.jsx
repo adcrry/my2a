@@ -603,7 +603,7 @@ export default function Dashboard() {
                                 Attention: Cette action est irréversible. Aucun changement ultérieur ne pourra être effectué sauf en cas de demande auprès de ton responsable de département.
                             </DialogContentText>
                             <DialogContentText sx={{ color: "red", fontWeight: "bold" }}>
-                                {student.ects < required_ects && "Vous n'avez que " + student.ects + " ECTS sur les " + required_ects + " scientifiques requis."}
+                                {student.ects + getParcoursAcademicBaseECTS(parcours) < 48.5 && "Vous n'avez que " + (student.ects + getParcoursAcademicBaseECTS(parcours)) + " ECTS sur les " + 48.5 + " scientifiques requis."}
                             </DialogContentText>
                             <DialogContentText sx={{ color: "red", fontWeight: "bold" }}>
                                 {choosenMandatoryCourses.length < required_mandatory_courses && "Vous devez choisir au moins 2 cours obligatoires sur liste."}
