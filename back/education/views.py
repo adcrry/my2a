@@ -209,12 +209,6 @@ class StudentViewset(ReadOnlyModelViewSet):
         courses = [course for course in courses]
         if student.parcours is None:
             return Response([])
-        mandatory = student.parcours.courses_mandatory.all().union(
-            student.parcours.courses_on_list.all()
-        )
-        for course in mandatory:
-            if course in courses:
-                courses.remove(course)
         serializer = CourseSerializer(courses, many=True)
         return Response(serializer.data)
 
