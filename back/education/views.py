@@ -205,10 +205,9 @@ class StudentViewset(ReadOnlyModelViewSet):
         Return the courses not enrolled by the current user.
         """
         student = get_object_or_404(Student, user=request.user)
-        courses = Course.objects.all()
-        courses = [course for course in courses]
         if student.parcours is None:
             return Response([])
+        courses = Course.objects.all()
         serializer = CourseSerializer(courses, many=True)
         return Response(serializer.data)
 
