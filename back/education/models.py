@@ -145,7 +145,8 @@ class Student(models.Model):
         if self.parcours is not None:
             for course in self.parcours.courses_mandatory.all():
                 ects += course.ects
-        ects += self.parcours.academic_base_ects + self.parcours.base_ects
+        if self.parcours is not None:
+            ects += self.parcours.academic_base_ects + self.parcours.base_ects
         return ects
 
     def check_ects(self):
