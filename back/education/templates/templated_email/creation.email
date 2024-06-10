@@ -6,7 +6,7 @@
 <body style="font-family: sans-serif;-webkit-font-smoothing: antialiased;line-height: 1.4;-ms-text-size-adjust: 100%;-webkit-text-size-adjust: 100%;">
 
   <p>
-    Bonjour {{ first_name}} {{ last_name }},
+    Bonjour {{ first_name}},
   </p>
 
   <p>

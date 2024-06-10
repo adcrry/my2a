@@ -15,6 +15,7 @@ class Department(models.Model):
     )
     description = models.TextField(null=True, blank=True)
     timetable_intro = models.TextField(null=True, blank=True, default="")
+    end_comment = models.TextField(null=True, blank=True, default="Attention: Cette action est irréversible. Aucun changement ultérieur ne pourra être effectué sauf en cas de demande auprès de ton responsable de département.")
 
     def __str__(self):
         return self.code
@@ -144,6 +145,7 @@ class Student(models.Model):
         if self.parcours is not None:
             for course in self.parcours.courses_mandatory.all():
                 ects += course.ects
+        ects += self.parcours.academic_base_ects + self.parcours.base_ects
         return ects
 
     def check_ects(self):

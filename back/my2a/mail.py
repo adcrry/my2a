@@ -36,3 +36,15 @@ def send_account_creation_mail(mail, first_name, last_name, password):
             "password": password,
         },
     )
+
+@shared_task(name="send_modification_mail")
+def send_account_status_change_mail(mail, first_name, last_name):
+    send_templated_mail(
+        template_name="modification",
+        from_email="my2a@enpc.org",
+        recipient_list=[mail],
+        context={
+            "first_name": first_name,
+            "last_name": last_name,
+        },
+    )

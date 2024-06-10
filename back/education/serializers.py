@@ -100,6 +100,7 @@ class DepartmentSerializer(serializers.ModelSerializer):
             "code",
             "description",
             "responsable",
+            "end_comment",
         ]
 
 

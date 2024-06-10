@@ -1,0 +1,18 @@
+{% block subject %}[2A] Choix débloqués {% endblock %}
+
+{% block html %}
+<!doctype html>
+<html>
+<body style="font-family: sans-serif;-webkit-font-smoothing: antialiased;line-height: 1.4;-ms-text-size-adjust: 100%;-webkit-text-size-adjust: 100%;">
+
+  <p>
+    Bonjour {{ first_name}},
+  </p>
+
+  <p>
+    Votre compte My2A a été débloqué par votre inspetrice des études. Vous pouvez à niveau modifier vos choix de cours !
+  </p>
+
+</body>
+</html>
+{% endblock %}

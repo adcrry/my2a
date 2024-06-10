@@ -6,7 +6,7 @@
 <body style="font-family: sans-serif;-webkit-font-smoothing: antialiased;line-height: 1.4;-ms-text-size-adjust: 100%;-webkit-text-size-adjust: 100%;">
 
   <p>
-    Bonjour {{ student.name}} {{ student.surname }},
+    Bonjour {{ student.name}},
   </p>
 
   <p>
@@ -22,27 +22,45 @@
       </tr>
     </thead>
     <tbody>
-    {% for course in mandatory_courses %}
+      {% for course in mandatory_courses %}
+        <tr>
+          <td>{{ course.name }}</td>
+          <td style="text-align: center;">{{ course.ects }}</td>
+          <td style="text-align: center;">{{ course.semester }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+    <thead style="text-align: center;background-color: #d9d9d9;">
       <tr>
-        <td>{{ course.name }}</td>
-        <td style="text-align: center;">{{ course.ects }}</td>
-        <td style="text-align: center;">{{ course.semester }}</td>
+        <th>Cours obligatoires sur liste</th>
+        <th>ECTS</th>
+        <th>Période</th>
       </tr>
-    {% endfor %}
-    {% for course in onlist_courses %}
+    </thead>
+    <tbody>
+      {% for course in onlist_courses %}
+        <tr>
+          <td>{{ course.course.name }}</td>
+          <td style="text-align: center;">{{ course.course.ects }}</td>
+          <td style="text-align: center;">{{ course.course.semester }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+    <thead style="text-align: center;background-color: #d9d9d9;">
       <tr>
-        <td>{{ course.course.name }}</td>
-        <td style="text-align: center;">{{ course.course.ects }}</td>
-        <td style="text-align: center;">{{ course.course.semester }}</td>
+        <th>Cours électifs</th>
+        <th>ECTS</th>
+        <th>Période</th>
       </tr>
-    {% endfor %}
-    {% for course in elective_courses %}
-      <tr>
-        <td>{{ course.course.name }}</td>
-        <td style="text-align: center;">{{ course.course.ects }}</td>
-        <td style="text-align: center;">{{ course.course.semester }}</td>
-      </tr>
-    {% endfor %}
+    </thead>
+    <tbody>
+      {% for course in elective_courses %}
+        <tr>
+          <td>{{ course.course.name }}</td>
+          <td style="text-align: center;">{{ course.course.ects }}</td>
+          <td style="text-align: center;">{{ course.course.semester }}</td>
+        </tr>
+      {% endfor %}
     </tbody>
   </table>
   <p>

@@ -18,7 +18,7 @@ from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet, ViewSet
 
 from .admin import CourseAdmin
-from my2a.mail import send_confirmation_mail
+from my2a.mail import send_confirmation_mail, send_account_status_change_mail
 from .models import Course, Department, Enrollment, Parcours, Student, Parameter
 from .serializers import (
     CompleteStudentSerializer,
@@ -227,6 +227,8 @@ class StudentViewset(ReadOnlyModelViewSet):
             target_student = get_object_or_404(Student, id=request.data["id"])
             target_student.editable = not target_student.editable
             target_student.save()
+            if target_student.editable:
+                send_account_status_change_mail(student.user.email, student.name, student.surname)
             return Response({"status": "ok"})
         elif "id" not in request.data:
             if (
