@@ -9,7 +9,17 @@ def get_department_admins(department):
 
 @shared_task(name="send_confirmation_mail")
 def send_confirmation_mail(studentId):
-    student = Student.objects.get(id=studentId)
+    student = Student.objects.get(id=studentId) 
+    mandatory_count = 0
+    elective_count = 0
+    parcours_count = 0
+    for course in student.mandatory_courses():
+        mandatory_count += course.course.ects
+    for course in student.elective_courses():
+        mandatory_count += course.course.ects
+    for course in student.parcours.courses_mandatory.all():
+        parcours_count += course.ects
+
     send_templated_mail(
         template_name="confirmation",
         from_email="my2a@enpc.org",
@@ -20,6 +30,10 @@ def send_confirmation_mail(studentId):
             "mandatory_courses": student.parcours.courses_mandatory.all(),
             "onlist_courses": student.mandatory_courses(),
             "elective_courses": student.elective_courses(),
+            "mandatory_count": mandatory_count,
+            "elective_count": elective_count,
+            "parcours_count": parcours_count,
+            "total_count": mandatory_count + elective_count + parcours_count
         },
         cc=get_department_admins(student.department),
     )

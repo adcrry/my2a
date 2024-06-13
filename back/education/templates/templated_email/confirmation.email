@@ -29,6 +29,11 @@
           <td style="text-align: center;">{{ course.semester }}</td>
         </tr>
       {% endfor %}
+      <tr>
+          <td><b>Sous total Obligatoires</b></td> 
+          <td style="text-align: center;">{{ parcours_count }}</td>
+          <td style="text-align: center;"></td>
+        </tr>
     </tbody>
     <thead style="text-align: center;background-color: #d9d9d9;">
       <tr>
@@ -45,6 +50,11 @@
           <td style="text-align: center;">{{ course.course.semester }}</td>
         </tr>
       {% endfor %}
+      <tr>
+          <td><b>Sous total obligatoires sur liste</b></td>
+          <td style="text-align: center;">{{ mandatory_count }}</td>
+          <td style="text-align: center;"></td>
+        </tr>
     </tbody>
     <thead style="text-align: center;background-color: #d9d9d9;">
       <tr>
@@ -59,6 +69,16 @@
           <td>{{ course.course.name }}</td>
           <td style="text-align: center;">{{ course.course.ects }}</td>
           <td style="text-align: center;">{{ course.course.semester }}</td>
+        </tr>
+        <tr>
+          <td><b>Sous total électifs<b></td>
+          <td style="text-align: center;">{{ elective_count }}</td>
+          <td style="text-align: center;">  </td>
+        </tr>
+        <tr>
+          <td><b>Total ECTS<b></td>
+          <td style="text-align: center;">{{ total_count }}</td>
+          <td style="text-align: center;">  </td>
         </tr>
       {% endfor %}
     </tbody>

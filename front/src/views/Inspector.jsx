@@ -302,11 +302,11 @@ export default function Inspector() {
                         <DialogContent>
                             <DialogContentText>
                                 <DialogContentText>
-                                    <strong>Département</strong> : {labels.departments && labels.departments[currentStudent.department - 1]}
+                                    <strong>Département</strong> : {labels.departments && labels.departments[currentStudent.department?.toString()]}
                                 </DialogContentText>
                             </DialogContentText>
                             <DialogContentText>
-                                <strong>Parcours</strong> : {labels.parcours && labels.parcours[currentStudent.parcours - 1]}
+                                <strong>Parcours</strong> : {labels.parcours && labels.parcours[currentStudent.parcours?.toString()]}
                             </DialogContentText>
                             <DialogContentText>
                                 <strong>ECTS</strong> : <span style={{ fontWeight: currentStudent.ects < required_ects ? 'bold' : 'normal', color: currentStudent.ects < required_ects ? 'red' : 'black' }}>{currentStudent.ects}</span>

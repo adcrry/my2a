@@ -22,6 +22,9 @@ import CircularProgress from '@mui/material/CircularProgress';
 import { ects_base, required_ects, required_mandatory_courses, total_required_ects } from "../utils/utils";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import TextField from "@mui/material/TextField";
+import { Document, Page, pdfjs } from "react-pdf";
+pdfjs.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.js`;
+
 
 const Transition = forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
@@ -45,6 +48,7 @@ export default function Dashboard() {
     const [student, setStudent] = useState({})
     const [comment, setComment] = useState('')
     const [parameters, setParameters] = useState({})
+    const [semester, setSemester] = useState(1)
     const handleChange = (panel) => {
         if (opened != panel) setOpened(panel)
     }
@@ -55,6 +59,12 @@ export default function Dashboard() {
                 <MenuItem value={parcours.id}>{parcours.name}</MenuItem>
             )
         })
+    }
+
+    const getParcoursName = (id) => {
+        const temp = parcoursList.filter((p) => p.id == id)
+        if (temp.length == 1) return temp[0].name
+        else return null
     }
 
     const isCourseCompitable = (courseName) => {
@@ -83,7 +93,7 @@ export default function Dashboard() {
             return (
                 <FormControlLabel control={<Checkbox defaultChecked={choosenMandatoryCourses.includes(course.name)} onClick={(e) => {
                     changeEnrollment(course.name, e.target.checked, 'mandatory')
-                }} />} disabled={!editable || !isCourseCompitable(course.name) && !choosenMandatoryCourses.includes(course.name) || (!choosenMandatoryCourses.includes(course.name) && choosenMandatoryCourses.length >= 2)} label={'[' + course.code.replaceAll(" ", "") + '] ' + course.name + ' (' + course.ects + ' ECTS)'} />
+                }} />} disabled={!editable || !isCourseCompitable(course.name) && !choosenMandatoryCourses.includes(course.name)} label={'[' + course.code.replaceAll(" ", "") + '] ' + course.name + ' (' + course.ects + ' ECTS)'} />
             )
         })
 
@@ -191,10 +201,6 @@ export default function Dashboard() {
                                             tempMandatory.push(result.mandatory_courses[index].course.name)
                                         }
                                         setChoosenMandatoryCourses(tempMandatory)
-                                        if (tempMandatory.length >= 2) {
-                                            setProgress(100)
-                                            setOpened('electifs')
-                                        }
                                         const tempElective = []
                                         for (const index in result.elective_courses) {
                                             tempElective.push(result.elective_courses[index].course.name)
@@ -306,10 +312,6 @@ export default function Dashboard() {
                             const tempMandatory = []
                             for (const index in result.mandatory_courses) {
                                 tempMandatory.push(result.mandatory_courses[index].course.name)
-                            }
-                            if (tempMandatory.length >= 2) {
-                                setProgress(100)
-                                setOpened('electifs')
                             }
                             setChoosenMandatoryCourses(tempMandatory)
 
@@ -523,7 +525,7 @@ export default function Dashboard() {
                                 if (expanded) handleChange('parcours')
                             }}>
                                 <AccordionSummary aria-controls="panel2d-content" id="panel2d-header" expandIcon={<ExpandMoreIcon />}>
-                                    <Typography><b>Choix du parcours</b></Typography>
+                                    <Typography><b>Choix du parcours{parcours != -1 && ": " + getParcoursName(parcours)}</b></Typography>
                                 </AccordionSummary>
                                 <AccordionDetails>
                                     <FormControl fullWidth>
@@ -554,9 +556,9 @@ export default function Dashboard() {
                                     <Typography><b>Choix des cours obligatoires sur liste</b></Typography>
                                 </AccordionSummary>
                                 <AccordionDetails>
-                                    <Typography sx={{ fontWeight: "bold", textDecoration: 'underline', fontSize: "15px", marginBottom: "20px" }}>
-                                        {getListCoursesHint(parcours) && getListCoursesHint(parcours)}
-                                    </Typography>
+                                    {getListCoursesHint(parcours) && getListCoursesHint(parcours).split("\r\n").map((part) => (
+                                        <Typography sx={{ fontWeight: "bold", textDecoration: 'underline', fontSize: "15px", marginBottom: "10px" }}>{part}</Typography>
+                                    ))}
                                     <FormGroup>
                                         {getMandatoryCourses()}
                                     </FormGroup>
@@ -570,9 +572,9 @@ export default function Dashboard() {
                                         <Typography><b>Choix des cours électifs</b></Typography>
                                     </AccordionSummary>
                                     <AccordionDetails>
-                                        <Typography sx={{ fontWeight: "bold", textDecoration: 'underline', fontSize: "15px", marginBottom: "20px" }}>
-                                            {getElectiveCoursesHint(parcours) && getElectiveCoursesHint(parcours)}
-                                        </Typography>
+                                        {getElectiveCoursesHint(parcours) && getElectiveCoursesHint(parcours).split("\r\n").map((part) => (
+                                            <Typography sx={{ fontWeight: "bold", textDecoration: 'underline', fontSize: "15px", marginBottom: "10px" }}>{part}</Typography>
+                                        ))}
                                         <Box sx={{ height: "300px", overflowY: "scroll" }}>
                                             <FormGroup>
                                                 {getElectiveCourses()}
@@ -590,9 +592,32 @@ export default function Dashboard() {
                             )}
                         </Grid>
                         <Grid item md={6} xs={11} sm={11}>
-                            <div className="pdf-viewer">
-                                <iframe key={mandatoryCourses + choosenElectiveCourses + choosenMandatoryCourses + parcours} src="/api/student/current/timetable/" width="100%" height="500px" />
-                            </div>
+                            <Box sx={{ marginBottom: "50px" }} >
+                                <Button variant="contained" sx={{marginRight: "10px"}} onClick={() => {
+                                    setSemester(1)
+                                }}>
+                                    Semestre 1
+                                </Button>
+                                <Button variant="contained" sx={{marginRight: "10px"}} onClick={() => {
+                                    setSemester(2)
+                                }}>
+                                    Semestre 2
+                                </Button>
+                                <Button variant="contained" sx={{marginRight: "10px"}} onClick={() => {
+                                    window.open("/api/student/current/timetable/")
+                                }}>
+                                    Télécharger PDF
+                                </Button>
+                            </Box>
+                            <Box sx={{ width: "100px" }}>
+                                <Document file={{
+                                    url: "/api/student/current/timetable/",
+                                }}
+                                    onContextMenu={(e) => e.preventDefault()}
+                                    className="pdf-container">
+                                    <Page size="A2" pageNumber={semester} scale={1} renderTextLayer={false} />
+                                </Document>
+                            </Box>
                         </Grid>
                     </Grid>
                     <Dialog

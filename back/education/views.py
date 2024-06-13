@@ -1,5 +1,6 @@
 import csv
 import io
+from textwrap import wrap
 
 from django.http import FileResponse, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
@@ -8,6 +9,7 @@ from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib import auth
+from django.db.models import Q
 from reportlab.lib.units import cm
 from reportlab.pdfgen import canvas
 from rest_framework import status
@@ -27,7 +29,7 @@ from .serializers import (
     EnrollmentSerializer,
     ParcoursSerializer,
     StudentSerializer,
-    ParameterSerializer
+    ParameterSerializer,
 )
 from .utils import course_list_to_string, importCourseCSV, importStudentCSV
 
@@ -35,24 +37,30 @@ from .utils import course_list_to_string, importCourseCSV, importStudentCSV
 def index(request):
     return HttpResponse("Hello, world. You're at the polls index.")
 
+
 def auth_view(request):
-    if request.method == 'GET':
+    if request.method == "GET":
         if request.user.is_authenticated and request.user.is_superuser:
-            return redirect('/inspector/')
+            return redirect("/inspector/")
         elif request.user.is_authenticated:
-            return render(request, '/')
-        return render(request, 'registration/login.html')
-    username = request.POST.get('mail', '')
-    password = request.POST.get('password', '')
+            return render(request, "/")
+        return render(request, "registration/login.html")
+    username = request.POST.get("mail", "")
+    password = request.POST.get("password", "")
     user = auth.authenticate(username=username, password=password)
 
     if user is not None:
         if user.is_active:
             auth.login(request, user)
-            return redirect('/')
+            return redirect("/")
 
-    else :
-        return render(request, 'registration/login.html', {'error': 'Mauvaise adresse email ou mot de passe'})
+    else:
+        return render(
+            request,
+            "registration/login.html",
+            {"error": "Mauvaise adresse email ou mot de passe"},
+        )
+
 
 class TranslationView(APIView):
     def get(self, request, format=None):
@@ -61,7 +69,12 @@ class TranslationView(APIView):
         """
         department = [department.code for department in Department.objects.all()]
         parcours = [parcours.name for parcours in Parcours.objects.all()]
-        return Response({"departments": department, "parcours": parcours})
+        response = {"departments": {}, "parcours": {}}
+        for department in Department.objects.all(): 
+            response["departments"][department.id] = department.name
+        for parcours in Parcours.objects.all():
+            response["parcours"][parcours.id] = parcours.name
+        return Response(response)
 
 
 class StudentViewset(ReadOnlyModelViewSet):
@@ -207,7 +220,9 @@ class StudentViewset(ReadOnlyModelViewSet):
         student = get_object_or_404(Student, user=request.user)
         if student.parcours is None:
             return Response([])
-        courses = Course.objects.all()
+        courses = (
+            Course.objects.all().order_by("code").filter(~Q(department__code="SHS"))
+        )
         serializer = CourseSerializer(courses, many=True)
         return Response(serializer.data)
 
@@ -228,7 +243,9 @@ class StudentViewset(ReadOnlyModelViewSet):
             target_student.editable = not target_student.editable
             target_student.save()
             if target_student.editable:
-                send_account_status_change_mail(student.user.email, student.name, student.surname)
+                send_account_status_change_mail(
+                    student.user.email, student.name, student.surname
+                )
             return Response({"status": "ok"})
         elif "id" not in request.data:
             if (
@@ -492,37 +509,49 @@ class ViewContractPDF(APIView):
             textobject.textLine(" ")
             textobject.textLine("Obligatoire parcours:")
             for course in student.parcours.courses_mandatory.all():
-                textobject.textLine(
-                    course.name
-                    + " - "
-                    + course.semester
-                    + " - "
-                    + str(course.ects)
-                    + " ECTS"
+                wraped_text = "\n".join(
+                    wrap(
+                        course.name
+                        + " - "
+                        + course.semester
+                        + " - "
+                        + str(course.ects)
+                        + " ECTS",
+                        80,
+                    )
                 )
+                textobject.textLines(wraped_text)
 
             textobject.textLine(" ")
             textobject.textLine("Obligatoire sur liste:")
-            for course in student.mandatory_courses():
-                textobject.textLine(
-                    course.course.name
-                    + " - "
-                    + course.course.semester
-                    + " - "
-                    + str(course.course.ects)
-                    + " ECTS"
+            for enrollment in student.mandatory_courses():
+                wraped_text = "\n".join(
+                    wrap(
+                        enrollment.course.name
+                        + " - "
+                        + enrollment.course.semester
+                        + " - "
+                        + str(enrollment.course.ects)
+                        + " ECTS",
+                        80,
+                    )
                 )
+                textobject.textLine(wraped_text)
             textobject.textLine(" ")
             textobject.textLine("Cours électifs: ")
             for enrollment in student.elective_courses():
-                textobject.textLine(
-                    enrollment.course.name
-                    + " - "
-                    + enrollment.course.semester
-                    + " - "
-                    + str(enrollment.course.ects)
-                    + " ECTS"
+                wraped_text = "\n".join(
+                    wrap(
+                        enrollment.course.name
+                        + " - "
+                        + enrollment.course.semester
+                        + " - "
+                        + str(enrollment.course.ects)
+                        + " ECTS",
+                        80,
+                    )
                 )
+                textobject.textLines(wraped_text)
         else:
             textobject.textLine("Pas de parcours sélectionné par l'étudiant")
         textobject.textLine(" ")
