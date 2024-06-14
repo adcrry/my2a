@@ -23,6 +23,8 @@ import { ects_base, required_ects, required_mandatory_courses, total_required_ec
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import TextField from "@mui/material/TextField";
 import { Document, Page, pdfjs } from "react-pdf";
+import "react-pdf/dist/esm/Page/AnnotationLayer.css";
+import "react-pdf/dist/esm/Page/TextLayer.css";
 pdfjs.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.js`;
 
 
