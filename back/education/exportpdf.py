@@ -190,7 +190,7 @@ def generate_table(elements, courses, semester):
                 "BACKGROUND",
                 (table_data[0].index(course["day"]), line),
                 (table_data[0].index(course["day"]), line),
-                colors_list[courses.index(course) % len(colors_list)],
+                colors_list[course['color'] % len(colors_list)],
             )
 
     table = Table(table_data, colWidths=100, rowHeights=15)
