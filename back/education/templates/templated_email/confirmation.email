@@ -70,7 +70,8 @@
           <td style="text-align: center;">{{ course.course.ects }}</td>
           <td style="text-align: center;">{{ course.course.semester }}</td>
         </tr>
-        <tr>
+      {% endfor %}
+      <tr>
           <td><b>Sous total électifs<b></td>
           <td style="text-align: center;">{{ elective_count }}</td>
           <td style="text-align: center;">  </td>
@@ -80,7 +81,6 @@
           <td style="text-align: center;">{{ total_count }}</td>
           <td style="text-align: center;">  </td>
         </tr>
-      {% endfor %}
     </tbody>
   </table>
   <p>

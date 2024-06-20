@@ -90,15 +90,8 @@ def generate_table(elements, courses, semester):
     }
 
     colors_list = [
-        colors.lightblue,
         colors.lightcoral,
         colors.lightgreen,
-        colors.lightpink,
-        colors.lightsalmon,
-        colors.lightseagreen,
-        colors.lightskyblue,
-        colors.lightsteelblue,
-        colors.lightyellow,
         colors.lightcyan,
     ]
 

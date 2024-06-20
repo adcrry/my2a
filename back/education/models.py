@@ -166,6 +166,18 @@ class Student(models.Model):
         intro = self.department.timetable_intro
         courses = [
             {
+                "name": enrolment.course.name,
+                "code": enrolment.course.code,
+                "day": enrolment.course.day,
+                "start_time": enrolment.course.start_time,
+                "end_time": enrolment.course.end_time,
+                "semester": enrolment.course.semester,
+                "ects": enrolment.course.ects,
+                "color": 0 if enrolment.category == "mandatory" else 1,
+            }
+            for enrolment in Enrollment.objects.filter(student=self)
+        ] + [
+            {
                 "name": course.name,
                 "code": course.code,
                 "day": course.day,
@@ -173,8 +185,9 @@ class Student(models.Model):
                 "end_time": course.end_time,
                 "semester": course.semester,
                 "ects": course.ects,
+                "color": 2,
             }
-            for course in courses
+            for course in self.parcours.courses_mandatory.all()
         ]
         return generate_pdf_from_courses(self.name, courses, intro)
 

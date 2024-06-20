@@ -1,4 +1,4 @@
-import React, { useEffect, useState, forwardRef } from "react";
+import React, { useEffect, useState, forwardRef, useMemo } from "react";
 import { Button, Grid, Typography, Accordion, AccordionSummary, AccordionDetails, Box, setRef } from "@mui/material";
 import TopBar from "../components/TopBar";
 import CustomProgressBar from "../components/ProgressBar";
@@ -51,6 +51,11 @@ export default function Dashboard() {
     const [comment, setComment] = useState('')
     const [parameters, setParameters] = useState({})
     const [semester, setSemester] = useState(1)
+
+    const timetable = useMemo(() => (
+        {url: "/api/student/current/timetable/"}
+    ), [choosenElectiveCourses, choosenMandatoryCourses, parcours])
+
     const handleChange = (panel) => {
         if (opened != panel) setOpened(panel)
     }
@@ -612,9 +617,7 @@ export default function Dashboard() {
                                 </Button>
                             </Box>
                             <Box sx={{ width: "100px" }}>
-                                <Document file={{
-                                    url: "/api/student/current/timetable/",
-                                }}
+                                <Document file={timetable}
                                     onContextMenu={(e) => e.preventDefault()}
                                     className="pdf-container">
                                     <Page size="A2" pageNumber={semester} scale={1} renderTextLayer={false} />
@@ -635,7 +638,7 @@ export default function Dashboard() {
                                 {getDepartmentEndComment(departement)}
                             </DialogContentText>
                             <DialogContentText sx={{ color: "red", fontWeight: "bold" }}>
-                                {student.ects < 48.5 && "Vous n'avez que " + (student.ects) + " ECTS sur les " + 48.5 + " scientifiques requis."}
+                                {((getDepartmentCode(departement) === 'GCC' && student.ects < 48.5) || (getDepartmentCode(departement) === 'IMI' && student.ects < 60)) && "Attention: vous n'avez pas choisi suffisamment d'ECTS de cours."}
                             </DialogContentText>
                             <DialogContentText sx={{ color: "red", fontWeight: "bold" }}>
                                 {choosenMandatoryCourses.length < required_mandatory_courses && "Vous devez choisir au moins 2 cours obligatoires sur liste."}

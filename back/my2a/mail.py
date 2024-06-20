@@ -16,7 +16,7 @@ def send_confirmation_mail(studentId):
     for course in student.mandatory_courses():
         mandatory_count += course.course.ects
     for course in student.elective_courses():
-        mandatory_count += course.course.ects
+        elective_count += course.course.ects
     for course in student.parcours.courses_mandatory.all():
         parcours_count += course.ects
 
@@ -33,7 +33,7 @@ def send_confirmation_mail(studentId):
             "mandatory_count": mandatory_count,
             "elective_count": elective_count,
             "parcours_count": parcours_count,
-            "total_count": mandatory_count + elective_count + parcours_count
+            "total_count": mandatory_count + elective_count + parcours_count + student.parcours.academic_base_ects + student.parcours.base_ects,
         },
         cc=get_department_admins(student.department),
     )
