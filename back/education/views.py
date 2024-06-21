@@ -43,7 +43,7 @@ def auth_view(request):
         if request.user.is_authenticated and request.user.is_superuser:
             return redirect("/inspector/")
         elif request.user.is_authenticated:
-            return render(request, "/")
+            return render("/")
         return render(request, "registration/login.html")
     username = request.POST.get("mail", "")
     password = request.POST.get("password", "")
@@ -52,6 +52,8 @@ def auth_view(request):
     if user is not None:
         if user.is_active:
             auth.login(request, user)
+            if user.is_superuser:
+                return redirect("/inspector/")
             return redirect("/")
 
     else:
