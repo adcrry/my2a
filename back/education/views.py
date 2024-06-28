@@ -576,6 +576,7 @@ class ExportStudentsView(APIView):
             headers={"Content-Disposition": 'attachment; filename="etudiants.csv"'},
         )
         response.write(u'\ufeff'.encode('utf8'))
+        response.write('sep=,')
         writer = csv.writer(response)
         writer.writerow(
             [

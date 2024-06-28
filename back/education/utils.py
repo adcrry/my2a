@@ -262,7 +262,7 @@ def importStudentCSV(csv_file):
 def course_list_to_string(course_list):
     text = ""
     for course in course_list:
-        text += course.course.name + ", "
+        text += course.course.name + " "
     if len(text) > 2:
         text = text[:-2]
     return text
