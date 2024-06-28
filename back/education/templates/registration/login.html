@@ -7,10 +7,10 @@
     <form role="form" class="form-horizontal" method="post" action="">{% csrf_token %}
       <div class="form-group">
         <div class="input-group">          
-          <input style="height: 40px;margin-bottom: 20px;width: 400px;" id="mail" maxlength="30"
+          <input style="height: 40px;margin-bottom: 20px;width: 400px;" id="mail"
             name="mail" placeholder="Adresse email" type="text" />
             <br />
-          <input type="password" style="height: 40px;margin-bottom: 20px;width: 400px;" id="password" maxlength="30"
+          <input type="password" style="height: 40px;margin-bottom: 20px;width: 400px;" id="password"
             name="password" placeholder="Mot de passe" value="" type="text" />
         </div>
         <p style="font-family: sans-serif;">{{ error }}</p>
