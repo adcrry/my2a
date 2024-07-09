@@ -246,7 +246,7 @@ class StudentViewset(ReadOnlyModelViewSet):
             target_student.save()
             if target_student.editable:
                 send_account_status_change_mail(
-                    student.user.email, student.name, student.surname
+                    target_student.user.email, target_student.name, target_student.surname
                 )
             return Response({"status": "ok"})
         elif "id" not in request.data:
