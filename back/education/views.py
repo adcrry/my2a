@@ -579,8 +579,8 @@ class ExportStudentsView(APIView):
         writer = csv.writer(response, delimiter=";")
         writer.writerow(
             [
-                "Nom",
                 "Prénom",
+                "Nom",
                 "Département",
                 "Parcours",
                 "Cours obligatoires sur liste",
